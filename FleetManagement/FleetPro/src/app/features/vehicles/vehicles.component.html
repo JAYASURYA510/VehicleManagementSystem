@@ -1,0 +1,115 @@
+<div class="page-header">
+  <div>
+    <h1>Vehicles Master</h1>
+    <p class="subtitle">Manage fleet vehicle records and assignments</p>
+  </div>
+</div>
+
+<div class="filter-panel">
+  <div class="form-group">
+    <label>Vehicle</label>
+    <select [(ngModel)]="filterVehicleId">
+      <option value="">All Vehicles</option>
+      @for (v of vehicles(); track v.id) {
+        <option [value]="v.id">{{ v.registrationNumber }}</option>
+      }
+    </select>
+  </div>
+  <div class="form-group">
+    <label>From</label>
+    <input type="date" [(ngModel)]="filterFrom" placeholder="dd-mm-yyyy" />
+  </div>
+  <div class="form-group">
+    <label>To</label>
+    <input type="date" [(ngModel)]="filterTo" placeholder="dd-mm-yyyy" />
+  </div>
+  <button class="btn btn-primary">🔽 Filter</button>
+</div>
+
+<div class="card">
+  <div class="card-toolbar">
+    <h3>Vehicles Inventory</h3>
+    @if (canManage) {
+      <button class="btn btn-primary" (click)="openCreate()">+ Register Vehicle</button>
+    }
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Plate Number</th>
+          <th>Make</th>
+          <th>Model</th>
+          <th>Year</th>
+          <th>Assigned Driver</th>
+          @if (canManage) { <th>Actions</th> }
+        </tr>
+      </thead>
+      <tbody>
+        @for (v of filteredVehicles(); track v.id) {
+          <tr [class.inactive]="!v.isActive">
+            <td><strong>{{ v.registrationNumber }}</strong></td>
+            <td>{{ v.make }}</td>
+            <td>{{ v.model }}</td>
+            <td>{{ v.year }}</td>
+            <td>{{ v.driverName }}</td>
+            @if (canManage) {
+              <td class="actions">
+                <button class="btn-icon" title="Edit" (click)="openEdit(v)">✎</button>
+                @if (v.isActive) {
+                  <button class="btn-icon" title="Delete" (click)="deleteVehicle(v.id)">🗑</button>
+                }
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr><td [attr.colspan]="canManage ? 6 : 5" class="empty">No vehicles found</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (showForm()) {
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingId() ? 'Edit' : 'Register' }} Vehicle</h3>
+        <button class="btn-icon" (click)="closeForm()">✕</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid cols-2">
+          <div class="form-group">
+            <label>Plate Number</label>
+            <input formControlName="registrationNumber" placeholder="KA-01-MJ-1234" />
+          </div>
+          <div class="form-group">
+            <label>Vehicle Type</label>
+            <input formControlName="vehicleType" />
+          </div>
+          <div class="form-group">
+            <label>Make</label>
+            <input formControlName="make" />
+          </div>
+          <div class="form-group">
+            <label>Model</label>
+            <input formControlName="model" />
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <input type="number" formControlName="year" />
+          </div>
+          <div class="form-group">
+            <label>Assigned Driver</label>
+            <input formControlName="driverName" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="closeForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

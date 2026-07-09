@@ -1,0 +1,79 @@
+<div class="page-header">
+  <h1>Masters</h1>
+  @if (canWrite) {
+    <button class="btn btn-primary" (click)="openCreate()">+ Add Master</button>
+  }
+</div>
+
+<div class="filter-bar card-inline">
+  <label>Category:</label>
+  <select (change)="onFilterChange($any($event.target).value)">
+    <option value="">All Categories</option>
+    @for (cat of categories; track cat) {
+      <option [value]="cat">{{ cat }}</option>
+    }
+  </select>
+</div>
+
+@if (showForm()) {
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <h3>{{ editingId() ? 'Edit' : 'Add' }} Master</h3>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-group">
+          <label>Category</label>
+          <select formControlName="category">
+            <option value="">Select...</option>
+            @for (cat of categories; track cat) {
+              <option [value]="cat">{{ cat }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Name</label>
+          <input formControlName="name" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea formControlName="description" rows="2"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="closeForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Name</th>
+          <th>Description</th>
+          @if (canEdit) { <th>Actions</th> }
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of masters(); track m.id) {
+          <tr>
+            <td><span class="badge">{{ m.category }}</span></td>
+            <td><strong>{{ m.name }}</strong></td>
+            <td>{{ m.description || '-' }}</td>
+            @if (canEdit) {
+              <td class="actions">
+                <button class="btn btn-sm btn-outline" (click)="openEdit(m)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteMaster(m.id)">Delete</button>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr><td colspan="4" class="empty">No master records found</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

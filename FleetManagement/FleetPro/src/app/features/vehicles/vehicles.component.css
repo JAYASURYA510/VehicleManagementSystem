@@ -1,0 +1,12 @@
+.card-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-toolbar h3 { margin: 0; font-size: 1rem; }
+
+.actions { display: flex; gap: 0.5rem; }
+.inactive { opacity: 0.5; }
+.modal-sm { max-width: 560px; }

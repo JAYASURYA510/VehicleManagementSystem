@@ -1,0 +1,132 @@
+<div class="page-header">
+  <div>
+    <h1>Users Master</h1>
+    <p class="subtitle">Manage users, roles, and vehicle assignments</p>
+  </div>
+  @if (canManage) {
+    <button class="btn btn-primary" (click)="openCreate()">+ Add User</button>
+  }
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Assigned Vehicles</th>
+          <th>Status</th>
+          @if (canManage) { <th>Actions</th> }
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of users(); track u.id) {
+          <tr [class.inactive]="!u.isActive">
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.fullName }}</td>
+            <td>{{ u.email }}</td>
+            <td><span class="role-badge">{{ getRoleLabel(u.role) }}</span></td>
+            <td class="vehicle-list">{{ getVehicleNames(u.assignedVehicleIds ?? []) }}</td>
+            <td>
+              <span class="status-badge" [class.active]="u.isActive">{{ u.isActive ? 'Active' : 'Inactive' }}</span>
+            </td>
+            @if (canManage) {
+              <td class="actions">
+                <button class="btn-icon" (click)="openEdit(u)">✎</button>
+                @if (u.isActive && getRoleLabel(u.role) !== 'Super Admin') {
+                  <button class="btn-icon" (click)="deactivateUser(u.id)">🗑</button>
+                }
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="empty">No users found</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (showForm()) {
+  <div class="modal-overlay" (click)="closeForm()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingId() ? 'Edit' : 'Add' }} User</h3>
+        <button class="btn-icon" (click)="closeForm()">✕</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid cols-2">
+          <div class="form-group">
+            <label>Username</label>
+            <input formControlName="username" [readonly]="!!editingId()" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" formControlName="email" />
+          </div>
+          <div class="form-group">
+            <label>{{ editingId() ? 'New Password (optional)' : 'Password' }}</label>
+            <input type="password" formControlName="password" />
+          </div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input formControlName="fullName" />
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <select formControlName="role">
+              @for (r of roles; track r.value) {
+                <option [value]="r.value">{{ r.label }}</option>
+              }
+            </select>
+          </div>
+          @if (editingId()) {
+            <div class="form-group">
+              <label class="checkbox-row">
+                <input type="checkbox" formControlName="isActive" /> Active
+              </label>
+            </div>
+          }
+        </div>
+
+        <div class="section-title">Assigned Vehicles</div>
+        <div class="vehicle-checkboxes">
+          @for (v of vehicles(); track v.id) {
+            <label class="checkbox-row">
+              <input type="checkbox" [checked]="isVehicleSelected(v.id)" (change)="toggleVehicle(v.id, $any($event.target).checked)" />
+              {{ v.registrationNumber }} — {{ v.driverName }}
+            </label>
+          }
+        </div>
+
+        <div class="section-title">Module Permissions</div>
+        <div class="table-responsive">
+          <table class="data-table perm-table">
+            <thead>
+              <tr><th>Module</th><th>View</th><th>Read</th><th>Write</th><th>Edit</th></tr>
+            </thead>
+            <tbody formArrayName="permissions">
+              @for (perm of permissionsArray.controls; track $index) {
+                <tr [formGroupName]="$index">
+                  <td>{{ perm.get('module')?.value }}</td>
+                  <td><input type="checkbox" formControlName="canView" /></td>
+                  <td><input type="checkbox" formControlName="canRead" /></td>
+                  <td><input type="checkbox" formControlName="canWrite" /></td>
+                  <td><input type="checkbox" formControlName="canEdit" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="closeForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

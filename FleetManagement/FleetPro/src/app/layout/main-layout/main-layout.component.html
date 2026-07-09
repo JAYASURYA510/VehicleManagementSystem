@@ -1,0 +1,44 @@
+<div class="layout" [class.sidebar-open]="sidebarOpen()">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">🚛</span>
+      <span class="brand-text">FleetPro</span>
+    </div>
+
+    <div class="user-card">
+      <div class="avatar">{{ userInitials() }}</div>
+      <div class="user-meta">
+        <strong>{{ auth.user()?.username }}</strong>
+        <small>{{ roleLabel() }}</small>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of visibleNavItems(); track item.route) {
+        <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeSidebar()">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <span>⏻</span> Log Out
+      </button>
+    </div>
+  </aside>
+
+  @if (sidebarOpen()) {
+    <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+  }
+
+  <div class="main-content">
+    <header class="mobile-topbar">
+      <button class="menu-toggle" (click)="toggleSidebar()">☰</button>
+    </header>
+    <main class="content-area">
+      <router-outlet />
+    </main>
+  </div>
+</div>

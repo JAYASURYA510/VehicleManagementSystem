@@ -1,0 +1,99 @@
+@if (config) {
+  <div class="page-header">
+    <h1>{{ config.title }}</h1>
+    @if (canWrite) {
+      <button class="btn btn-primary" (click)="openCreate()">+ Add Record</button>
+    }
+  </div>
+
+  <div class="filter-bar card-inline">
+    <label>Filter by Vehicle:</label>
+    <select (change)="onFilterChange($any($event.target).value)">
+      <option value="">All Vehicles</option>
+      @for (v of vehicles(); track v.id) {
+        <option [value]="v.id">{{ v.registrationNumber }}</option>
+      }
+    </select>
+  </div>
+
+  @if (showForm()) {
+    <div class="modal-overlay" (click)="closeForm()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3>{{ editingId() ? 'Edit' : 'Add' }} {{ config.title }}</h3>
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <div class="form-grid">
+            @for (field of config.fields; track field.key) {
+              <div class="form-group" [class.full-width]="field.type === 'textarea'">
+                <label [for]="field.key">{{ field.label }}</label>
+                @switch (field.type) {
+                  @case ('textarea') {
+                    <textarea [id]="field.key" [formControlName]="field.key" rows="3"></textarea>
+                  }
+                  @case ('select') {
+                    <select [id]="field.key" [formControlName]="field.key">
+                      <option value="">Select...</option>
+                      @for (opt of field.options; track opt.value) {
+                        <option [value]="opt.value">{{ opt.label }}</option>
+                      }
+                    </select>
+                  }
+                  @default {
+                    <input [id]="field.key" [type]="field.type" [formControlName]="field.key" />
+                  }
+                }
+              </div>
+            }
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" (click)="closeForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="card">
+    @if (loading()) {
+      <div class="loading">Loading...</div>
+    } @else {
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              @for (field of tableFields; track field.key) {
+                <th>{{ field.label }}</th>
+              }
+              @if (canEdit) { <th>Actions</th> }
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track getItemId(item)) {
+              <tr>
+                @for (field of tableFields; track field.key) {
+                  <td>
+                    @if (field.format === 'currency') {
+                      {{ currencyValue(item, field) | currency:'INR':'symbol':'1.0-0' }}
+                    } @else if (field.format === 'date') {
+                      {{ dateValue(item, field) | date:'mediumDate' }}
+                    } @else {
+                      {{ displayValue(item, field) }}
+                    }
+                  </td>
+                }
+                @if (canEdit) {
+                  <td class="actions">
+                    <button class="btn btn-sm btn-outline" (click)="openEdit(item)">Edit</button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteItem(getItemId(item))">Delete</button>
+                  </td>
+                }
+              </tr>
+            } @empty {
+              <tr><td [attr.colspan]="tableFields.length + (canEdit ? 1 : 0)" class="empty">No records found</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}

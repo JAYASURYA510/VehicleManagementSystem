@@ -1,0 +1,80 @@
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  border-left: 4px solid #1e3a5f;
+}
+
+.kpi-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.kpi-card.spend { border-left-color: #ef4444; }
+.kpi-card.spend .kpi-icon { background: #fee2e2; color: #ef4444; }
+.kpi-card.returns { border-left-color: #22c55e; }
+.kpi-card.returns .kpi-icon { background: #dcfce7; color: #22c55e; }
+.kpi-card.profit { border-left-color: #3b82f6; }
+.kpi-card.profit .kpi-icon { background: #dbeafe; color: #3b82f6; }
+.kpi-card.diesel { border-left-color: #eab308; }
+.kpi-card.diesel .kpi-icon { background: #fef9c3; color: #ca8a04; }
+.kpi-card.mileage { border-left-color: #7c3aed; }
+.kpi-card.mileage .kpi-icon { background: #ede9fe; color: #7c3aed; }
+
+.kpi-label { font-size: 0.85rem; color: #64748b; display: block; }
+.kpi-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; display: block; }
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-card h3 {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: #1e3a5f;
+}
+
+.chart-wrap {
+  height: 280px;
+  position: relative;
+}
+
+.card h3 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: #1e3a5f;
+}
+
+@media (max-width: 1200px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+}

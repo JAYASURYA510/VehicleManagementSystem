@@ -1,0 +1,33 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">🚛</div>
+      <h1>FleetPro</h1>
+      <p>Vehicle Daily Tracking & Expense Management</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (error()) {
+        <div class="alert alert-error">{{ error() }}</div>
+      }
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading() || form.invalid">
+        {{ loading() ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div class="login-hint">
+      <small>Demo: superadmin / Admin@123</small>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+.role-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.vehicle-list { font-size: 0.85rem; color: #64748b; max-width: 200px; }
+.actions { display: flex; gap: 0.5rem; }
+.inactive { opacity: 0.6; }
+
+.vehicle-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.perm-table { min-width: auto; }
+.perm-table input[type="checkbox"] { width: auto; }
+
+@media (max-width: 600px) {
+  .vehicle-checkboxes { grid-template-columns: 1fr; }
+}

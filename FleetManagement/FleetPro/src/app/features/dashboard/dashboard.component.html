@@ -1,0 +1,124 @@
+<div class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="subtitle">Consolidated overview of fleet activities</p>
+  </div>
+</div>
+
+<div class="filter-panel">
+  <div class="form-group">
+    <label>Vehicle</label>
+    <select [(ngModel)]="filterVehicleId">
+      <option value="">All Vehicles</option>
+      @for (v of vehicles(); track v.id) {
+        <option [value]="v.id">{{ v.registrationNumber }}</option>
+      }
+    </select>
+  </div>
+  <div class="form-group">
+    <label>From</label>
+    <input type="date" [(ngModel)]="filterFrom" />
+  </div>
+  <div class="form-group">
+    <label>To</label>
+    <input type="date" [(ngModel)]="filterTo" />
+  </div>
+  <button class="btn btn-primary" (click)="applyFilter()">🔽 Filter</button>
+</div>
+
+@if (loading()) {
+  <div class="loading">Loading dashboard...</div>
+} @else if (summary(); as s) {
+  <div class="kpi-grid">
+    <div class="kpi-card spend">
+      <div class="kpi-icon">↗</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Total Spend</span>
+        <span class="kpi-value">{{ s.totalSpend | currency:'INR':'symbol':'1.0-0' }}</span>
+      </div>
+    </div>
+    <div class="kpi-card returns">
+      <div class="kpi-icon">↘</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Total Returns</span>
+        <span class="kpi-value">{{ s.totalReturns | currency:'INR':'symbol':'1.0-0' }}</span>
+      </div>
+    </div>
+    <div class="kpi-card profit">
+      <div class="kpi-icon">◎</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Net Profit</span>
+        <span class="kpi-value" [class.text-success]="s.netProfit >= 0" [class.text-danger]="s.netProfit < 0">
+          {{ s.netProfit | currency:'INR':'symbol':'1.0-0' }}
+        </span>
+      </div>
+    </div>
+    <div class="kpi-card diesel">
+      <div class="kpi-icon">⛽</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Diesel Litres</span>
+        <span class="kpi-value">{{ s.totalDieselLitres | number:'1.0-0' }} L</span>
+      </div>
+    </div>
+    <div class="kpi-card mileage">
+      <div class="kpi-icon">◉</div>
+      <div class="kpi-body">
+        <span class="kpi-label">Average Mileage</span>
+        <span class="kpi-value">{{ s.averageMileage | number:'1.2-2' }} KM/L</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="card chart-card">
+      <h3>Financial Trends (Spend vs Returns vs Profit)</h3>
+      <div class="chart-wrap">
+        <canvas #trendChart></canvas>
+      </div>
+    </div>
+    <div class="card chart-card chart-sm">
+      <h3>Vehicle Profitability Distribution</h3>
+      <div class="chart-wrap">
+        <canvas #profitChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Vehicle Aggregates Overview</h3>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Vehicle</th>
+            <th>Driver</th>
+            <th>Diesel</th>
+            <th>Toll</th>
+            <th>Workshop</th>
+            <th>Returns</th>
+            <th>Net Profit</th>
+            <th>Mileage</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of s.vehicleSummaries; track v.vehicleId) {
+            <tr>
+              <td><strong>{{ v.registrationNumber }}</strong></td>
+              <td>{{ v.driverName }}</td>
+              <td>{{ v.totalDiesel | currency:'INR':'symbol':'1.0-0' }}</td>
+              <td>{{ v.totalToll | currency:'INR':'symbol':'1.0-0' }}</td>
+              <td>{{ v.totalWorkshop | currency:'INR':'symbol':'1.0-0' }}</td>
+              <td>{{ v.totalReturns | currency:'INR':'symbol':'1.0-0' }}</td>
+              <td [class.text-success]="v.netProfit >= 0" [class.text-danger]="v.netProfit < 0">
+                {{ v.netProfit | currency:'INR':'symbol':'1.0-0' }}
+              </td>
+              <td>{{ v.averageMileage | number:'1.2-2' }} KM/L</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="8" class="empty">No vehicle data for selected filters</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
