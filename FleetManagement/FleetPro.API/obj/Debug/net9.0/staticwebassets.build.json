@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "+dqYfdvxW00ofJi8El7O7aD0sprIQcViPAr5YbbjrIU=",
+  "Source": "FleetPro.API",
+  "BasePath": "_content/FleetPro.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
