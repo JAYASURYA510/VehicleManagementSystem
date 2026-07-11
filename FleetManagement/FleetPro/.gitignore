@@ -5,6 +5,8 @@
 
 # dependencies
 /node_modules
+.angular/
+.cache/
 
 # IDEs and editors
 /.idea
@@ -39,3 +41,18 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# .NET
+bin/
+obj/
+
+# Logs
+*.log
+
+# Visual Studio
+.vs/
+
+# User files
+*.user
+*.suo
+*.backup.json

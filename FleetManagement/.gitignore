@@ -1,0 +1,22 @@
+# Angular
+**/node_modules/
+**/dist/
+**/.angular/
+**/.cache/
+
+# .NET
+**/bin/
+**/obj/
+
+# Visual Studio
+**/.vs/
+*.user
+*.suo
+*.backup.json
+
+# Logs
+*.log
+
+# SQLite
+*.db-shm
+*.db-wal
