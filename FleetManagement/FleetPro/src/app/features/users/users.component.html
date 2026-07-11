@@ -29,7 +29,7 @@
             <td>{{ u.fullName }}</td>
             <td>{{ u.email }}</td>
             <td><span class="role-badge">{{ getRoleLabel(u.role) }}</span></td>
-            <td class="vehicle-list">{{ getVehicleNames(u.assignedVehicleIds ?? []) }}</td>
+            <td class="vehicle-list">{{ getVehicleNames(u.assignedVehicleIds ? u.assignedVehicleIds : [0]) }}</td>
             <td>
               <span class="status-badge" [class.active]="u.isActive">{{ u.isActive ? 'Active' : 'Inactive' }}</span>
             </td>
