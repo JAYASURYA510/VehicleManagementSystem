@@ -14,10 +14,7 @@ public class VehicleAccessService(ApplicationDbContext db)
             return await db.Vehicles.Where(v => v.IsActive).Select(v => v.Id).ToListAsync();
 
         var userId = user.GetUserId();
-        return await db.UserVehicles
-            .Where(uv => uv.UserId == userId)
-            .Select(uv => uv.VehicleId)
-            .ToListAsync();
+        return null;
     }
 
     public async Task<bool> CanAccessVehicleAsync(ClaimsPrincipal user, int vehicleId)

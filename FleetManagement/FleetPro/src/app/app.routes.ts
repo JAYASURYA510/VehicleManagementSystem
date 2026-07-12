@@ -5,7 +5,7 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { UsersComponent } from './features/users/users.component';
 import { VehiclesComponent } from './features/vehicles/vehicles.component';
 import { DailyTrackingComponent } from './features/daily-tracking/daily-tracking.component';
-import { authGuard, permissionGuard, adminGuard } from './core/guards/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { AppModule } from './core/models';
 
 export const routes: Routes = [
@@ -16,10 +16,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-      { path: 'dashboard', component: DashboardComponent, canActivate: [permissionGuard(AppModule.Dashboard, 'View')] },
-      { path: 'daily-tracking', component: DailyTrackingComponent, canActivate: [permissionGuard(AppModule.Diesel, 'View')] },
-      { path: 'vehicles', component: VehiclesComponent, canActivate: [adminGuard] },
-      { path: 'users', component: UsersComponent, canActivate: [adminGuard] },
+      { path: 'dashboard', component: DashboardComponent},
+      { path: 'daily-tracking', component: DailyTrackingComponent },
+      { path: 'vehicles', component: VehiclesComponent },
+      { path: 'users', component: UsersComponent },
       { path: 'diesel', redirectTo: 'daily-tracking' },
       { path: 'toll', redirectTo: 'daily-tracking' },
       { path: 'trips', redirectTo: 'daily-tracking' },

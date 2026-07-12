@@ -1,3 +1,4 @@
+using FleetPro.API.Data.Entitys;
 using FleetPro.API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,10 @@ namespace FleetPro.API.Data;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users => Set<User>();
+    public DbSet<UserMst> UserMaster {  get; set; }
+    public DbSet<MenuMst> MenuMsts { get; set; }
+    public DbSet<RoleMst> RoleMsts { get; set; }
+    public DbSet<RoleMenu> RoleMenus { get; set; }
     public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<DieselExpense> DieselExpenses => Set<DieselExpense>();
@@ -111,5 +116,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .WithMany()
             .HasForeignKey(d => d.VehicleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<RoleMenu>()
+           .HasKey(x => new { x.RoleId, x.MenuId });
     }
 }

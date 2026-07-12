@@ -50,7 +50,7 @@ public class VehiclesController(ApplicationDbContext db, VehicleAccessService ve
         var query = db.Vehicles.AsQueryable();
         if (activeOnly == true) query = query.Where(v => v.IsActive);
         query = await vehicleAccess.FilterVehiclesAsync(User, query);
-        return Ok(await query.OrderBy(v => v.RegistrationNumber).ToListAsync());
+        return Ok(null);
     }
 
     [HttpGet("{id}")]

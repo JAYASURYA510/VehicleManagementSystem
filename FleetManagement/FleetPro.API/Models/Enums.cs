@@ -1,11 +1,17 @@
+using System.ComponentModel;
+
 namespace FleetPro.API.Models;
 
 public enum UserRole
 {
-    SuperAdmin = 0,
-    Admin = 1,
-    ManagingAuthority = 2,
-    User = 3
+    [Description("Super Admin")]
+    SuperAdmin = 1,
+    [Description("Admin")]
+    Admin = 2,
+    [Description("Manager")]
+    ManagingAuthority = 3,
+    [Description("Driver")]
+    User = 4
 }
 
 public enum AppModule
