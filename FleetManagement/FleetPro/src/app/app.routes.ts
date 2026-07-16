@@ -7,6 +7,8 @@ import { VehiclesComponent } from './features/vehicles/vehicles.component';
 import { DailyTrackingComponent } from './features/daily-tracking/daily-tracking.component';
 import { authGuard } from './core/guards/auth.guard';
 import { AppModule } from './core/models';
+import { FormDataComponent } from './components/form-data/form-data';
+
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -15,6 +17,10 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
+       {
+    path: 'form-data',
+    component: FormDataComponent
+  },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent},
       { path: 'daily-tracking', component: DailyTrackingComponent },
