@@ -85,7 +85,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           datasets: [
             { label: 'Returns (Income)', data: s.financialTrend.map(t => t.returns), backgroundColor: '#22c55e' },
             { label: 'Spend (Expense)', data: s.financialTrend.map(t => t.spend), backgroundColor: '#ef4444' },
-            { label: 'Net Profit', data: s.financialTrend.map(t => t.profit), backgroundColor: '#3b82f6' }
+            { label: 'Net Profit', data: s.financialTrend.map(t => t.profit), backgroundColor: '#5d0565' }
           ]
         },
         options: {
@@ -101,7 +101,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.profitChartRef?.nativeElement && s.profitDistribution.length) {
-      const colors = ['#7c3aed', '#3b82f6', '#22c55e', '#eab308', '#ef4444'];
+      const colors = ['#47034e', '#5d0565', '#7e3285', '#9f5ea5', '#e0b6e4'];
       this.profitChart = new Chart(this.profitChartRef.nativeElement, {
         type: 'doughnut',
         data: {

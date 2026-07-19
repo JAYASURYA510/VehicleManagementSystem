@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { UserRole } from '../../core/models';
@@ -18,7 +18,9 @@ interface NavItem {
 })
 export class MainLayoutComponent {
   auth = inject(AuthService);
-  sidebarOpen = signal(false);
+  sidebarOpen = signal(this.getInitialSidebarState());
+  userDropdownOpen = signal(false);
+  userMenuRef = viewChild<ElementRef>('userMenuRef');
 
   readonly navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: '▦' },
@@ -30,6 +32,15 @@ export class MainLayoutComponent {
   visibleNavItems = () => this.navItems.filter(item =>
     !item.adminOnly || this.auth.isAdminOrSuperAdmin()
   );
+
+  displayName(): string {
+    const name = this.auth.fullName() || this.auth.user()?.username || 'User';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return `${parts[0]} ${parts[1]}`;
+    }
+    return parts[0];
+  }
 
   userInitials(): string {
     const name = this.auth.fullName() || this.auth.user()?.username || 'U';
@@ -44,7 +55,33 @@ export class MainLayoutComponent {
     return 'User';
   }
 
+  private getInitialSidebarState(): boolean {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth > 768;
+    }
+    return true;
+  }
+
   toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
   closeSidebar(): void { this.sidebarOpen.set(false); }
-  logout(): void { this.auth.logout(); }
+
+  toggleUserDropdown(event: Event): void {
+    event.stopPropagation();
+    this.userDropdownOpen.update(v => !v);
+  }
+
+  closeUserDropdown(): void { this.userDropdownOpen.set(false); }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const menuEl = this.userMenuRef()?.nativeElement;
+    if (menuEl && !menuEl.contains(event.target)) {
+      this.closeUserDropdown();
+    }
+  }
+
+  logout(): void {
+    this.closeUserDropdown();
+    this.auth.logout();
+  }
 }

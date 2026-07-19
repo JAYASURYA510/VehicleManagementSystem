@@ -21,7 +21,7 @@
 
 .modal-card h3 {
   margin: 0 0 1.25rem;
-  color: #1e3a5f;
+  color: var(--text-primary);
 }
 
 .form-grid {

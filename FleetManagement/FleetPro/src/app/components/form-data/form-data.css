@@ -108,7 +108,7 @@
 
 .chip{
     display:inline-block;
-    background:#0d6efd;
+    background:var(--accent);
     color:#fff;
     padding:6px 14px;
     border-radius:18px;
@@ -132,22 +132,31 @@
     border-radius:6px;
     font-size:15px;
     cursor:pointer;
+    font-weight: bold;
+    
 }
 
 .save-btn{
-    background:#0d6efd;
-    color:#fff;
+    background:var(--save);
+    color:#ffffff;
 }
 
 .save-btn:hover{
-    background:#0b5ed7;
+    background:var(--save-hover);
 }
 
 .reset-btn{
-    background:#6c757d;
+    background:#73777b;
     color:#fff;
 }
 
 .reset-btn:hover{
     background:#5c636a;
+}
+.card{
+    background: var(--card-bg);
+    border-radius:14px;
+    padding:20px;
+    border:1px solid var(--border-color);
+    box-shadow: var(--shadow);
 }

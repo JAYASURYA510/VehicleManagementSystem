@@ -13,38 +13,47 @@
 
 .kpi-card {
   background: #fff;
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  border-left: 4px solid #1e3a5f;
+  border: 1px solid rgba(232, 234, 237, 0.8);
+  border-left: 4px solid var(--accent);
 }
 
 .kpi-icon {
   width: 42px;
   height: 42px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .kpi-card.spend { border-left-color: #ef4444; }
 .kpi-card.spend .kpi-icon { background: #fee2e2; color: #ef4444; }
 .kpi-card.returns { border-left-color: #22c55e; }
 .kpi-card.returns .kpi-icon { background: #dcfce7; color: #22c55e; }
-.kpi-card.profit { border-left-color: #3b82f6; }
-.kpi-card.profit .kpi-icon { background: #dbeafe; color: #3b82f6; }
+.kpi-card.profit { border-left-color: var(--accent); }
+.kpi-card.profit .kpi-icon { background: var(--accent-soft); color: var(--accent); }
 .kpi-card.diesel { border-left-color: #eab308; }
 .kpi-card.diesel .kpi-icon { background: #fef9c3; color: #ca8a04; }
-.kpi-card.mileage { border-left-color: #7c3aed; }
-.kpi-card.mileage .kpi-icon { background: #ede9fe; color: #7c3aed; }
+.kpi-card.mileage { border-left-color: #7e3285; }
+.kpi-card.mileage .kpi-icon { background: #f5e8f6; color: #7e3285; }
 
-.kpi-label { font-size: 0.85rem; color: #64748b; display: block; }
-.kpi-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; display: block; }
+.kpi-label { font-size: 0.85rem; color: var(--text-muted); display: block; }
+.kpi-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  letter-spacing: -0.02em;
+}
 
 .charts-grid {
   display: grid;
@@ -56,7 +65,8 @@
 .chart-card h3 {
   margin: 0 0 1rem;
   font-size: 0.95rem;
-  color: #1e3a5f;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .chart-wrap {
@@ -67,7 +77,8 @@
 .card h3 {
   margin: 0 0 1rem;
   font-size: 1rem;
-  color: #1e3a5f;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 @media (max-width: 1200px) {

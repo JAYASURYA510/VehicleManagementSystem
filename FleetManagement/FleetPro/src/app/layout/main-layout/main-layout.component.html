@@ -5,28 +5,14 @@
       <span class="brand-text">FleetPro</span>
     </div>
 
-    <div class="user-card">
-      <div class="avatar">{{ userInitials() }}</div>
-      <div class="user-meta">
-        <strong>{{ auth.user()?.username }}</strong>
-        <small>{{ roleLabel() }}</small>
-      </div>
-    </div>
-
     <nav class="sidebar-nav">
       @for (item of visibleNavItems(); track item.route) {
-        <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" (click)="closeSidebar()">
+        <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" >
           <span class="nav-icon">{{ item.icon }}</span>
           <span class="nav-label">{{ item.label }}</span>
         </a>
       }
     </nav>
-
-    <div class="sidebar-footer">
-      <button class="logout-btn" (click)="logout()">
-        <span>⏻</span> Log Out
-      </button>
-    </div>
   </aside>
 
   @if (sidebarOpen()) {
@@ -34,9 +20,75 @@
   }
 
   <div class="main-content">
-    <header class="mobile-topbar">
-      <button class="menu-toggle" (click)="toggleSidebar()">☰</button>
+    <header class="top-navbar">
+      <button class="menu-toggle" (click)="toggleSidebar()" aria-label="Toggle menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <div class="navbar-actions">
+        <button class="nav-icon-btn" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+
+        <button class="nav-icon-btn notification-btn" aria-label="Notifications">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notification-badge">3</span>
+        </button>
+
+        <div class="user-menu" #userMenuRef>
+          <button class="user-trigger" (click)="toggleUserDropdown($event)" aria-label="User menu">
+            <span class="user-name">{{ displayName() }}</span>
+            <svg class="chevron" [class.open]="userDropdownOpen()" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+
+          @if (userDropdownOpen()) {
+            <div class="user-dropdown">
+              <div class="dropdown-header">
+                <div class="dropdown-avatar">{{ userInitials() }}</div>
+                <div class="dropdown-user-info">
+                  <strong>{{ auth.fullName() || auth.user()?.username }}</strong>
+                  <small>{{ auth.user()?.email }}</small>
+                  <span class="role-badge">{{ roleLabel() }}</span>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-details">
+                <div class="detail-row">
+                  <span class="detail-label">Username</span>
+                  <span class="detail-value">{{ auth.user()?.username }}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Role</span>
+                  <span class="detail-value">{{ roleLabel() }}</span>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <button class="logout-btn" (click)="logout()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Log Out
+              </button>
+            </div>
+          }
+        </div>
+      </div>
     </header>
+
     <main class="content-area">
       <router-outlet />
     </main>
