@@ -1,92 +1,62 @@
 <div class="permission-container">
+  <h2>Role Permission</h2>
 
-    <h2>Role Permission</h2>
-
+  <form [formGroup]="permissionForm">
     <div class="form-row">
+      <!-- Role -->
+      <div class="form-group">
+        <label>Role</label>
 
-        <!-- Role -->
-        <div class="form-group">
+        <select formControlName="selectedRoleId">
+          <option [ngValue]="null">Select Role</option>
 
-            <label>Role</label>
+          <option *ngFor="let role of roles" [ngValue]="role.id">
+            {{ role.roleName }}
+          </option>
+        </select>
+      </div>
 
-         <select [(ngModel)]="selectedRoleId">
-    <option [ngValue]="null" selected>Select Role</option>
+      <!-- Pages -->
+      <div class="form-group">
+        <label>Pages</label>
 
-    <option *ngFor="let role of roles" [ngValue]="role.id">
-        {{ role.roleName }}
-    </option>
-</select>
+        <div class="dropdown">
+          <div class="dropdown-header" (click)="toggleDropdown()">
+            {{
+              selectedPages.length > 0 ? selectedPages.length + ' Pages Selected' : 'Select Pages'
+            }}
 
-        </div>
+            <span>▼</span>
+          </div>
 
-        <!-- Pages -->
-        <div class="form-group">
+          <div class="dropdown-body" *ngIf="dropdownOpen">
+            <div class="checkbox-item" *ngFor="let menu of menus">
+              <input
+                type="checkbox"
+                [id]="'menu' + menu.id"
+                [checked]="isSelected(menu)"
+                (change)="onCheckboxChange($event, menu)"
+              />
 
-            <label>Pages</label>
-
-            <div class="dropdown">
-
-                <div
-                    class="dropdown-header"
-                    (click)="toggleDropdown()">
-
-                    {{ selectedPages.length > 0
-                        ? selectedPages.length + ' Pages Selected'
-                        : 'Select Pages' }}
-
-                    <span>▼</span>
-
-                </div>
-
-                <div
-                    class="dropdown-body"
-                    *ngIf="dropdownOpen">
-
-                    <div
-                        class="checkbox-item"
-                        *ngFor="let menu of menus">
-
-                        <input
-                            type="checkbox"
-                            [id]="'menu'+menu.id"
-                            [checked]="isSelected(menu)"
-                            (change)="onCheckboxChange($event,menu)">
-
-                        <label
-                            [for]="'menu'+menu.id">
-
-                            {{ menu.menuName }}
-
-                        </label>
-
-                    </div>
-
-                </div>
-
+              <label [for]="'menu' + menu.id">
+                {{ menu.menuName }}
+              </label>
             </div>
-
+          </div>
         </div>
-
+      </div>
     </div>
 
     <!-- Selected Pages -->
 
     <div class="selected-section">
+      <label>Selected Pages</label>
 
-        <label>Selected Pages</label>
-
-        <div class="chips">
-
-            <span
-                class="chip"
-                *ngFor="let page of selectedPages">
-
-                {{ page.menuName }}
-
-            </span>
-
-        </div>
-
+      <div class="chips">
+        <span class="chip" *ngFor="let page of selectedPages">
+          {{ page.menuName }}
+        </span>
+      </div>
     </div>
 
     <div class="button-area">
@@ -96,11 +66,7 @@
             Save
         </button>
 
-        <button class="reset-btn"
-                (click)="resetForm()">
-            Reset
-        </button>
-
+      <button class="reset-btn" (click)="reset()">Reset</button>
     </div>
-
+  </form>
 </div>

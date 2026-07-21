@@ -145,14 +145,6 @@
     background:var(--save-hover);
 }
 
-.reset-btn{
-    background:#73777b;
-    color:#fff;
-}
-
-.reset-btn:hover{
-    background:#5c636a;
-}
 .card{
     background: var(--card-bg);
     border-radius:14px;

@@ -40,7 +40,7 @@ public class AuthService(ApplicationDbContext db, JwtSettings jwtSettings)
     public async Task<LoginResponse?> LoginAsync(LoginRequest request)
     {
         var user = await db.UserMaster
-            .FirstOrDefaultAsync(u => u.username == request.Username && u.is_active == true);
+            .FirstOrDefaultAsync(u => u.username == request.Username && u.role == request.roleId && u.is_active == true);
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.password))
             return null;
 

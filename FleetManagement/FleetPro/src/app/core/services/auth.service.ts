@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AppModule, LoginResponse, Permission, UserRole } from '../models';
@@ -20,14 +21,18 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  login(username: string, password: string) {
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, { username, password }).pipe(
+  login(username: string, roleId: string, password: string) {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, { username, roleId, password }).pipe(
       tap(res => {
         localStorage.setItem(TOKEN_KEY, res.token);
         localStorage.setItem(USER_KEY, JSON.stringify(res));
         this.currentUser.set(res);
       })
     );
+  }
+
+  getRoleForLog(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/userRole/roleForLogin`);
   }
 
   logout(): void {

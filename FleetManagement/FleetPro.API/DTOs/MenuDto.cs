@@ -38,4 +38,10 @@ namespace FleetPro.API.DTOs
 
         public bool IsActive { get; set; }
     }
+
+    public class saveMenuDto
+    {
+        public int RoleId { get; set; }
+        public List<int> MenuIds { get; set; } = new();
+    }
 }

@@ -21,7 +21,9 @@ namespace FleetPro.API.Data.Entitys
         [Column("phonenumber")]
         public string phoneNumber { get; set; }
         [Column("role")]
+        [ForeignKey(nameof(RoleMst))]
         public int role {  get; set; }
+        public RoleMst RoleMst { get; set; }
         public bool is_active { get; set; }
         [Column("createdby")]
         public int? createdBy { get; set; }

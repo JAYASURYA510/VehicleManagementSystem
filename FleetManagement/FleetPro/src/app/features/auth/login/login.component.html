@@ -1,33 +1,48 @@
 <div class="login-page">
-  <div class="login-card">
-    <div class="login-header">
-      <div class="logo">🚛</div>
-      <h1>FleetPro</h1>
-      <p>Vehicle Daily Tracking & Expense Management</p>
+    <div class="login-wrapper">
+        <div class="login-left">
+            <div class="logo-circle">
+                🚛
+            </div>
+            <h2>FleetPro</h2>
+            <p>
+                Vehicle Daily Tracking
+                <br>
+                & Expense Management
+            </p>
+            <div class="bottom-links">
+                <span>Fleet Management</span>
+            </div>
+        </div>
+
+        <div class="wave"></div>
+        <div class="login-right">
+            <h2>Welcome Back</h2>
+            <p class="subtitle">
+                Sign in to continue
+            </p>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input
+                        type="text" formControlName="username" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <ng-select class="custom-select" formControlName="roleId" [items]="roleList" bindLabel="roleName"
+                        bindValue="id" placeholder="Select Role">
+                    </ng-select>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" formControlName="password" placeholder="Enter password">
+                </div>
+
+                <button type="submit" class="login-btn">
+                    {{ loading() ? 'Signing In...' : 'Sign In' }}
+                </button>
+            </form>
+        </div>
     </div>
-
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      @if (error()) {
-        <div class="alert alert-error">{{ error() }}</div>
-      }
-
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input id="username" type="text" formControlName="username" placeholder="Enter username" autocomplete="username" />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input id="password" type="password" formControlName="password" placeholder="Enter password" autocomplete="current-password" />
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading() || form.invalid">
-        {{ loading() ? 'Signing in...' : 'Sign In' }}
-      </button>
-    </form>
-
-    <div class="login-hint">
-      <small>Demo: superadmin / Admin@123</small>
-    </div>
-  </div>
 </div>

@@ -2,7 +2,7 @@ using FleetPro.API.Models;
 
 namespace FleetPro.API.DTOs;
 
-public record LoginRequest(string Username, string Password);
+public record LoginRequest(string Username, int roleId, string Password);
 
 public record LoginResponse(
     string Token,
@@ -58,8 +58,7 @@ public record DashboardSummaryDto(
     decimal TotalDieselLitres,
     decimal AverageMileage,
     List<FinancialTrendPointDto> FinancialTrend,
-    List<ProfitDistributionDto> ProfitDistribution,
-    List<VehicleSummaryDto> VehicleSummaries);
+    List<ProfitDistributionDto> ProfitDistribution);
 
 public record FinancialTrendPointDto(string Label, decimal Spend, decimal Returns, decimal Profit);
 

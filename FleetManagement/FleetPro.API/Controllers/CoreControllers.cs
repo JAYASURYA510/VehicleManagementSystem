@@ -25,6 +25,27 @@ public class AuthController(AuthService authService) : ControllerBase
 
 [ApiController]
 [Route("api/[controller]")]
+public class UserRoleController : ControllerBase
+{
+     private readonly ApplicationDbContext context;
+     public UserRoleController(ApplicationDbContext context)
+    {
+        this.context = context;
+    }
+    [HttpGet("roleForLogin")]
+    public async Task<ActionResult<List<RoleDto>>> GetAll()
+    {
+        var roleData = await context.RoleMsts.AsNoTracking().ToListAsync();
+        return roleData.Select(data => new RoleDto
+            {
+                Id = data.id,
+                RoleName = data.roleName
+            }).ToList();
+    }
+}
+
+[ApiController]
+[Route("api/[controller]")]
 [Authorize]
 public class DashboardController(DashboardService dashboardService) : ControllerBase
 {

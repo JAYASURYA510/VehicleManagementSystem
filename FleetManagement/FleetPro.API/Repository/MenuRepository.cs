@@ -47,5 +47,56 @@ namespace FleetPro.API.Repository
                 throw;
             }
         }
+
+        public async Task<List<MenuDto>> getNavMenu(int roleId)
+        {
+            try
+            {
+                var roleMenu = await context.RoleMenus
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.RoleId == roleId);
+
+                if (roleMenu == null || string.IsNullOrWhiteSpace(roleMenu.MenuId))
+                {
+                    return new List<MenuDto>();
+                }
+
+                var menuIds = roleMenu.MenuId
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .ToList();
+
+                var menus = await context.MenuMsts
+                    .AsNoTracking()
+                    .Where(x => menuIds.Contains(x.Id) && x.IsActive)
+                    .OrderBy(x => x.DisplayOrder)
+                    .Select(menu => new MenuDto
+                    {
+                        Id = menu.Id,
+                        MenuName = menu.MenuName,
+                        Icon = menu.Icon ?? string.Empty,
+                        Route = menu.Route,
+                        ParentId = menu.ParentId
+                    })
+                    .ToListAsync();
+
+                var parents = menus
+                    .Where(x => x.ParentId == null)
+                    .ToList();
+
+                foreach (var parent in parents)
+                {
+                    parent.Children = menus
+                        .Where(x => x.ParentId == parent.Id)
+                        .ToList();
+                }
+
+                return parents;
+            }
+            catch
+            {
+                throw;
+            }
+        }
     }
 }

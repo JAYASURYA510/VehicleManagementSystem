@@ -1,3 +1,4 @@
+@import "@ng-select/ng-select/themes/default.theme.css";
 :root {
   --bg-primary: #f5f6f8;
   --bg-secondary: #ffffff;
@@ -20,8 +21,8 @@
   --info: #7e3285;
   --sidebar-width: 260px;
   --radius: 14px;
-  --save:#f7d113;
-  --save-hover:#ecc502;
+  --save:#f7a013;
+  --save-hover:#f29807;
   --shadow-sm: 0 1px 3px rgba(26, 29, 35, 0.06);
   --shadow-md: 0 4px 16px rgba(26, 29, 35, 0.06);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -48,6 +49,17 @@ body {
 }
 
 button, input, select, textarea { font: inherit; }
+
+.reset-btn{
+    background:#e2e4e8;
+    color:rgb(160, 156, 156);
+    border : none;
+}
+
+.reset-btn:hover{
+    /* background:#bababd; */
+    color:rgb(181, 117, 241);
+}
 
 input, select, textarea {
   width: 100%;
