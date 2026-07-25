@@ -57,42 +57,125 @@
         <h3>{{ editingId() ? 'Edit' : 'Add' }} User</h3>
         <button class="btn-icon" (click)="closeForm()">✕</button>
       </div>
-      <form [formGroup]="form" (ngSubmit)="save()">
+      <form [formGroup]="form" (ngSubmit)="saveData()">
         <div class="form-grid cols-2">
           <div class="form-group">
-            <label>Username</label>
-            <input formControlName="username" [readonly]="!!editingId()" />
+            <label>Username <span class="required">*</span></label>
+            <input
+              formControlName="username"
+              placeholder="Enter UserName"
+              [readonly]="!!editingId()"
+              [class.is-invalid]="isFieldInvalid('username')"
+            />
+            @if (isFieldInvalid('username')) {
+              <div class="alert alert-danger">{{ getFieldError('username') }}</div>
+            }
           </div>
           <div class="form-group">
-            <label>Email</label>
-            <input type="email" formControlName="email" />
+            <label>Email <span class="required">*</span></label>
+            <input
+              type="email"
+              placeholder="Enter Email id"
+              formControlName="email"
+              [class.is-invalid]="isFieldInvalid('email')"
+            />
+            @if (isFieldInvalid('email')) {
+              <div class="alert alert-danger">{{ getFieldError('email') }}</div>
+            }
           </div>
           <div class="form-group">
-            <label>{{ editingId() ? 'New Password (optional)' : 'Password' }}</label>
-            <input type="password" formControlName="password" />
+            <label>Mobile Number <span class="required">*</span></label>
+            <input
+              type="tel"
+              formControlName="mobileNumber"
+              placeholder="Enter Mobile Number"
+              maxlength="10"
+              [class.is-invalid]="isFieldInvalid('mobileNumber')"
+            />
+            @if (isFieldInvalid('mobileNumber')) {
+              <div class="alert alert-danger">{{ getFieldError('mobileNumber') }}</div>
+            }
           </div>
           <div class="form-group">
-            <label>Full Name</label>
-            <input formControlName="fullName" />
+            <label>
+              {{ editingId() ? 'New Password (optional)' : 'Password' }}
+              @if (!editingId()) { <span class="required">*</span> }
+            </label>
+            <input
+              type="password"
+              placeholder="Enter Password"
+              formControlName="password"
+               (keydown.space)="$event.preventDefault()"
+              [class.is-invalid]="isFieldInvalid('password')"
+            />
+ @if (passwordValue.length > 0 && !isPasswordValid()) {
+
+<div class="password-rules">
+
+  @if (!hasMinLength()) {
+    <div class="rule">
+      ✖ Minimum 8 characters
+    </div>
+  }
+
+  @if (!hasUpperCase()) {
+    <div class="rule">
+      ✖ Uppercase (A-Z)
+    </div>
+  }
+
+  @if (!hasLowerCase()) {
+    <div class="rule">
+      ✖ Lowercase (a-z)
+    </div>
+  }
+
+  @if (!hasNumber()) {
+    <div class="rule">
+      ✖ Number (0-9)
+    </div>
+  }
+
+  @if (!hasSpecialCharacter()) {
+    <div class="rule">
+      ✖ Special (! @ # $ % & *)
+    </div>
+  }
+
+</div>
+
+}
+            <!-- @if (isFieldInvalid('password')) {
+              <div class="alert alert-danger">{{ getFieldError('password') }}</div>
+            }
+             -->
           </div>
           <div class="form-group">
-            <label>Role</label>
-            <select formControlName="role">
-              @for (r of roles; track r.value) {
-                <option [value]="r.value">{{ r.label }}</option>
+            <label>Full Name <span class="required">*</span></label>
+            <input
+              placeholder="Enter Full Name"
+              formControlName="fullName"
+              [class.is-invalid]="isFieldInvalid('fullName')"
+            />
+            @if (isFieldInvalid('fullName')) {
+              <div class="alert alert-danger">{{ getFieldError('fullName') }}</div>
+            }
+          </div>
+          <div class="form-group">
+            <label>Role <span class="required" >*</span></label>
+            <select formControlName="role" [class.is-invalid]="isFieldInvalid('role')">
+              <option [ngValue]="null"  disabled hidden>Select Role</option>
+              @for (r of roles; track r.id) {
+                <option  [ngValue]="r.id">{{ r.roleName }} </option>
               }
             </select>
+            @if (isFieldInvalid('role')) {
+              <div class="alert alert-danger">{{ getFieldError('role') }}</div>
+            }
           </div>
-          @if (editingId()) {
-            <div class="form-group">
-              <label class="checkbox-row">
-                <input type="checkbox" formControlName="isActive" /> Active
-              </label>
-            </div>
-          }
         </div>
 
-        <div class="section-title">Assigned Vehicles</div>
+        <!-- <div class="section-title">Assigned Vehicles</div>
         <div class="vehicle-checkboxes">
           @for (v of vehicles(); track v.id) {
             <label class="checkbox-row">
@@ -120,7 +203,27 @@
               }
             </tbody>
           </table>
-        </div>
+        </div> -->
+        <div class="form-group">
+  <label>Status</label>
+
+  <div class="status-toggle">
+    <input
+      type="checkbox"
+      id="statusToggle"
+      formControlName="isActive"
+      (change)="onStatusChange()"
+    />
+
+    <label for="statusToggle" class="toggle-label">
+      <span class="toggle-slider"></span>
+    </label>
+
+    <span class="status-text">
+      {{ form.get('isActive')?.value ? 'Active' : 'Deactivated' }}
+    </span>
+  </div>
+</div>
 
         <div class="form-actions">
           <button type="button" class="btn btn-outline" (click)="closeForm()">Cancel</button>
