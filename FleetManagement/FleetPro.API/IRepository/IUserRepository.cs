@@ -7,5 +7,7 @@ namespace FleetPro.API.IRepository
     {
         Task<UserDetailsDto> saveUser(UserDetailsDto user);
         Task<List<userDatasDto>> getAllUser();
+        Task<string> updateUser(UserDetailsDto user);
+        Task<string> deleteUser(int id);
     }
 }

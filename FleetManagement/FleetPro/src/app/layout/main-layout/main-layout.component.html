@@ -2,14 +2,17 @@
   <aside class="sidebar">
     <div class="sidebar-brand">
       <span class="brand-icon">🚛</span>
-      <span class="brand-text">FleetPro</span>
+      <span class="brand-text">NASPro</span>
     </div>
 
     <nav class="sidebar-nav">
-      @for (item of visibleNavItems(); track item.route) {
+      @for (item of this.navList; track item.route) {
         <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" >
-          <span class="nav-icon">{{ item.icon }}</span>
-          <span class="nav-label">{{ item.label }}</span>
+          <mat-icon fontSet="material-symbols-outlined">
+          {{ item.icon }}
+          </mat-icon>
+          <!-- <span class="nav-icon">{{ item.icon }}</span> -->
+          <span class="nav-label">{{ item.menuName }}</span>
         </a>
       }
     </nav>

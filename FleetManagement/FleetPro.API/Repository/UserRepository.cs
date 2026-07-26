@@ -6,6 +6,7 @@ using FleetPro.API.IRepository;
 using FleetPro.API.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Drawing;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FleetPro.API.Repository
@@ -79,6 +80,55 @@ namespace FleetPro.API.Repository
             catch (Exception ex)
             {
                 throw new Exception("Exception", ex);
+            }
+        }
+
+        public async Task<string> updateUser(UserDetailsDto user)
+        {
+            try
+            {
+
+                var userData = await context.UserMaster
+                    .Where(x => x.userId == user.userId)
+                    .FirstOrDefaultAsync();
+             
+               if(userData == null)
+               {
+                    return "User Not Found.";
+               }
+               else{
+               userData.username = user.username;
+               userData.fullName = user.fullName;
+               userData.emailId = user.emailId;
+               userData.phoneNumber = user.phoneNumber;
+               userData.role = user.role;
+               userData.updatedBy = user.updatedBy;
+               userData.updated_at = user.updated_at;
+
+               await context.SaveChangesAsync();
+               return "User updated successfully.";
+               }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception", ex);
+            }
+        }
+
+        public async Task<string> deleteUser(int id)
+        {
+            try
+            {
+                var userData = await context.UserMaster.Where(x => x.userId == id).FirstOrDefaultAsync();
+                if (userData == null) return "User Not Found";
+
+                context.UserMaster.Remove(userData);
+                await context.SaveChangesAsync();
+                return "User Deleted Successfully";
+            }
+            catch (Exception ex)
+            {
+                 throw;
             }
         }
     }

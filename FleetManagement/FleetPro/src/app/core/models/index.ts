@@ -1,8 +1,8 @@
 export enum UserRole {
-  SuperAdmin = 0,
-  Admin = 1,
-  ManagingAuthority = 2,
-  User = 3
+  SuperAdmin = 1,
+  Admin = 2,
+  Manager = 3,
+  Driver = 4
 }
 
 export enum AppModule {

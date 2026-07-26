@@ -24,7 +24,7 @@ export class LoginComponent {
   ) {
     this.form = this.fb.group({
     username: ['', Validators.required],
-    roleId : ['', Validators.required],
+    roleId : [null, Validators.required],
     password: ['', Validators.required]
     });
   }
@@ -45,7 +45,10 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
+    }
     this.loading.set(true);
     this.error.set('');
     const { username,roleId, password } = this.form.getRawValue();

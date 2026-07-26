@@ -4,11 +4,13 @@
     box-sizing:border-box;
     font-family:"Segoe UI",sans-serif;
 }
+html,
+body{
+    overflow-x:hidden;
+}
 
 body{
-
     background:#f5f6f8;
-
 }
 
 .login-page{
@@ -22,7 +24,7 @@ body{
 
 .login-wrapper{
     width:900px;
-    height:520px;
+    height:600px;
     background:white;
     display:flex;
     border-radius:18px;
@@ -80,6 +82,11 @@ body{
     clip-path:path("M0,0 C70,40 70,120 0,170 C70,220 70,300 0,350 C70,400 70,480 0,520 L90,520 L90,0 Z");
 }
 
+.error-text {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 2px;
+}
 
 .login-right{
     flex:1;
@@ -150,4 +157,188 @@ input:focus{
 
 ::ng-deep .custom-select.ng-select-focused .ng-select-container{
     border-bottom:2px solid #0d6efd !important;
+}
+
+@media (max-width: 1024px) {
+
+  .login-wrapper {
+    width: 92%;
+    max-width: 900px;
+  }
+
+  .login-left {
+    width: 40%;
+    padding: 30px;
+  }
+
+  .login-right {
+    padding: 35px;
+  }
+
+}
+
+@media (max-width:768px) {
+
+.login-page{
+    padding:20px;
+}
+
+.login-wrapper{
+    width:100%;
+    max-width:420px;
+    height:auto;
+    flex-direction:column;
+    border-radius:20px;
+}
+
+.login-left{
+    width:100%;
+    min-height:220px;
+    border-radius:20px 20px 0 0;
+    padding:30px 20px;
+}
+
+.wave{
+    display:none;
+}
+
+.login-left h2{
+    font-size:28px;
+}
+
+.login-left p{
+    font-size:15px;
+    line-height:24px;
+}
+
+.bottom-links{
+    position:static;
+    margin-top:25px;
+}
+
+.login-right{
+    width:100%;
+    padding:30px 25px 35px;
+}
+
+.login-right h2{
+    text-align:center;
+}
+
+.subtitle{
+    text-align:center;
+}
+
+.login-btn{
+    width:100%;
+}
+
+}
+
+@media (max-width:480px){
+
+.login-page{
+    padding:15px;
+}
+
+.login-wrapper{
+    border-radius:18px;
+}
+
+.login-left{
+    min-height:180px;
+    padding:25px 15px;
+}
+
+.logo-circle{
+    width:65px;
+    height:65px;
+    font-size:30px;
+}
+
+.login-left h2{
+    font-size:24px;
+}
+
+.login-left p{
+    font-size:14px;
+}
+
+.login-right{
+    padding:25px 20px;
+}
+
+.login-right h2{
+    font-size:26px;
+}
+
+.subtitle{
+    font-size:14px;
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+input{
+    height:46px;
+    font-size:14px;
+}
+
+::ng-deep .custom-select .ng-select-container{
+    min-height:46px;
+}
+
+.login-btn{
+    height:46px;
+
+    font-size:15px;
+}
+
+}
+
+@media (max-width:360px){
+.login-left{
+    min-height:160px;
+
+}
+.login-left h2{
+    font-size:22px;
+}
+
+.login-left p{
+    font-size:13px;
+}
+
+.login-right{
+    padding:20px 16px;
+}
+
+.login-right h2{
+    font-size:22px;
+}
+
+label{
+    font-size:14px;
+}
+
+input{
+    font-size:13px;
+}
+
+.login-btn{
+    font-size:14px;
+}
+}
+
+.custom-select{
+    width:100%;
+}
+
+::ng-deep .custom-select .ng-select-container{
+    width:100%;
+}
+
+::ng-deep .ng-dropdown-panel{
+    width:100% !important;
 }

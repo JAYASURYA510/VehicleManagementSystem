@@ -29,6 +29,20 @@ namespace FleetPro.API.Controllers
         {
             return await userRepository.saveUser(user);
         }
+
+        [HttpPut("EditUser/{id}")]
+         public async Task<IActionResult> update(UserDetailsDto user)
+        {
+            var result = await userRepository.updateUser(user);
+            return Ok(result);
+        }
+
+        [HttpDelete("DeleteUser/{id}")]
+        public async Task<IActionResult> delete(int id)
+        {
+            var result = await userRepository.deleteUser(id);
+            return Ok(result);
+        }
     }
 
 }

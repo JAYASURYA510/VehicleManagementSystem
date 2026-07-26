@@ -8,7 +8,7 @@
   }
 </div>
 
-<div class="card">
+<!-- <div class="card">
   <div class="table-responsive">
     <table class="data-table">
       <thead>
@@ -48,7 +48,138 @@
       </tbody>
     </table>
   </div>
+</div> -->
+<div class="filter-panel">
+  <div class="form-group" style="display: flex; flex-direction: row; gap: 1rem;">
+    <div class="search-input-wrapper" style="position: relative; width: 100%;">
+      <i class="fa-solid fa-magnifying-glass search-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #666;"></i>
+      <input class="search" matInput placeholder="Search by username, name, email, phone..." (keyup)="applyFilter($event)" style="padding-left: 2.5rem;">
+    </div>
+  </div>
 </div>
+<div class="card">
+  <div class="table-responsive">
+    <div class="mat-elevation-z2">
+      <table mat-table [dataSource]="dataSource" class="custom-table" matSort>
+
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>S.No</th>
+          <td mat-cell *matCellDef="let user; let i = index">
+            <strong>{{ i + 1 }}</strong>
+          </td>
+        </ng-container>
+        <!-- Username -->
+        <ng-container matColumnDef="username">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Username</th>
+          <td mat-cell *matCellDef="let user">
+            <strong>{{ user.username }}</strong>
+          </td>
+        </ng-container>
+
+        <!-- Full Name -->
+        <ng-container matColumnDef="fullName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Full Name</th>
+          <td mat-cell *matCellDef="let user">{{ user.fullName }}</td>
+        </ng-container>
+
+        <!-- Email -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Email</th>
+          <td mat-cell *matCellDef="let user">{{ user.emailId }}</td>
+        </ng-container>
+
+        <!-- Role -->
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef>Role</th>
+          <td mat-cell *matCellDef="let user">
+            <span class="role-badge">{{ getRoleLabel(user.role) }} </span>
+          </td>
+        </ng-container>
+
+        <!-- Vehicles -->
+        <ng-container matColumnDef="phoneNumber">
+          <th mat-header-cell *matHeaderCellDef>Phone Number</th>
+          <td mat-cell *matCellDef="let user">{{ user.phoneNumber }}</td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let user">
+            <span class="status-badge" [class.active]="user.is_active">
+              {{ user.is_active == true ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let user">
+            <button mat-icon-button color="primary" style="color: rgb(228, 63, 118)" (click)="openEdit(user)">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+
+            <button mat-icon-button color="warn" style="color: rgb(228, 63, 118)" (click)="deactivateUser(user.id)">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" [class.inactive]="!row.isActive"></tr>
+      </table>
+
+      <div class="custom-paginator">
+        <!-- Center -->
+        <div class="page-size" style="font-family: 'Plus Jakarta Sans', system-ui, sans-serif;">
+          <span>Item per page :</span>
+
+          <mat-form-field appearance="fill" class="page-size-select">
+            <mat-select [value]="pageSize" (selectionChange)="changePageSize($event.value)">
+              <mat-option *ngFor="let size of [5, 10, 20, 50]" [value]="size">
+                {{ size }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Left -->
+        <div class="page-info">
+          Showing {{ startRecord }} - {{ endRecord }} of {{ totalRecords }}
+        </div>
+        <!-- Right -->
+        <div class="page-nav">
+          <button mat-icon-button (click)="firstPage()" [disabled]="!paginator || paginator.pageIndex === 0">
+            <mat-icon>first_page</mat-icon>
+          </button>
+
+          <button mat-icon-button (click)="previousPage()" [disabled]="!paginator || paginator.pageIndex === 0">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          <button mat-icon-button (click)="nextPage()" [disabled]="!paginator || paginator.pageIndex >= totalPages - 1">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+
+          <button mat-icon-button (click)="lastPage()" [disabled]="!paginator || paginator.pageIndex >= totalPages - 1">
+            <mat-icon>last_page</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hidden Material Paginator -->
+      <mat-paginator
+        #paginator
+        [length]="totalRecords"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        style="display: none"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
 
 @if (showForm()) {
   <div class="modal-overlay" (click)="closeForm()">
@@ -226,7 +357,7 @@
 </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-outline" (click)="closeForm()">Cancel</button>
+          <button type="button" class="btn btn-outline" (click)="resetForm()">Reset</button>
           <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
         </div>
       </form>

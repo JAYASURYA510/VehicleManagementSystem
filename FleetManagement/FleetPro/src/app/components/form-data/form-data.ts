@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService, Role, Menu } from '../../core/services/api.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import {
   FormBuilder,
   FormControl,
@@ -29,7 +30,8 @@ export class FormDataComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private alert: ToastrService
   ) {
     this.permissionForm = this.fb.group({
       selectedRoleId: new FormControl(null, Validators.required),
@@ -47,9 +49,6 @@ export class FormDataComponent implements OnInit {
       next: (res) => {
         this.roles = [...res];
         this.cdr.detectChanges();
-
-        // console.log('Roles API Response:', res);
-        // this.roles = res;
       },
       error: (err) => {
         console.error('Roles API Error:', err);
@@ -77,8 +76,6 @@ export class FormDataComponent implements OnInit {
     } else {
       this.selectedPages = this.selectedPages.filter((x) => x.id !== menu.id);
     }
-
-    console.log(this.selectedPages);
   }
 
   isSelected(menu: any): boolean {
@@ -100,11 +97,11 @@ export class FormDataComponent implements OnInit {
     }
 
     this.apiService.post("Menu/SaveMenu", payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
-        alert('Role permissions saved successfully.');
+        this.alert.success('Role permissions saved successfully.');
         this.reset();
     },
     (error) => {
-      alert('Failed to save role permissions.');
+      this.alert.error('Failed to save role permissions.');
     });
   }
 

@@ -1,22 +1,98 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators, FormArray, FormGroup, FormsModule, ValidationErrors } from '@angular/forms';
 import { ApiService, Role } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { AppModule, Permission, User, UserRole, Vehicle } from '../../core/models';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { CommanService } from '../../core/services/comman.service';
+import { Subject, takeUntil } from 'rxjs';
+import { Router } from '@angular/router';
+import { MatFormField, MatSelect, MatOption } from "@angular/material/select";
+import { AfterViewInit } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
 
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule,MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormField,
+    MatSelect,
+    MatOption],
   templateUrl: './users.component.html',
-  styleUrl: './users.component.css'
+  styleUrls: ['./users.component.css']
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit, AfterViewInit {
+  protected readonly unsubscribe$ = new Subject<void>();
+  localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
   private api = inject(ApiService);
   auth = inject(AuthService);
   private fb = inject(FormBuilder);
+
+  displayedColumns: string[] = [
+  'id',
+  'username',
+  'fullName',
+  'email',
+  'role',
+  'phoneNumber',
+  'status',
+  'actions'
+];
+
+dataSource = new MatTableDataSource<any>();
+
+@ViewChild(MatPaginator) paginator!: MatPaginator;
+@ViewChild(MatSort) sort!: MatSort;
+
+pageSize = 10;
+get totalPages(): number {
+  if (!this.paginator) return 0;
+
+  return Math.ceil(
+    this.paginator.length / this.paginator.pageSize
+  );
+}
+
+get totalRecords(): number {
+  return this.dataSource.data.length;
+}
+
+get startRecord(): number {
+  if (!this.paginator) return 0;
+
+  return this.paginator.pageIndex * this.paginator.pageSize + 1;
+}
+
+get endRecord(): number {
+  if (!this.paginator) return 0;
+
+  return Math.min(
+    (this.paginator.pageIndex + 1) * this.paginator.pageSize,
+    this.totalRecords
+  );
+}
+
+constructor(
+       private apiService : CommanService, private cdr: ChangeDetectorRef,
+       private router : Router, private alert: ToastrService
+    ) {}
+
+ngAfterViewInit() {
+  this.dataSource.paginator = this.paginator;
+  this.dataSource.sort = this.sort;
+}
 
   users = signal<User[]>([]);
   vehicles = signal<Vehicle[]>([]);
@@ -48,6 +124,7 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+     this.getUserData();
     this.loadRoles();
     this.api.get<Vehicle[]>('vehicles').subscribe(v => this.vehicles.set(v));
   }
@@ -62,20 +139,33 @@ export class UsersComponent implements OnInit {
   // get permissionsArray(): FormArray { return this.form.get('permissions') as FormArray; }
 
   load(): void { this.api.get<User[]>('users').subscribe(u => this.users.set(u)); }
+  
+  
+ changePageSize(size: number) {
+  this.pageSize = size;
+  this.paginator.pageSize = size;
+  this.paginator.firstPage();
 
-  buildPermissions(existing?: Permission[]): void {
-    // this.permissionsArray.clear();
-    // for (const mod of this.modules) {
-    //   const existingPerm = existing?.find(p => String(p.module) === String(mod));
-    //   this.permissionsArray.push(this.fb.group({
-    //     module: [mod],
-    //     canView: [existingPerm?.canView ?? false],
-    //     canRead: [existingPerm?.canRead ?? false],
-    //     canWrite: [existingPerm?.canWrite ?? false],
-    //     canEdit: [existingPerm?.canEdit ?? false]
-    //   }));
-    // }
-  }
+  this.dataSource.paginator = this.paginator;
+}
+
+  firstPage() {
+  this.paginator.firstPage();
+}
+
+previousPage() {
+  this.paginator.previousPage();
+}
+
+nextPage() {
+  this.paginator.nextPage();
+}
+
+lastPage() {
+  this.paginator.pageIndex = this.totalPages - 1;
+  this.paginator._changePageSize(this.paginator.pageSize);
+}
+
 
   openCreate(): void {
     this.editingId.set(null);
@@ -83,7 +173,6 @@ export class UsersComponent implements OnInit {
     this.form.get('password')?.setValidators([Validators.required, ...this.passwordValidators]);
     this.form.get('password')?.updateValueAndValidity();
     this.selectedVehicleIds.set([]);
-    this.buildPermissions();
     this.showForm.set(true);
   }
 
@@ -97,7 +186,6 @@ export class UsersComponent implements OnInit {
     this.form.get('password')?.setValidators(this.passwordValidators);
     this.form.get('password')?.updateValueAndValidity();
     this.selectedVehicleIds.set(user.assignedVehicleIds ?? []);
-    this.buildPermissions(user.permissions);
     this.showForm.set(true);
   }
 
@@ -112,6 +200,24 @@ export class UsersComponent implements OnInit {
     return this.selectedVehicleIds().includes(id);
   }
 
+  applyFilter(event: Event) : void{
+    const filterValue = (event.target as HTMLInputElement).value;
+
+  this.dataSource.filter = filterValue.trim().toLowerCase();
+
+  if (this.dataSource.paginator) {
+    this.dataSource.paginator.firstPage();
+  }
+  }
+
+  getUserData(){
+   this.apiService.list(`User/getUser`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.dataSource.data = data;
+     if (this.paginator) {
+        this.paginator.length = data.length;
+      }
+      });
+  }
   closeForm(): void { this.showForm.set(false); }
 
   save(): void {
@@ -203,7 +309,6 @@ export class UsersComponent implements OnInit {
   onStatusChange(): void {
   const status = this.form.get('isActive')?.value;
 
-  console.log(status ? 'Active' : 'Deactivated');
 }
 
 get passwordValue(): string {
@@ -244,9 +349,41 @@ saveData(): void {
     return;
   }
 
-  console.log('===== USER FORM DATA =====');
-  console.log(this.form.value);
+  const payload = {
+     userId : 0,
+     username : this.form.get("username")?.value,
+     password : this.form.get("password")?.value,
+     fullName : this.form.get("fullName")?.value,
+     emailId : this.form.get("email")?.value,
+     phoneNumber : this.form.get("mobileNumber")?.value,
+     role : this.form.get("role")?.value,
+     is_active : this.form.get("isActive")?.value,
+     createdBy : this.localStorageData.userId,
+     updatedBy : this.localStorageData.userId,
+     created_at : new Date().toISOString(),
+     updated_at : new Date().toISOString(),
+  }
+
+  this.apiService.create(`User/SaveUser`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data) =>{
+    this.closeForm();
+    this.getUserData();
+    this.alert.success("User Saved Successfully");
+  },(error) => {
+     this.alert.error("Unable to save user");
+  });
   this.form.reset({ isActive: true, role: null });
   this.editingId.set(null);
+}
+
+resetForm(): void {
+  this.form.reset({
+    username: '',
+    email: '',
+    mobileNumber: '',
+    password: '',
+    fullName: '',
+    role: null,
+    isActive: true
+  });
 }
 }
