@@ -7,7 +7,7 @@ namespace FleetPro.API.DTOs
     { 
         public int userId { get; set; }
         public string username { get; set; }
-        public string password { get; set; }
+        public string? password { get; set; }
         public string fullName { get; set; }
         [EmailAddress]
         public string emailId { get; set; }

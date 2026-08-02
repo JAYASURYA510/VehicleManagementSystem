@@ -102,12 +102,13 @@ namespace FleetPro.API.Repository
                userData.emailId = user.emailId;
                userData.phoneNumber = user.phoneNumber;
                userData.role = user.role;
+               userData.is_active = user.is_active;
                userData.updatedBy = user.updatedBy;
                userData.updated_at = user.updated_at;
 
                await context.SaveChangesAsync();
-               return "User updated successfully.";
-               }
+                    return "User updated successfully.";
+                }
             }
             catch (Exception ex)
             {

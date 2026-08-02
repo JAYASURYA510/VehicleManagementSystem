@@ -31,17 +31,47 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpPut("EditUser/{id}")]
-         public async Task<IActionResult> update(UserDetailsDto user)
+        public async Task<IActionResult> update(UserDetailsDto user)
         {
             var result = await userRepository.updateUser(user);
-            return Ok(result);
+            if (result == "User updated successfully.")
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = "User updated successfully."
+                });
+            }
+            else
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = result
+                });
+            }
         }
 
         [HttpDelete("DeleteUser/{id}")]
         public async Task<IActionResult> delete(int id)
         {
             var result = await userRepository.deleteUser(id);
-            return Ok(result);
+            if(result == "User Deleted Successfully")
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = "User updated successfully."
+                });
+            }
+            else
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = result
+                });
+            }
         }
     }
 

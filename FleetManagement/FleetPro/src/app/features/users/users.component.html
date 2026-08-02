@@ -120,7 +120,7 @@
               <span class="material-symbols-outlined">edit</span>
             </button>
 
-            <button mat-icon-button color="warn" style="color: rgb(228, 63, 118)" (click)="deactivateUser(user.id)">
+            <button mat-icon-button color="warn" style="color: rgb(228, 63, 118)" (click)="deleteUser(user.userId)">
               <span class="material-symbols-outlined">delete</span>
             </button>
           </td>
@@ -227,7 +227,7 @@
               <div class="alert alert-danger">{{ getFieldError('mobileNumber') }}</div>
             }
           </div>
-          <div class="form-group">
+          <div *ngIf="isSaveButton" class="form-group">
             <label>
               {{ editingId() ? 'New Password (optional)' : 'Password' }}
               @if (!editingId()) { <span class="required">*</span> }
@@ -296,7 +296,7 @@
             <label>Role <span class="required" >*</span></label>
             <select formControlName="role" [class.is-invalid]="isFieldInvalid('role')">
               <option [ngValue]="null"  disabled hidden>Select Role</option>
-              @for (r of roles; track r.id) {
+              @for (r of roleList; track r.id) {
                 <option  [ngValue]="r.id">{{ r.roleName }} </option>
               }
             </select>
@@ -305,36 +305,6 @@
             }
           </div>
         </div>
-
-        <!-- <div class="section-title">Assigned Vehicles</div>
-        <div class="vehicle-checkboxes">
-          @for (v of vehicles(); track v.id) {
-            <label class="checkbox-row">
-              <input type="checkbox" [checked]="isVehicleSelected(v.id)" (change)="toggleVehicle(v.id, $any($event.target).checked)" />
-              {{ v.registrationNumber }} — {{ v.driverName }}
-            </label>
-          }
-        </div>
-
-        <div class="section-title">Module Permissions</div>
-        <div class="table-responsive">
-          <table class="data-table perm-table">
-            <thead>
-              <tr><th>Module</th><th>View</th><th>Read</th><th>Write</th><th>Edit</th></tr>
-            </thead>
-            <tbody formArrayName="permissions">
-              @for (perm of permissionsArray.controls; track $index) {
-                <tr [formGroupName]="$index">
-                  <td>{{ perm.get('module')?.value }}</td>
-                  <td><input type="checkbox" formControlName="canView" /></td>
-                  <td><input type="checkbox" formControlName="canRead" /></td>
-                  <td><input type="checkbox" formControlName="canWrite" /></td>
-                  <td><input type="checkbox" formControlName="canEdit" /></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div> -->
         <div class="form-group">
   <label>Status</label>
 
@@ -358,7 +328,8 @@
 
         <div class="form-actions">
           <button type="button" class="btn btn-outline" (click)="resetForm()">Reset</button>
-          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+          <button *ngIf="isSaveButton" type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
+          <button *ngIf="isUpdateButton" type="button" class="btn btn-primary" (click)="updateUser()">Update</button>
         </div>
       </form>
     </div>

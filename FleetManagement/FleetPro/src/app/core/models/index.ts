@@ -46,14 +46,13 @@ export interface LoginResponse {
 }
 
 export interface User {
+  emailId: string | null | undefined;
   id: number;
   username: string;
-  email: string;
   fullName: string;
   role: UserRole | string;
-  isActive: boolean;
-  permissions: Permission[];
-  assignedVehicleIds: number[];
+  is_active: boolean;
+  phoneNumber: string;
 }
 
 export interface Vehicle {

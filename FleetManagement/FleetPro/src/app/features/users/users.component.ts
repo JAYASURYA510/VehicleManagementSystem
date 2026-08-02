@@ -100,7 +100,10 @@ ngAfterViewInit() {
   editingId = signal<number | null>(null);
   selectedVehicleIds = signal<number[]>([]);
 
-  roles: Role[] = [];
+  roles: UserRole[] = [];
+  roleList : any;
+  isSaveButton : any;
+  isUpdateButton : any;
 
   modules = Object.values(AppModule);
 
@@ -131,7 +134,7 @@ ngAfterViewInit() {
 
   loadRoles(): void {
     this.api.getRoles().subscribe({
-      next: (res) => { this.roles = [...res]; },
+      next: (res) => { this.roleList = [...res]; },
       error: (err) => { console.error('Roles API Error:', err); }
     });
   }
@@ -168,6 +171,8 @@ lastPage() {
 
 
   openCreate(): void {
+    this.isSaveButton = true;
+    this.isUpdateButton = false;
     this.editingId.set(null);
     this.form.reset({ role: null, isActive: true });
     this.form.get('password')?.setValidators([Validators.required, ...this.passwordValidators]);
@@ -176,17 +181,43 @@ lastPage() {
     this.showForm.set(true);
   }
 
+  editedData: any;
+
   openEdit(user: User): void {
+    this.isSaveButton = false;
+    this.isUpdateButton = true;
+    this.editedData = user;
     this.editingId.set(user.id);
     this.form.patchValue({
-      username: user.username, email: user.email, fullName: user.fullName,
+      username: user.username, email: user.emailId, fullName: user.fullName,
       role: typeof user.role === 'number' ? user.role : null,
-      isActive: user.isActive, password: '', mobileNumber: (user as User & { mobileNumber?: string }).mobileNumber ?? ''
+      isActive: user.is_active, mobileNumber: user.phoneNumber
     });
-    this.form.get('password')?.setValidators(this.passwordValidators);
-    this.form.get('password')?.updateValueAndValidity();
-    this.selectedVehicleIds.set(user.assignedVehicleIds ?? []);
     this.showForm.set(true);
+  }
+
+  updateUser(): void {
+    var payload = {
+        userId : this.editedData.userId,
+        username : this.form.get("username")?.value,
+        fullName : this.form.get("fullName")?.value,
+        emailId : this.form.get("email")?.value,
+        phoneNumber : this.form.get("mobileNumber")?.value,
+        role : this.form.get("role")?.value,
+        is_active : this.form.get("isActive")?.value,
+        updatedBy : this.localStorageData.userId,
+        updated_at : new Date().toISOString(),
+    }
+
+    this.apiService.update(`User/EditUser/${this.editedData.userId}`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
+      if(data){
+       this.closeForm();
+      this.getUserData();
+      this.alert.success("User Updated Successfully");
+      }
+    },(error) => {
+     this.alert.error("Unable to Update user");
+    });
   }
 
   toggleVehicle(vehicleId: number, checked: boolean): void {
@@ -220,35 +251,19 @@ lastPage() {
   }
   closeForm(): void { this.showForm.set(false); }
 
-  save(): void {
-    // if (this.form.invalid) return;
-    // const raw = this.form.getRawValue();
-    // const permissions = raw.permissions as Permission[];
-    // const assignedVehicleIds = this.selectedVehicleIds();
-    // const id = this.editingId();
-
-    // if (id) {
-    //   this.api.put(`users/${id}`, {
-    //     email: raw.email, fullName: raw.fullName, role: raw.role,
-    //     isActive: raw.isActive, newPassword: raw.password || null,
-    //     permissions, assignedVehicleIds
-    //   }).subscribe(() => { this.closeForm(); this.load(); });
-    // } else {
-    //   this.api.post('users', {
-    //     username: raw.username, email: raw.email, password: raw.password,
-    //     fullName: raw.fullName, role: raw.role, permissions, assignedVehicleIds
-    //   }).subscribe(() => { this.closeForm(); this.load(); });
-    // }
+  deleteUser(id: number): void {
+     if(id != null){
+          this.apiService.delete(`User/DeleteUser/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
+            this.getUserData();
+            this.alert.success("User Deleted Successfully");
+          },(error) => {
+            this.alert.error("Unable to Delete user");
+          });
+    }
   }
 
-  deactivateUser(id: number): void {
-    if (!confirm('Deactivate this user?')) return;
-    this.api.delete(`users/${id}`).subscribe(() => this.load());
-  }
-
-  getRoleLabel(role: UserRole | string | number): string {
-    const r = this.roles.find(x => x.id === role || x.roleName === role);
-    return r?.roleName ?? String(role);
+  getRoleLabel(role: any | string | number): string {
+     return UserRole[role];
   }
 
   isFieldInvalid(fieldName: string): boolean {
