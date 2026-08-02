@@ -3,6 +3,8 @@ import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angu
 import { ApiService } from '../../core/services/api.service';
 import { DailyRecordListItem, Vehicle } from '../../core/models';
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-daily-tracking',
@@ -42,6 +44,12 @@ export class DailyTrackingComponent implements OnInit {
     notes: ['']
   });
 
+
+private router = inject(Router);
+
+OpenCreate(): void {
+  this.router.navigate(['/daily-log-report']);
+}
   ngOnInit(): void {
     this.api.get<Vehicle[]>('vehicles').subscribe(v => this.vehicles.set(v));
     this.load();

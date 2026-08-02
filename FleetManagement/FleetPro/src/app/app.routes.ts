@@ -8,6 +8,7 @@ import { DailyTrackingComponent } from './features/daily-tracking/daily-tracking
 import { authGuard } from './core/guards/auth.guard';
 import { AppModule } from './core/models';
 import { FormDataComponent } from './components/form-data/form-data';
+import { DailyLogReport } from './daily-log-report/daily-log-report';
 
 
 export const routes: Routes = [
@@ -21,6 +22,7 @@ export const routes: Routes = [
     path: 'form-data',
     component: FormDataComponent
   },
+      { path: 'daily-log-report', component: DailyLogReport},
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent},
       { path: 'daily-tracking', component: DailyTrackingComponent },
