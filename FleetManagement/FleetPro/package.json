@@ -23,6 +23,8 @@
     "@fortawesome/fontawesome-free": "^7.3.1",
     "@ng-select/ng-select": "^21.8.2",
     "chart.js": "^4.5.1",
+    "lottie-web": "^5.13.0",
+    "ngx-lottie": "^21.2.0",
     "ngx-toastr": "^20.0.5",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

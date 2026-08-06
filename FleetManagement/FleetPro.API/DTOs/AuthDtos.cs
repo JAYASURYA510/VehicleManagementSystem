@@ -2,7 +2,7 @@ using FleetPro.API.Models;
 
 namespace FleetPro.API.DTOs;
 
-public record LoginRequest(string Username, int roleId, string Password);
+public record LoginRequest(string Username, string Password);
 
 public record LoginResponse(
     string Token,

@@ -1,0 +1,13 @@
+@if (loadingService.loading$ | async) {
+<div class="loading-overlay">
+    <div class="loading-box">
+        <ng-lottie
+            [options]="options"
+            width="250px"
+            height="250px">
+        </ng-lottie>
+        <h3>Please Wait</h3>
+        <span>Loading...</span>
+    </div>
+</div>
+}

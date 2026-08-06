@@ -5,12 +5,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
 import { Subject, takeUntil } from 'rxjs';
-import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -24,7 +23,6 @@ export class LoginComponent {
   ) {
     this.form = this.fb.group({
     username: ['', Validators.required],
-    roleId : [null, Validators.required],
     password: ['', Validators.required]
     });
   }
@@ -38,7 +36,6 @@ export class LoginComponent {
 
 
   loadRole(){
-    debugger;
    this.auth.getRoleForLog().pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
     this.roleList = data;
    });
@@ -51,8 +48,8 @@ export class LoginComponent {
     }
     this.loading.set(true);
     this.error.set('');
-    const { username,roleId, password } = this.form.getRawValue();
-    this.auth.login(username!,roleId!, password!).subscribe({
+    const { username, password } = this.form.getRawValue();
+    this.auth.login(username!, password!).subscribe({
       next: () => {
         this.loading.set(false);
         this.router.navigate(['/dashboard']);

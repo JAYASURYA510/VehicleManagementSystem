@@ -6,6 +6,9 @@ import { provideToastr } from 'ngx-toastr';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { iLoadingInterceptor } from './core/interceptors/iloading-interceptor';
+import { provideLottieOptions } from 'ngx-lottie';
+import player from 'lottie-web';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,6 +22,12 @@ export const appConfig: ApplicationConfig = {
       progressBar: true,
       closeButton: true
     }),
-    provideHttpClient(withInterceptors([authInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor],)),
+    provideHttpClient(withInterceptors([iLoadingInterceptor])),
+    provideLottieOptions({
+
+      player: () => player
+
+    })
   ]
 };

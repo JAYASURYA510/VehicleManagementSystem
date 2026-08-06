@@ -1,0 +1,26 @@
+.loading-overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: #ffffff;
+    backdrop-filter:blur(4px);
+    z-index:999999;
+}
+
+.loading-box{
+    text-align:center;
+}
+
+.loading-box h3{
+    margin-top:15px;
+    color:#1976d2;
+}
+
+.loading-box span{
+    color:#666;
+}
