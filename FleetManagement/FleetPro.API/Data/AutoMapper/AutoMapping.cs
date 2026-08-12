@@ -9,6 +9,7 @@ namespace FleetPro.API.Data.AutoMapper
         public AutoMapping() {
             CreateMap<UserDetailsDto, UserMst>().ReverseMap();
             CreateMap<MenuTypesDto, MenuMst>().ReverseMap();
+            CreateMap<VehicleMstDto, VehicleMst>().ReverseMap();
         }
     }
 }

@@ -11,6 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<MenuMst> MenuMsts { get; set; }
     public DbSet<RoleMst> RoleMsts { get; set; }
     public DbSet<RoleMenu> RoleMenus { get; set; }
+    public DbSet<VehicleMst> VehicleMsts { get; set; }
     public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<DieselExpense> DieselExpenses => Set<DieselExpense>();

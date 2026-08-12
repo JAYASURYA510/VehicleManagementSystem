@@ -10,6 +10,7 @@ namespace FleetPro.API.Data
         {
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMenuRepository, MenuRepository>();
+            services.AddScoped<IVehicleMstRepository, VehicleMstRepository>();
 
             return services;
         }
