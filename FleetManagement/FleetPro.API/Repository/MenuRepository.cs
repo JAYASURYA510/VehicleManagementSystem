@@ -3,7 +3,6 @@ using FleetPro.API.Data;
 using FleetPro.API.DTOs;
 using FleetPro.API.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Writers;
 
 namespace FleetPro.API.Repository
 {
