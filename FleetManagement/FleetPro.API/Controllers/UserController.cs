@@ -1,8 +1,11 @@
-﻿using FleetPro.API.DTOs;
+﻿using AutoMapper;
+using FleetPro.API.Data;
+using FleetPro.API.DTOs;
 using FleetPro.API.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FleetPro.API.Controllers
 {
@@ -12,10 +15,15 @@ namespace FleetPro.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository userRepository;
+        private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, ApplicationDbContext context, IMapper mapper)
         {
             this.userRepository = userRepository;
+            this.context = context;
+            this.mapper = mapper;
+
         }
 
         [HttpGet("getUser")]
@@ -72,6 +80,22 @@ namespace FleetPro.API.Controllers
                     message = result
                 });
             }
+        }
+
+        [HttpGet("getDriverDetailsOnly")]
+        public async Task<List<UserDetailsDto>> GetDriverDetails(string roleId)
+        {
+           var roleData = await context.RoleMsts.Where(x => x.roleName == "Driver").AsNoTracking().FirstOrDefaultAsync();
+           var driverData = await context.UserMaster.Where(x => x.role == roleData.id && x.is_active == true).AsNoTracking().ToListAsync();
+
+           var result = mapper.Map<List<UserDetailsDto>>(driverData);
+
+            if(result == null || result.Count == 0)
+            {
+                return new List<UserDetailsDto>();
+            }
+
+            return result;     
         }
     }
 
