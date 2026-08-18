@@ -364,3 +364,28 @@ input:focus, select:focus, textarea:focus {
     grid-template-columns: 1fr;
   }
 }
+
+.checkbox-group {
+  justify-content: center;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: #d58ad1;
+}
+.required {
+  color: var(--danger);
+}
+.error {
+  color: var(--danger);
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}

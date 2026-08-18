@@ -39,7 +39,7 @@ export class  DailyLogReport implements OnInit {
     kmBeforeFueling: [0],
 
     tollCharges: [0],
-    insuranceShare: [0],
+    // insuranceShare: [0],
     workshopExpenses: [0],
     tyreMaintenance: [0],
 
@@ -85,7 +85,7 @@ export class  DailyLogReport implements OnInit {
           toKm: 0,
           kmBeforeFueling: 0,
           tollCharges: 0,
-          insuranceShare: 0,
+          // insuranceShare: 0,
           workshopExpenses: 0,
           tyreMaintenance: 0,
           driverSalary: 0,

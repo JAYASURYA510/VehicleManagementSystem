@@ -1,0 +1,536 @@
+<form [formGroup]="form" (ngSubmit)="save()">
+
+  <!-- Page Header -->
+
+  <div class="page-header">
+    <div>
+      <h1>New Vehicle Master</h1>
+      <p class="subtitle">
+        Add and manage vehicle master information
+      </p>
+    </div>
+  </div>
+
+
+  <div class="card">
+
+    <!-- Vehicle Information -->
+
+    <div class="section-title">
+      Vehicle Information
+    </div>
+
+    <div class="form-grid">
+
+      <!-- Registration Number -->
+
+      <div class="form-group">
+
+        <label>
+          Registration Number
+          <!-- <span class="required">*</span> -->
+        </label>
+
+        <input
+          type="text"
+          formControlName="registrationNumber"
+          placeholder="Enter registration number"
+          maxlength="20"
+        />
+
+        @if (
+          form.controls.registrationNumber.touched &&
+          form.controls.registrationNumber.invalid
+        ) {
+
+          <small class="error">
+
+            @if (form.controls.registrationNumber.errors?.['required']) {
+              Registration number is required.
+            }
+
+            @if (form.controls.registrationNumber.errors?.['maxlength']) {
+              Maximum 20 characters allowed.
+            }
+
+            @if (form.controls.registrationNumber.errors?.['pattern']) {
+              Only letters, numbers, spaces and hyphens are allowed.
+            }
+
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- Vehicle Type -->
+
+      <div class="form-group">
+
+        <label>
+          Vehicle Type
+          <span class="required">*</span>
+        </label>
+
+        <select formControlName="vehicleTypeId">
+
+          <option value="">
+            -- Select Vehicle Type --
+          </option>
+
+          <option value="1">Bus</option>
+          <option value="2">Car</option>
+          <option value="3">Van</option>
+          <option value="4">Truck</option>
+
+        </select>
+
+        @if (
+          form.controls.vehicleTypeId.touched &&
+          form.controls.vehicleTypeId.invalid
+        ) {
+
+          <small class="error">
+            Vehicle type is required.
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- Vehicle Category -->
+
+      <div class="form-group">
+
+        <label>
+          Vehicle Category
+          <span class="required">*</span>
+        </label>
+
+        <select formControlName="vehicleCategory">
+
+          <!-- <option value="">
+            -- Select Category --
+          </option> -->
+
+          <option value="1">Heavy Vehicle</option>
+          <option value="2">Light Vehicle</option>
+          <option value="3">Commercial Vehicle</option>
+
+        </select>
+
+        @if (
+          form.controls.vehicleCategory.touched &&
+          form.controls.vehicleCategory.invalid
+        ) {
+
+          <small class="error">
+            Vehicle category is required.
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- Make -->
+
+      <div class="form-group">
+
+        <label>
+          Make
+          <!-- <span class="required">*</span> -->
+        </label>
+
+        <input
+          type="text"
+          formControlName="make"
+          placeholder="Enter vehicle make"
+          maxlength="50"
+        />
+
+        @if (
+          form.controls.make.touched &&
+          form.controls.make.invalid
+        ) {
+
+          <small class="error">
+            Make is required.
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- Model -->
+
+      <div class="form-group">
+
+        <label>
+          Model
+          <!-- <span class="required">*</span> -->
+        </label>
+
+        <input
+          type="text"
+          formControlName="model"
+          placeholder="Enter vehicle model"
+          maxlength="50"
+        />
+
+        @if (
+          form.controls.model.touched &&
+          form.controls.model.invalid
+        ) {
+
+          <small class="error">
+            Model is required.
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- Chassis Number -->
+
+      <div class="form-group">
+
+        <label>
+          Chassis Number
+          <!-- <span class="required">*</span> -->
+        </label>
+
+        <input
+          type="text"
+          formControlName="chassisNumber"
+          placeholder="Enter chassis number"
+          maxlength="50"
+        />
+
+        @if (
+          form.controls.chassisNumber.touched &&
+          form.controls.chassisNumber.invalid
+        ) {
+
+          <small class="error">
+
+            @if (form.controls.chassisNumber.errors?.['required']) {
+              Chassis number is required.
+            }
+
+            @if (form.controls.chassisNumber.errors?.['maxlength']) {
+              Maximum 50 characters allowed.
+            }
+
+            @if (form.controls.chassisNumber.errors?.['pattern']) {
+              Invalid chassis number format.
+            }
+
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- Fuel Type -->
+
+      <div class="form-group">
+
+        <label>
+          Fuel Type
+          <span class="required">*</span>
+        </label>
+
+        <select formControlName="fuelTypeId">
+
+          <option value="">
+            -- Select Fuel Type --
+          </option>
+
+          <option value="1">Diesel</option>
+          <option value="2">Petrol</option>
+          <option value="3">Electric</option>
+          <option value="4">CNG</option>
+
+        </select>
+
+        @if (
+          form.controls.fuelTypeId.touched &&
+          form.controls.fuelTypeId.invalid
+        ) {
+
+          <small class="error">
+            Fuel type is required.
+          </small>
+
+        }
+
+      </div>
+
+    </div>
+
+
+    <!-- Registration & Insurance -->
+
+    <div class="section-title">
+      Registration & Insurance
+    </div>
+
+    <div class="form-grid cols-2">
+
+      <!-- Insurance Policy -->
+
+      <div class="form-group">
+
+        <label>
+          Insurance Policy Number
+        </label>
+
+        <input
+          type="text"
+          formControlName="insurancePolicyNo"
+          placeholder="Enter insurance policy number"
+          maxlength="100"
+        />
+
+      </div>
+
+
+      <!-- Insurance Expiry Date -->
+
+      <div class="form-group">
+
+       
+
+       <div class="form-group">
+
+  <label>
+    Insurance Expiry Date
+  </label>
+ 
+    <input
+      type="date"
+      formControlName="date"
+    />
+    @if (
+      form.controls.date.touched &&
+      form.controls.date.invalid
+    ) {
+      <small class="error">
+        Date is required.
+      </small>
+    }
+
+  </div>
+
+      </div>
+
+
+      <!-- RC Number -->
+
+      <div class="form-group">
+
+        <label>
+          RC Number
+          <span class="required">*</span>
+        </label>
+
+        <input
+          type="text"
+          formControlName="rcNumber"
+          placeholder="Enter RC number"
+          maxlength="50"
+        />
+
+        @if (
+          form.controls.rcNumber.touched &&
+          form.controls.rcNumber.invalid
+        ) {
+
+          <small class="error">
+            RC number is required.
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- FC Number -->
+
+      <div class="form-group">
+
+        <label>
+          FC Number
+        </label>
+
+        <input
+          type="text"
+          formControlName="fcNumber"
+          placeholder="Enter FC number"
+          maxlength="50"
+        />
+
+      </div>
+
+
+      <!-- FC Date -->
+
+      <div class="form-group">
+
+
+        <div class="form-group">
+
+    
+        <label>
+          FC Date
+        </label>
+
+   <!-- <label>
+          Last Service Date
+        </label> -->
+    <input
+      type="date"
+      formControlName="date"
+    />
+    @if (
+      form.controls.date.touched &&
+      form.controls.date.invalid
+    ) {
+      <small class="error">
+        Date is required.
+      </small>
+    }
+
+  </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Vehicle Status -->
+
+    <div class="section-title">
+      Vehicle Status & Service
+    </div>
+
+    <div class="form-grid cols-2">
+
+      <!-- Vehicle Status -->
+
+      <div class="form-group">
+
+        <label>
+          Vehicle Status
+          <span class="required">*</span>
+        </label>
+
+        <select formControlName="vehicleStatusId">
+
+          <option value="">
+            -- Select Vehicle Status --
+          </option>
+
+          <option value="1">Active</option>
+          <option value="2">Inactive</option>
+          <option value="3">Maintenance</option>
+
+        </select>
+
+        @if (
+          form.controls.vehicleStatusId.touched &&
+          form.controls.vehicleStatusId.invalid
+        ) {
+
+          <small class="error">
+            Vehicle status is required.
+          </small>
+
+        }
+
+      </div>
+
+
+      <!-- Last Service Date -->
+
+      <div class="form-group">
+
+        <!-- <label>
+          Last Service Date
+        </label> -->
+
+       <div class="form-group">
+
+    <label>
+          Last Service Date
+        </label>
+    <input
+      type="date"
+      formControlName="date"
+    />
+
+    @if (
+      form.controls.date.touched &&
+      form.controls.date.invalid
+    ) {
+      <small class="error">
+        Date is required.
+      </small>
+    }
+
+  </div>
+
+      </div>
+
+
+<!-- Available -->
+        <div class="form-group checkbox-group">
+
+          <label class="checkbox-label">
+
+            <input
+              type="checkbox"
+              formControlName="isAvailable"
+            />
+
+            <span>Vehicle Available</span>
+
+          </label>
+
+        </div>
+
+    </div>
+
+
+    <!-- Buttons -->
+
+    <div class="form-actions">
+
+      <button
+        type="reset"
+        class="btn btn-outline">
+
+        Reset
+
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="form.invalid">
+
+        Save Vehicle
+
+      </button>
+
+    </div>
+
+  </div>
+
+</form>
