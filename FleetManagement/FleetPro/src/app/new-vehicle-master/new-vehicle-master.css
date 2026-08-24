@@ -1,0 +1,8 @@
+.date-input {
+  cursor: pointer;
+  background: #fff;
+}
+
+.date-input[readonly] {
+  cursor: pointer;
+}

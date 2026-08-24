@@ -44,6 +44,9 @@ namespace FleetPro.API.Data.Entitys
         [Column("fc_number")]
         public string FcNumber { get; set; } = string.Empty;
 
+        [Column("fc_date")]
+        public DateOnly? FcDate { get; set; }
+
         [Column("vehicle_status_id")]
         public int? VehicleStatusId { get; set; }
 

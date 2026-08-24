@@ -1,5 +1,6 @@
 @import "@ng-select/ng-select/themes/default.theme.css";
 @import 'ngx-toastr/toastr';
+@import '@danielmoncada/angular-datetime-picker/assets/style/picker.min.css';
 :root {
   --bg-primary: #f5f6f8;
   --bg-secondary: #ffffff;
@@ -389,3 +390,86 @@ input:focus, select:focus, textarea:focus {
   font-size: 0.75rem;
   margin-top: 0.15rem;
 }
+
+.owl-dt-popup-container,
+.owl-dt-inline-container {
+  width: 20.5em;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(26, 29, 35, 0.16);
+}
+
+.owl-dt-container {
+  background: #fff;
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.owl-dt-calendar-control {
+  padding: 0.85em 0.75em 0.35em;
+}
+
+.owl-dt-calendar-control .owl-dt-control-arrow-button {
+  color: var(--accent-mid);
+}
+
+.owl-dt-control-period-button .owl-dt-control-button-content {
+  height: auto;
+  padding: 0.45em 0.85em;
+  border-radius: 12px;
+  background: #efe4fb;
+  color: #7a3aad;
+  font-weight: 700;
+}
+
+.owl-dt-control-period-button:hover > .owl-dt-control-button-content {
+  background: #e7d6fb;
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-header {
+  color: #7a3aad;
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-header .owl-dt-weekdays th {
+  font-size: 0.78em;
+  font-weight: 600;
+  padding-bottom: 0.65em;
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-header .owl-dt-calendar-table-divider:after {
+  background: #eceef2;
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-cell-content {
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-cell-selected {
+  color: #fff;
+  background-color: var(--accent);
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-cell-today:not(.owl-dt-calendar-cell-selected) {
+  border-color: var(--accent-muted);
+}
+
+.owl-dt-calendar-table :not(.owl-dt-calendar-cell-disabled):hover > .owl-dt-calendar-cell-content:not(.owl-dt-calendar-cell-selected) {
+  background-color: var(--accent-soft);
+}
+
+.owl-dt-container-buttons {
+  height: 2.6em;
+  color: #5b4db1;
+  border-top: 1px solid #eceef2;
+}
+
+.owl-dt-container-control-button .owl-dt-control-button-content {
+  font-weight: 600;
+}
+
+.owl-dt-container-control-button:hover .owl-dt-control-button-content {
+  background-color: var(--accent-soft);
+}
+

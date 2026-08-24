@@ -2,7 +2,7 @@
 {
     public class VehicleMstDto
     {
-        public Guid VehicleId { get; set; }
+        public Guid? VehicleId { get; set; }
         public string RegistrationNumber { get; set; } = string.Empty;
         public int? VehicleTypeId { get; set; }
         public int? VehicleCategory { get; set; }
@@ -14,6 +14,7 @@
         public DateOnly? InsuranceExpiryDate { get; set; }
         public string RcNumber { get; set; } = string.Empty;
         public string FcNumber { get; set; } = string.Empty;
+        public DateOnly? FcDate { get; set; }
         public int? VehicleStatusId { get; set; }
         public DateOnly? LastServiceDate { get; set; }
         public bool IsAvailable { get; set; }

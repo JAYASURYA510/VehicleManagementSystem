@@ -1,4 +1,4 @@
-<form [formGroup]="form" (ngSubmit)="save()">
+<form [formGroup]="vehicleForm" (ngSubmit)="save()">
 
   <!-- Page Header -->
 
@@ -39,21 +39,21 @@
         />
 
         @if (
-          form.controls.registrationNumber.touched &&
-          form.controls.registrationNumber.invalid
+          vehicleForm.controls.registrationNumber.touched &&
+          vehicleForm.controls.registrationNumber.invalid
         ) {
 
           <small class="error">
 
-            @if (form.controls.registrationNumber.errors?.['required']) {
+            @if (vehicleForm.controls.registrationNumber.errors?.['required']) {
               Registration number is required.
             }
 
-            @if (form.controls.registrationNumber.errors?.['maxlength']) {
+            @if (vehicleForm.controls.registrationNumber.errors?.['maxlength']) {
               Maximum 20 characters allowed.
             }
 
-            @if (form.controls.registrationNumber.errors?.['pattern']) {
+            @if (vehicleForm.controls.registrationNumber.errors?.['pattern']) {
               Only letters, numbers, spaces and hyphens are allowed.
             }
 
@@ -87,8 +87,8 @@
 </select>
 
         @if (
-          form.controls.vehicleTypeId.touched &&
-          form.controls.vehicleTypeId.invalid
+          vehicleForm.controls.vehicleTypeId.touched &&
+          vehicleForm.controls.vehicleTypeId.invalid
         ) {
 
           <small class="error">
@@ -122,8 +122,8 @@
         </select>
 
         @if (
-          form.controls.vehicleCategory.touched &&
-          form.controls.vehicleCategory.invalid
+          vehicleForm.controls.vehicleCategory.touched &&
+          vehicleForm.controls.vehicleCategory.invalid
         ) {
 
           <small class="error">
@@ -141,7 +141,7 @@
 
         <label>
           Make
-          <!-- <span class="required">*</span> -->
+          <span class="required">*</span>
         </label>
 
         <input
@@ -152,8 +152,8 @@
         />
 
         @if (
-          form.controls.make.touched &&
-          form.controls.make.invalid
+          vehicleForm.controls.make.touched &&
+          vehicleForm.controls.make.invalid
         ) {
 
           <small class="error">
@@ -171,7 +171,7 @@
 
         <label>
           Model
-          <!-- <span class="required">*</span> -->
+          <span class="required">*</span>
         </label>
 
         <input
@@ -182,8 +182,8 @@
         />
 
         @if (
-          form.controls.model.touched &&
-          form.controls.model.invalid
+          vehicleForm.controls.model.touched &&
+          vehicleForm.controls.model.invalid
         ) {
 
           <small class="error">
@@ -201,7 +201,7 @@
 
         <label>
           Chassis Number
-          <!-- <span class="required">*</span> -->
+          <span class="required">*</span>
         </label>
 
         <input
@@ -212,21 +212,21 @@
         />
 
         @if (
-          form.controls.chassisNumber.touched &&
-          form.controls.chassisNumber.invalid
+          vehicleForm.controls.chassisNumber.touched &&
+          vehicleForm.controls.chassisNumber.invalid
         ) {
 
           <small class="error">
 
-            @if (form.controls.chassisNumber.errors?.['required']) {
+            @if (vehicleForm.controls.chassisNumber.errors?.['required']) {
               Chassis number is required.
             }
 
-            @if (form.controls.chassisNumber.errors?.['maxlength']) {
+            @if (vehicleForm.controls.chassisNumber.errors?.['maxlength']) {
               Maximum 50 characters allowed.
             }
 
-            @if (form.controls.chassisNumber.errors?.['pattern']) {
+            @if (vehicleForm.controls.chassisNumber.errors?.['pattern']) {
               Invalid chassis number format.
             }
 
@@ -261,8 +261,8 @@
 </select>
 
         @if (
-          form.controls.fuelTypeId.touched &&
-          form.controls.fuelTypeId.invalid
+          vehicleForm.controls.fuelTypeId.touched &&
+          vehicleForm.controls.fuelTypeId.invalid
         ) {
 
           <small class="error">
@@ -306,28 +306,24 @@
 
       <div class="form-group">
 
-       
+        <label>
+          Insurance Expiry Date
+        </label>
 
-       <div class="form-group">
-
-  <label>
-    Insurance Expiry Date
-  </label>
- 
-    <input
-      type="date"
-      formControlName="date"
-    />
-    @if (
-      form.controls.date.touched &&
-      form.controls.date.invalid
-    ) {
-      <small class="error">
-        Date is required.
-      </small>
-    }
-
-  </div>
+        <input
+          class="date-input"
+          [owlDateTime]="insuranceExpiryPicker"
+          [owlDateTimeTrigger]="insuranceExpiryPicker"
+          formControlName="insuranceExpiryDate"
+          placeholder="dd-mm-yyyy"
+          readonly
+        />
+        <owl-date-time
+          #insuranceExpiryPicker
+          pickerType="calendar"
+          [firstDayOfWeek]="1"
+          [hideOtherMonths]="true">
+        </owl-date-time>
 
       </div>
 
@@ -349,8 +345,8 @@
         />
 
         @if (
-          form.controls.rcNumber.touched &&
-          form.controls.rcNumber.invalid
+          vehicleForm.controls.rcNumber.touched &&
+          vehicleForm.controls.rcNumber.invalid
         ) {
 
           <small class="error">
@@ -368,6 +364,7 @@
 
         <label>
           FC Number
+           <span class="required">*</span>
         </label>
 
         <input
@@ -377,6 +374,17 @@
           maxlength="50"
         />
 
+         @if (
+          vehicleForm.controls.fcNumber.touched &&
+          vehicleForm.controls.fcNumber.invalid
+        ) {
+
+          <small class="error">
+            FC number is required.
+          </small>
+
+        }
+
       </div>
 
 
@@ -384,31 +392,36 @@
 
       <div class="form-group">
 
-
-        <div class="form-group">
-
-    
         <label>
           FC Date
+           <span class="required">*</span>
         </label>
 
-   <!-- <label>
-          Last Service Date
-        </label> -->
-    <input
-      type="date"
-      formControlName="date"
-    />
-    @if (
-      form.controls.date.touched &&
-      form.controls.date.invalid
-    ) {
-      <small class="error">
-        Date is required.
-      </small>
-    }
+        <input
+          class="date-input"
+          [owlDateTime]="fcDatePicker"
+          [owlDateTimeTrigger]="fcDatePicker"
+          formControlName="fcDate"
+          placeholder="dd-mm-yyyy"
+          readonly
+        />
+        <owl-date-time
+          #fcDatePicker
+          pickerType="calendar"
+          [firstDayOfWeek]="1"
+          [hideOtherMonths]="true">
+        </owl-date-time>
 
-  </div>
+         @if (
+          vehicleForm.controls.fcDate.touched &&
+          vehicleForm.controls.fcDate.invalid
+        ) {
+
+          <small class="error">
+            FC Date is required.
+          </small>
+
+        }
 
       </div>
 
@@ -446,8 +459,8 @@
         </select>
 
         @if (
-          form.controls.vehicleStatusId.touched &&
-          form.controls.vehicleStatusId.invalid
+          vehicleForm.controls.vehicleStatusId.touched &&
+          vehicleForm.controls.vehicleStatusId.invalid
         ) {
 
           <small class="error">
@@ -463,30 +476,24 @@
 
       <div class="form-group">
 
-        <!-- <label>
-          Last Service Date
-        </label> -->
-
-       <div class="form-group">
-
-    <label>
+        <label>
           Last Service Date
         </label>
-    <input
-      type="date"
-      formControlName="date"
-    />
 
-    @if (
-      form.controls.date.touched &&
-      form.controls.date.invalid
-    ) {
-      <small class="error">
-        Date is required.
-      </small>
-    }
-
-  </div>
+        <input
+          class="date-input"
+          [owlDateTime]="lastServicePicker"
+          [owlDateTimeTrigger]="lastServicePicker"
+          formControlName="lastServiceDate"
+          placeholder="dd-mm-yyyy"
+          readonly
+        />
+        <owl-date-time
+          #lastServicePicker
+          pickerType="calendar"
+          [firstDayOfWeek]="1"
+          [hideOtherMonths]="true">
+        </owl-date-time>
 
       </div>
 
@@ -525,7 +532,7 @@
       <button
         type="submit"
         class="btn btn-primary"
-        [disabled]="form.invalid">
+        [disabled]="vehicleForm.invalid">
 
         Save Vehicle
 
