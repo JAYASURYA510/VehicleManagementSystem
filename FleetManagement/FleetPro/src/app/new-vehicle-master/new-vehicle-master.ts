@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import { ApiService } from '../../app/core/services/api.service';
-
+import vehicleOptions from '../../ennum/vehicle-option.json';
 
 
 @Component({
@@ -22,7 +22,11 @@ import { ApiService } from '../../app/core/services/api.service';
    styleUrl: './new-vehicle-master.css'
 })
 export class NewVehicleMaster implements OnInit {
-
+   vehicleCategories = vehicleOptions.vehicleCategories;
+  vehicleTypes = vehicleOptions.vehicleTypes;
+  fuelTypes = vehicleOptions.fuelTypes;
+  vehicleStatuses = vehicleOptions.vehicleStatuses;
+  
   private api = inject(ApiService);
   private fb = inject(FormBuilder);
 

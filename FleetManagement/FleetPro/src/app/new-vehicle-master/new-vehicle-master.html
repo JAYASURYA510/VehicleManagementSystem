@@ -72,19 +72,19 @@
           Vehicle Type
           <span class="required">*</span>
         </label>
+<select formControlName="vehicleTypeId">
 
-        <select formControlName="vehicleTypeId">
+  <option value="">
+    -- Select Vehicle Type --
+  </option>
 
-          <option value="">
-            -- Select Vehicle Type --
-          </option>
+  @for (type of vehicleTypes; track type.id) {
+    <option [value]="type.id">
+      {{ type.name }}
+    </option>
+  }
 
-          <option value="1">Bus</option>
-          <option value="2">Car</option>
-          <option value="3">Van</option>
-          <option value="4">Truck</option>
-
-        </select>
+</select>
 
         @if (
           form.controls.vehicleTypeId.touched &&
@@ -104,21 +104,21 @@
 
       <div class="form-group">
 
-        <label>
-          Vehicle Category
-          <span class="required">*</span>
-        </label>
+    <label>
+    Vehicle Category
+  </label>
 
-        <select formControlName="vehicleCategory">
+  <select formControlName="vehicleCategory">
 
-          <!-- <option value="">
-            -- Select Category --
-          </option> -->
+    <option value="">
+      -- Select Category --
+    </option>
 
-          <option value="1">Heavy Vehicle</option>
-          <option value="2">Light Vehicle</option>
-          <option value="3">Commercial Vehicle</option>
-
+    @for (category of vehicleCategories; track category.id) {
+      <option [value]="category.id">
+        {{ category.name }}
+      </option>
+    }
         </select>
 
         @if (
@@ -248,16 +248,17 @@
 
         <select formControlName="fuelTypeId">
 
-          <option value="">
-            -- Select Fuel Type --
-          </option>
+  <option value="">
+    -- Select Fuel Type --
+  </option>
 
-          <option value="1">Diesel</option>
-          <option value="2">Petrol</option>
-          <option value="3">Electric</option>
-          <option value="4">CNG</option>
+  @for (fuel of fuelTypes; track fuel.id) {
+    <option [value]="fuel.id">
+      {{ fuel.name }}
+    </option>
+  }
 
-        </select>
+</select>
 
         @if (
           form.controls.fuelTypeId.touched &&
@@ -433,14 +434,15 @@
 
         <select formControlName="vehicleStatusId">
 
-          <option value="">
-            -- Select Vehicle Status --
-          </option>
+         <option value="">
+    -- Select Vehicle Status --
+  </option>
 
-          <option value="1">Active</option>
-          <option value="2">Inactive</option>
-          <option value="3">Maintenance</option>
-
+  @for (status of vehicleStatuses; track status.id) {
+    <option [value]="status.id">
+      {{ status.name }}
+    </option>
+  }
         </select>
 
         @if (

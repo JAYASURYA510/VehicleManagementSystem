@@ -1,0 +1,69 @@
+{
+  "vehicleCategories": [
+    {
+      "id": 1,
+      "name": "Heavy Vehicle"
+    },
+    {
+      "id": 2,
+      "name": "Light Vehicle"
+    },
+    {
+      "id": 3,
+      "name": "Commercial Vehicle"
+    }
+  ],
+
+  "vehicleTypes": [
+    {
+      "id": 1,
+      "name": "Bus"
+    },
+    {
+      "id": 2,
+      "name": "Car"
+    },
+    {
+      "id": 3,
+      "name": "Van"
+    },
+    {
+      "id": 4,
+      "name": "Truck"
+    }
+  ],
+
+  "fuelTypes": [
+    {
+      "id": 1,
+      "name": "Diesel"
+    },
+    {
+      "id": 2,
+      "name": "Petrol"
+    },
+    {
+      "id": 3,
+      "name": "CNG"
+    },
+    {
+      "id": 4,
+      "name": "Electric"
+    }
+  ],
+
+  "vehicleStatuses": [
+    {
+      "id": 1,
+      "name": "Active"
+    },
+    {
+      "id": 2,
+      "name": "Inactive"
+    },
+    {
+      "id": 3,
+      "name": "Maintenance"
+    }
+  ]
+}
