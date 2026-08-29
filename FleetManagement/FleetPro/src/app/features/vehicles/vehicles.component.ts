@@ -23,6 +23,10 @@ export class VehiclesComponent implements OnInit {
   filterFrom = '';
   filterTo = '';
 
+
+
+
+  
   form = this.fb.group({
     registrationNumber: ['', Validators.required],
     vehicleType: ['Truck', Validators.required],
@@ -33,10 +37,32 @@ export class VehiclesComponent implements OnInit {
   });
 
   ngOnInit(): void { this.load(); }
+load(): void {
+  this.api.get<any[]>('VehicleMst/getAllVehicle').subscribe({
+    next: (data) => {
+      console.log('Vehicle API Response:', data);
 
-  load(): void {
-    this.api.get<Vehicle[]>('vehicles', { activeOnly: false }).subscribe(v => this.vehicles.set(v));
-  }
+      const vehicles: Vehicle[] = data.map(v => ({
+        id: v.vehicleId,
+        registrationNumber: v.registrationNumber,
+        vehicleType: v.vehicleType ?? '-',
+        make: v.make ?? '-',
+        model: v.model ?? '-',
+        year: v.year ?? new Date().getFullYear(),
+        driverName: v.driverName ?? '-',
+        chassisNumber: v.chassisNumber ?? '-',
+        rcNumber: v.rcNumber ?? '-',
+        fcNumber: v.fcNumber ?? '-',
+        isActive: v.isAvailable ?? true
+      }));
+
+      this.vehicles.set(vehicles);
+    },
+    error: (error) => {
+      console.error('Error loading vehicles:', error);
+    }
+  });
+}
 
   filteredVehicles(): Vehicle[] {
     return this.vehicles();

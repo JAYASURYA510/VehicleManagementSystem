@@ -28,47 +28,107 @@
 
 <div class="card">
   <div class="card-toolbar">
-    <h3>Vehicles Inventory</h3>
-    @if (canManage) {
-      <button class="btn btn-primary" (click)="openCreate()">+ Register Vehicle</button>
-    }
+    <!-- <h3>Vehicles Inventory</h3> -->
+
+    <!-- @if (canManage) {
+      <button class="btn btn-primary" (click)="openCreate()">
+        + Register Vehicle
+      </button>
+    } -->
   </div>
 
-  <div class="table-responsive">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Plate Number</th>
-          <th>Make</th>
-          <th>Model</th>
-          <th>Year</th>
-          <th>Assigned Driver</th>
-          @if (canManage) { <th>Actions</th> }
-        </tr>
-      </thead>
-      <tbody>
-        @for (v of filteredVehicles(); track v.id) {
-          <tr [class.inactive]="!v.isActive">
-            <td><strong>{{ v.registrationNumber }}</strong></td>
-            <td>{{ v.make }}</td>
-            <td>{{ v.model }}</td>
-            <td>{{ v.year }}</td>
-            <td>{{ v.driverName }}</td>
-            @if (canManage) {
-              <td class="actions">
-                <button class="btn-icon" title="Edit" (click)="openEdit(v)">✎</button>
-                @if (v.isActive) {
-                  <button class="btn-icon" title="Delete" (click)="deleteVehicle(v.id)">🗑</button>
-                }
-              </td>
-            }
-          </tr>
-        } @empty {
-          <tr><td [attr.colspan]="canManage ? 6 : 5" class="empty">No vehicles found</td></tr>
+  <div class="table-responsive vehicle-table-wrapper">
+  <table class="custom-table vehicle-table">
+
+    <thead>
+      <tr>
+        <th>Registration Number</th>
+        <th>Vehicle Type</th>
+        <th>Chassis Number</th>
+        <th>RC Number</th>
+        <th>FC Number</th>
+        <th>Vehicle Status</th>
+
+        @if (canManage) {
+          <th>Actions</th>
         }
-      </tbody>
-    </table>
-  </div>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (v of filteredVehicles(); track v.id) {
+        <tr [class.inactive]="!v.isActive">
+
+          <td>
+            <strong>{{ v.registrationNumber }}</strong>
+          </td>
+
+          <td>
+            {{ v.vehicleType || '-' }}
+          </td>
+
+          <td>
+            {{ v.chassisNumber || '-' }}
+          </td>
+
+          <td>
+            {{ v.rcNumber || '-' }}
+          </td>
+
+          <td>
+            {{ v.fcNumber || '-' }}
+          </td>
+
+          <td>
+            @if (v.isActive) {
+              <span class="status-badge active">
+                Active
+              </span>
+            } @else {
+              <span class="status-badge">
+                Inactive
+              </span>
+            }
+          </td>
+
+          @if (canManage) {
+            <td class="actions">
+
+              <button
+                class="btn-icon"
+                title="Edit"
+                (click)="openEdit(v)">
+                ✎
+              </button>
+
+              @if (v.isActive) {
+                <button
+                  class="btn-icon"
+                  title="Delete"
+                  (click)="deleteVehicle(v.id)">
+                  🗑
+                </button>
+              }
+
+            </td>
+          }
+
+        </tr>
+      }
+
+      @empty {
+        <tr>
+          <td
+            [attr.colspan]="canManage ? 7 : 6"
+            class="empty">
+            No vehicles found
+          </td>
+        </tr>
+      }
+    </tbody>
+
+  </table>
+</div>
 </div>
 
 @if (showForm()) {

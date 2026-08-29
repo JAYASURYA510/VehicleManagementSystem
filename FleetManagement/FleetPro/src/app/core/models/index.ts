@@ -64,6 +64,10 @@ export interface Vehicle {
   year: number;
   driverName: string;
   isActive: boolean;
+  chassisNumber?: string;
+  rcNumber?: string;
+  fcNumber?: string;
+  
 }
 
 export interface Master {
