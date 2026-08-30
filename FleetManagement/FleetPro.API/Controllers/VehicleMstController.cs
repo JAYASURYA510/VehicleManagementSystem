@@ -1,8 +1,10 @@
-﻿using FleetPro.API.DTOs;
+﻿using FleetPro.API.Data;
+using FleetPro.API.DTOs;
 using FleetPro.API.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FleetPro.API.Controllers
 {
@@ -12,10 +14,12 @@ namespace FleetPro.API.Controllers
     public class VehicleMstController : ControllerBase
     {
         private readonly IVehicleMstRepository vehicleMstRepository;
+        private readonly ApplicationDbContext context;
 
-        public VehicleMstController(IVehicleMstRepository vehicleMstRepository)
+        public VehicleMstController(IVehicleMstRepository vehicleMstRepository,ApplicationDbContext context)
         {
             this.vehicleMstRepository = vehicleMstRepository;
+            this.context = context;
         }
 
         [HttpGet("getAllVehicle")]
@@ -27,6 +31,62 @@ namespace FleetPro.API.Controllers
                 return new List<VehicleMstDto>();
             }
             return vehicleDEtails;
+        }
+
+        [HttpGet("getAllVehicleForDropDown")]
+        public async Task<IActionResult> getVehicleForDropDown()
+        {
+            var getData = await context.VehicleMsts.AsNoTracking().Select(
+                x => new
+                {
+                    x.VehicleId,
+                    x.RegistrationNumber
+                }
+            ).ToListAsync();
+            if (getData != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = getData,
+                });
+            }
+            else
+            {
+                 return BadRequest(new
+                {
+                    success = false,
+                    message = "Assigned Vehicle Details Not Saved.",
+                });
+            }
+        }
+
+        [HttpGet("getActiveAllVehicle")]
+        public async Task<IActionResult> getActiveAllVehicle()
+        {
+            var getData = await context.VehicleMsts.Where(x => x.VehicleStatusId == 1).AsNoTracking().Select(
+                x => new
+                {
+                    x.VehicleId,
+                    x.RegistrationNumber
+                }
+            ).ToListAsync();
+            if (getData != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = getData,
+                });
+            }
+            else
+            {
+                 return BadRequest(new
+                {
+                    success = false,
+                    message = "Assigned Vehicle Details Not Saved.",
+                });
+            }
         }
 
         [HttpGet("getVehicleById/{VehicleId}")]
@@ -102,6 +162,28 @@ namespace FleetPro.API.Controllers
                 {
                     success = false,
                     message = "Failed to delete vehicle details."
+                });
+            }
+        }
+
+        [HttpPost("getVehicleBySearch")]
+        public async Task<IActionResult> getSearchedData([FromBody] searchVehicleDto searchVehicleDto)
+        {
+            var vehicleData = await vehicleMstRepository.getsearchedVehicle(searchVehicleDto);
+            if (vehicleData != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = vehicleData,
+                });
+            }
+            else
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Not Found."
                 });
             }
         }

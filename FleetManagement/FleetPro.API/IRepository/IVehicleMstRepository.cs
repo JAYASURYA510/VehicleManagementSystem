@@ -9,5 +9,7 @@ namespace FleetPro.API.IRepository
         Task<VehicleMstDto> saveVehicle(VehicleMstDto vehicle);
         Task<VehicleMstDto> updateVehicle(Guid VehicleId, VehicleMstDto vehicle);
         Task<bool> deleteVehicle(Guid VehicleId);
+        Task<List<VehicleMstDto>> getsearchedVehicle(searchVehicleDto searchVehicleDto);
+
     }
 }

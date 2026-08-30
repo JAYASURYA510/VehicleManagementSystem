@@ -125,5 +125,36 @@ namespace FleetPro.API.Repository
                 throw new Exception("An error occurred while deleting the vehicle details.", ex);
             }
         }
+
+        public async Task<List<VehicleMstDto>> getsearchedVehicle(searchVehicleDto searchVehicleDto)
+        {
+            try
+            {
+                var query = context.VehicleMsts.AsQueryable().AsNoTracking();
+                if (!string.IsNullOrWhiteSpace(searchVehicleDto.RegistrationNumber))
+                {
+                    query = query.Where(x => x.RegistrationNumber.Contains(searchVehicleDto.RegistrationNumber));
+                }
+                if (searchVehicleDto.VehicleTypeId.HasValue)
+                {
+                    query = query.Where(x => x.VehicleTypeId == searchVehicleDto.VehicleTypeId);
+                }
+                if (searchVehicleDto.VehicleStatusId.HasValue)
+                {
+                    query = query.Where(x => x.VehicleStatusId == searchVehicleDto.VehicleStatusId);
+                }
+                if (!string.IsNullOrWhiteSpace(searchVehicleDto.searchTerm))
+                {
+                    query = query.Where(x => x.ChassisNumber.Contains(searchVehicleDto.searchTerm) || x.RcNumber.Contains(searchVehicleDto.searchTerm) || x.FcNumber.Contains(searchVehicleDto.searchTerm));
+                }
+
+                var result = await query.ToListAsync();
+                return mapper.Map<List<VehicleMstDto>>(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while searching vehicle details.", ex);
+            }
+        }
     }
 }
