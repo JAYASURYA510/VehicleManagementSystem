@@ -83,7 +83,7 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpGet("getDriverDetailsOnly")]
-        public async Task<List<UserDetailsDto>> GetDriverDetails(string roleId)
+        public async Task<List<UserDetailsDto>> GetDriverDetails()
         {
            var roleData = await context.RoleMsts.Where(x => x.roleName == "Driver").AsNoTracking().FirstOrDefaultAsync();
            var driverData = await context.UserMaster.Where(x => x.role == roleData.id && x.is_active == true).AsNoTracking().ToListAsync();
@@ -97,6 +97,43 @@ namespace FleetPro.API.Controllers
 
             return result;     
         }
+
+        [HttpGet("getallUserForSelection")]
+        public async Task<IActionResult> getAllUser()
+        {
+            try
+            {
+                var allUser = await context.UserMaster.AsNoTracking().Select(
+                    x => new
+                    {
+                        x.userId,
+                        x.fullName,
+                        x.role
+                    }
+                ).OrderBy(x => x.userId).ToListAsync();
+                if (allUser != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = allUser,
+                });
+            }
+            else
+            {
+                 return BadRequest(new
+                {
+                    success = false,
+                    message = "No Data Found.",
+                });
+            }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception", ex);
+            }
+        }
+
     }
 
 }
