@@ -82,11 +82,6 @@ body{
     clip-path:path("M0,0 C70,40 70,120 0,170 C70,220 70,300 0,350 C70,400 70,480 0,520 L90,520 L90,0 Z");
 }
 
-.error-text {
-    color: #dc3545;
-    font-size: 12px;
-    margin-top: 2px;
-}
 
 .login-right{
     flex:1;
@@ -107,28 +102,87 @@ body{
 }
 
 .form-group{
-    margin-bottom:22px;
+    position:relative;
+    margin-bottom:28px;
+    padding-top:16px;
 }
 
-label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:600;
-    color:#374151;
-}
-
-input{
-    width:100%;
-    height:48px;
-    border:none;
-    border-bottom:2px solid #d6d6d6;
-    outline:none;
+.floating-group label{
+    position:absolute;
+    top:22px;
+    left:0;
     font-size:15px;
-    transition:.3s;
+    font-weight:400;
+    color:#a89f95;
+    pointer-events:none;
+    transition:all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin:left top;
+    letter-spacing:0.2px;
 }
 
-input:focus{
-    border-bottom:2px solid #985197;
+.floating-group input{
+    width:100%;
+    height:38px;
+    border:none !important;
+    border-bottom:1px solid #e0ddd8 !important;
+    border-radius:0 !important;
+    outline:none !important;
+    box-shadow:none !important;
+    font-size:15px;
+    font-weight:400;
+    background:transparent !important;
+    padding:4px 0 6px 0;
+    color:#2d3748;
+    transition:border-color 0.25s ease;
+}
+
+.floating-group input:focus,
+.floating-group input:focus-visible{
+    border:none !important;
+    border-bottom:1.5px solid #985197 !important;
+    border-radius:0 !important;
+    outline:none !important;
+    box-shadow:none !important;
+}
+
+/* Chrome/Edge autofill styling */
+.floating-group input:-webkit-autofill,
+.floating-group input:-webkit-autofill:hover,
+.floating-group input:-webkit-autofill:focus,
+.floating-group input:-webkit-autofill:active{
+    -webkit-box-shadow:0 0 0 30px white inset !important;
+    box-shadow:0 0 0 30px white inset !important;
+    -webkit-text-fill-color:#2d3748 !important;
+    border:none !important;
+    border-bottom:1px solid #e0ddd8 !important;
+    border-radius:0 !important;
+}
+
+.floating-group input:-webkit-autofill:focus{
+    border-bottom:1.5px solid #985197 !important;
+}
+
+/* Float label to top on focus, input containing value, or browser autofill */
+.floating-group input:focus ~ label,
+.floating-group input:not(:placeholder-shown) ~ label,
+.floating-group input:-webkit-autofill ~ label{
+    top:-2px;
+    font-size:12px;
+    font-weight:500;
+    color:#985197;
+}
+
+.floating-group input:not(:focus):not(:placeholder-shown) ~ label{
+    color:#8c837a;
+}
+
+/* Validation error state */
+.floating-group input.ng-invalid.ng-touched{
+    border-bottom-color:#dc3545 !important;
+}
+
+.floating-group input.ng-invalid.ng-touched ~ label{
+    color:#dc3545;
 }
 
 .login-btn{
@@ -277,11 +331,11 @@ input:focus{
 }
 
 .form-group{
-    margin-bottom:18px;
+    margin-bottom:20px;
 }
 
-input{
-    height:46px;
+.floating-group input{
+    height:40px;
     font-size:14px;
 }
 
@@ -318,11 +372,7 @@ input{
     font-size:22px;
 }
 
-label{
-    font-size:14px;
-}
-
-input{
+.floating-group input{
     font-size:13px;
 }
 
@@ -342,3 +392,33 @@ input{
 ::ng-deep .ng-dropdown-panel{
     width:100% !important;
 }
+
+.error-text {
+    display: block;
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.login-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff0f0;
+    border: 1px solid #f5b5b5;
+    color: #dc3545;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin: 15px 0;
+}
+
+.error-icon {
+    font-size: 16px;
+}
+
+.login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+

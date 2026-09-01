@@ -5,6 +5,7 @@
   <div class="page-header">
     <div>
       <h1>New Vehicle Master</h1>
+      
       <p class="subtitle">
         Add and manage vehicle master information
       </p>
@@ -28,7 +29,7 @@
 
         <label>
           Registration Number
-          <!-- <span class="required">*</span> -->
+          <span class="required">*</span>
         </label>
 
         <input
@@ -36,6 +37,8 @@
           formControlName="registrationNumber"
           placeholder="Enter registration number"
           maxlength="20"
+           oninput="this.value = this.value.toUpperCase()"
+          
         />
 
         @if (
@@ -43,7 +46,7 @@
           vehicleForm.controls.registrationNumber.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
 
             @if (vehicleForm.controls.registrationNumber.errors?.['required']) {
               Registration number is required.
@@ -91,7 +94,7 @@
           vehicleForm.controls.vehicleTypeId.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             Vehicle type is required.
           </small>
 
@@ -106,6 +109,7 @@
 
     <label>
     Vehicle Category
+    <span class="required">*</span>
   </label>
 
   <select formControlName="vehicleCategory">
@@ -126,7 +130,7 @@
           vehicleForm.controls.vehicleCategory.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             Vehicle category is required.
           </small>
 
@@ -156,7 +160,7 @@
           vehicleForm.controls.make.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             Make is required.
           </small>
 
@@ -186,7 +190,7 @@
           vehicleForm.controls.model.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             Model is required.
           </small>
 
@@ -216,7 +220,7 @@
           vehicleForm.controls.chassisNumber.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
 
             @if (vehicleForm.controls.chassisNumber.errors?.['required']) {
               Chassis number is required.
@@ -265,7 +269,7 @@
           vehicleForm.controls.fuelTypeId.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             Fuel type is required.
           </small>
 
@@ -349,7 +353,7 @@
           vehicleForm.controls.rcNumber.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             RC number is required.
           </small>
 
@@ -379,7 +383,7 @@
           vehicleForm.controls.fcNumber.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             FC number is required.
           </small>
 
@@ -417,7 +421,7 @@
           vehicleForm.controls.fcDate.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             FC Date is required.
           </small>
 
@@ -463,7 +467,7 @@
           vehicleForm.controls.vehicleStatusId.invalid
         ) {
 
-          <small class="error">
+          <small class="alert alert-danger">
             Vehicle status is required.
           </small>
 

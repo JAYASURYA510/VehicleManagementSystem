@@ -6,3 +6,21 @@
 .date-input[readonly] {
   cursor: pointer;
 }
+/* Required field validation - same style as Users component */
+
+.form-group .alert-danger {
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: #fee2e2;
+  color: #991b1b;
+  margin: 0;
+  display: block;
+}
+
+.form-group input.is-invalid,
+.form-group select.is-invalid {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}

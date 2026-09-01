@@ -1,69 +1,190 @@
-import { Component, inject, signal } from '@angular/core';
+
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { ApiService } from '../../../core/services/api.service';
 import { Subject, takeUntil } from 'rxjs';
+
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
-  protected readonly unsubscribe$ = new Subject<void>();
-  form : any;
-  roleList : any;
-  constructor(
-     private fb : FormBuilder, private auth : AuthService,
-     private router : Router
-  ) {
-    this.form = this.fb.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required]
-    });
-  }
+export class LoginComponent implements OnInit, OnDestroy {
 
-    ngOnInit(): void {
-    this.loadRole();
-  }
+  protected readonly unsubscribe$ = new Subject<void>();
+
+  form: any;
+  roleList: any;
 
   error = signal('');
   loading = signal(false);
 
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router
+  ) {
 
-  loadRole(){
-   this.auth.getRoleForLog().pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
-    this.roleList = data;
-   });
-  }
-
-  onSubmit(): void {
-    if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
-    }
-    this.loading.set(true);
-    this.error.set('');
-    const { username, password } = this.form.getRawValue();
-    this.auth.login(username!, password!).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        if (err.status === 0) {
-          this.error.set('Cannot connect to API. Start the backend: cd FleetPro.API && dotnet run');
-        } else if (err.status === 401) {
-          this.error.set('Invalid username or password');
-        } else {
-          this.error.set(err.error?.message ?? 'Login failed. Please try again.');
-        }
-      }
+    this.form = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     });
+
   }
+
+
+  ngOnInit(): void {
+    this.loadRole();
+  }
+
+
+  /*
+   * Load Roles
+   */
+  loadRole(): void {
+
+    this.auth
+      .getRoleForLog()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+
+        next: (data: any) => {
+          this.roleList = data;
+        },
+
+        error: (err: any) => {
+          console.error('Role loading failed:', err);
+        }
+
+      });
+
+  }
+
+
+  /*
+   * Login
+   */
+  onSubmit(): void {
+
+    // Clear previous API error
+    this.error.set('');
+
+    // Validate form
+    if (this.form.invalid) {
+
+      this.form.markAllAsTouched();
+
+      return;
+    }
+
+
+    // Start loading
+    this.loading.set(true);
+
+
+    const { username, password } = this.form.getRawValue();
+
+
+    this.auth.login(username, password).subscribe({
+
+      /*
+       * Login Success
+       */
+      next: () => {
+
+        this.loading.set(false);
+
+        this.router.navigate(['/dashboard']);
+
+      },
+
+
+      /*
+       * Login Error
+       */
+      error: (err: any) => {
+
+        this.loading.set(false);
+
+        console.error('Login error:', err);
+
+
+        /*
+         * Backend not available
+         */
+        if (err.status === 0) {
+
+          this.error.set(
+            'Cannot connect to server. Please try again later.'
+          );
+
+        }
+
+
+        /*
+         * Wrong username/password
+         */
+        else if (err.status === 401) {
+
+          this.error.set(
+            'Invalid username or password.'
+          );
+
+        }
+
+
+        /*
+         * Bad request
+         */
+        else if (err.status === 400) {
+
+          this.error.set(
+            err.error?.message || 'Invalid login details.'
+          );
+
+        }
+
+
+        /*
+         * Other errors
+         */
+        else {
+
+          this.error.set(
+            err.error?.message ||
+            'Login failed. Please try again.'
+          );
+
+        }
+
+      }
+
+    });
+
+  }
+
+
+  /*
+   * Destroy
+   */
+  ngOnDestroy(): void {
+
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+
+  }
+
 }
+
