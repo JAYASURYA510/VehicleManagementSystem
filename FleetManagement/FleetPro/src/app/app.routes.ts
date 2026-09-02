@@ -23,6 +23,7 @@ export const routes: Routes = [
     component: FormDataComponent
   },
       { path: 'NewVehiclemaster', component: NewVehicleMaster},
+      { path: 'NewVehiclemaster/edit/:id', component: NewVehicleMaster},
       { path: 'daily-log-report', component: DailyLogReport},
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent},

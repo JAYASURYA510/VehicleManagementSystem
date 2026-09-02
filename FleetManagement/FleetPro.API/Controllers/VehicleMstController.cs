@@ -36,7 +36,7 @@ namespace FleetPro.API.Controllers
         [HttpGet("getAllVehicleForDropDown")]
         public async Task<IActionResult> getVehicleForDropDown()
         {
-            var getData = await context.VehicleMsts.AsNoTracking().Select(
+            var getData = await context.VehicleMsts.AsNoTracking().Where(x => x.IsAvailable == true).Select(
                 x => new
                 {
                     x.VehicleId,
@@ -64,7 +64,7 @@ namespace FleetPro.API.Controllers
         [HttpGet("getActiveAllVehicle")]
         public async Task<IActionResult> getActiveAllVehicle()
         {
-            var getData = await context.VehicleMsts.Where(x => x.VehicleStatusId == 1).AsNoTracking().Select(
+            var getData = await context.VehicleMsts.Where(x => x.VehicleStatusId == 1 && x.IsAvailable == true).AsNoTracking().Select(
                 x => new
                 {
                     x.VehicleId,

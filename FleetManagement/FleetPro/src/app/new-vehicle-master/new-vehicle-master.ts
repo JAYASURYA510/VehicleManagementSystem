@@ -21,6 +21,7 @@ import { CommanService } from '../core/services/comman.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 const DATE_PICKER_FORMATS = {
   parseInput: { year: 'numeric', month: '2-digit', day: '2-digit' },
@@ -91,6 +92,10 @@ export class NewVehicleMaster implements OnInit {
   fuelTypes = vehicleOptions.fuelTypes;
   vehicleStatuses = vehicleOptions.vehicleStatuses;
   
+  isSaveButton : boolean = true;
+  updateButton : boolean = false;
+  vehicleId : any;
+  
   private api = inject(ApiService);
   private fb = inject(FormBuilder);
   localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
@@ -116,10 +121,16 @@ export class NewVehicleMaster implements OnInit {
 
   constructor(
          private apiService : CommanService, private cdr: ChangeDetectorRef,
-         private router : Router, private alert: ToastrService
+         private router : Router, private alert: ToastrService,private route: ActivatedRoute
       ) {}
 
   ngOnInit(): void {
+    this.vehicleId = this.route.snapshot.paramMap.get('id');
+    if (this.vehicleId) {
+      this.isSaveButton = false;
+      this.updateButton = true;
+      this.getVehicleById(this.vehicleId);
+    }
   }
 
   save(): void {
@@ -160,6 +171,50 @@ export class NewVehicleMaster implements OnInit {
      this.alert.error("Unable to Save Vehicle Master");
    });
 
+  }
+
+  getVehicleById(id: any): void {
+    this.apiService.list(`VehicleMst/getVehicleById/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+      if(data){
+        this.vehicleForm.patchValue(data);
+      }
+    });
+  }
+
+  updateVehicle(): void {
+    if (this.vehicleForm.invalid) {
+      this.vehicleForm.markAllAsTouched();
+      return;
+    }
+
+    const vehicleData = {
+      registrationNumber : this.vehicleForm.get("registrationNumber")?.value,
+      vehicleTypeId: Number(this.vehicleForm.get("vehicleTypeId")?.value) || 0,
+      vehicleCategory: Number(this.vehicleForm.get("vehicleCategory")?.value) || 0,
+      make: this.vehicleForm.get("make")?.value,
+      model: this.vehicleForm.get("model")?.value,
+      chassisNumber: this.vehicleForm.get("chassisNumber")?.value,
+      fuelTypeId: Number(this.vehicleForm.get("fuelTypeId")?.value) || 0,
+      insurancePolicyNo : this.vehicleForm.get("insurancePolicyNo")?.value,
+      insuranceExpiryDate : this.toApiDate(this.vehicleForm.get("insuranceExpiryDate")?.value),
+      rcNumber : this.vehicleForm.get("rcNumber")?.value,
+      fcNumber : this.vehicleForm.get("fcNumber")?.value,
+      fcDate : this.toApiDate(this.vehicleForm.get("fcDate")?.value),
+      vehicleStatusId: Number(this.vehicleForm.get("vehicleStatusId")?.value) || 0,
+      lastServiceDate : this.toApiDate(this.vehicleForm.get("lastServiceDate")?.value),
+      updatedDate : new Date().toISOString(),
+      updatedBy : this.localStorageData.userId,
+    }
+
+    this.apiService.update(`VehicleMst/UpdateVehicleDetails/${this.vehicleId}`, vehicleData).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+      if(data.success == true){
+        this.alert.success("Vehicle Master Updated Successfully")
+        this.reset();
+         this.router.navigate(['/vehicles']);
+      }
+    },(error) =>{
+     this.alert.error("Unable to Update Vehicle Master");
+   });
   }
 
   reset(){

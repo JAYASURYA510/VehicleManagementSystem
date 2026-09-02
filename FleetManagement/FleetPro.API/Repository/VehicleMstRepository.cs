@@ -21,7 +21,7 @@ namespace FleetPro.API.Repository
         {
             try
             {
-                var vehicleData = await context.VehicleMsts.AsNoTracking().ToListAsync();
+                var vehicleData = await context.VehicleMsts.Where(x => x.IsAvailable == true).AsNoTracking().ToListAsync();
                 return mapper.Map<List<VehicleMstDto>>(vehicleData);
             }
             catch (Exception ex)
@@ -116,7 +116,7 @@ namespace FleetPro.API.Repository
                     throw new Exception($"Vehicle with ID {VehicleId} not found.");
                 }
 
-                context.VehicleMsts.Remove(existingVehicle);
+                existingVehicle.IsAvailable = false;
                 await context.SaveChangesAsync();
                 return true;
             }

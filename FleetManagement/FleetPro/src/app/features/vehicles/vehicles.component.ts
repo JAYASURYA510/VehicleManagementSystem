@@ -1,33 +1,105 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { AfterViewInit, Component, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Vehicle } from '../../core/models';
+import { CommanService } from '../../core/services/comman.service';
+import { Subject, takeUntil } from 'rxjs';
+import { NgxSelectModule } from 'ngx-select-ex';
+import vehicleoption from '../../../ennum/vehicle-option.json';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { NgSelectComponent } from '@ng-select/ng-select';
+import { MatFormField, MatOption, MatSelect } from "@angular/material/select";
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vehicles',
-  imports: [ReactiveFormsModule, FormsModule],
+  standalone: true,
+  imports: [ReactiveFormsModule, FormsModule, MatTableModule, MatSortModule, NgxSelectModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatButtonModule,
+    MatIconModule, MatFormField, MatOption, MatSelect],
   templateUrl: './vehicles.component.html',
   styleUrl: './vehicles.component.css'
 })
-export class VehiclesComponent implements OnInit {
+export class VehiclesComponent implements OnInit, AfterViewInit {
+  protected readonly unsubscribe$ = new Subject<void>();
   private api = inject(ApiService);
   auth = inject(AuthService);
-  private fb = inject(FormBuilder);
-
+  private fb2 = inject(FormBuilder);
+  serachVehicle: FormGroup;
   vehicles = signal<Vehicle[]>([]);
   showForm = signal(false);
   editingId = signal<number | null>(null);
+  vehicleList : any;
+  vehicleOption : typeof vehicleoption.vehicleTypes = vehicleoption.vehicleTypes;
+  vehicleStatuses : typeof vehicleoption.vehicleStatuses = vehicleoption.vehicleStatuses;
+
+  dataSource = new MatTableDataSource<Vehicle>();
+
+  @ViewChild(MatSort) sort!: MatSort;
+
+  get displayedColumns(): string[] {
+    return this.canManage
+      ? ['registrationNumber', 'vehicleType', 'chassisNumber', 'rcNumber', 'fcNumber', 'isActive', 'actions']
+      : ['registrationNumber', 'vehicleType', 'chassisNumber', 'rcNumber', 'fcNumber', 'isActive'];
+  }
 
   filterVehicleId = '';
   filterFrom = '';
   filterTo = '';
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+pageSize = 10;
+get totalPages(): number {
+  if (!this.paginator) return 0;
+
+  return Math.ceil(
+    this.paginator.length / this.paginator.pageSize
+  );
+}
+
+get totalRecords(): number {
+  return this.dataSource.data.length;
+}
+
+get startRecord(): number {
+  if (!this.paginator) return 0;
+
+  return this.paginator.pageIndex * this.paginator.pageSize + 1;
+}
+
+get endRecord(): number {
+  if (!this.paginator) return 0;
+
+  return Math.min(
+    (this.paginator.pageIndex + 1) * this.paginator.pageSize,
+    this.totalRecords
+  );
+}
 
 
+  constructor(private fb: FormBuilder,private apiService : CommanService,private alert: ToastrService,private router : Router) {
+     this.serachVehicle = this.fb.group({
+      registrationNumber : this.fb.control(null),
+      vehicleType : this.fb.control(null),
+      VehicleStatus : this.fb.control(null),
+      searchTerm : this.fb.control(null),
+     });
+  }
+  ngAfterViewInit() {
+  this.dataSource.paginator = this.paginator;
+  this.dataSource.sort = this.sort;
+}
 
-  
-  form = this.fb.group({
+  form = this.fb2.group({
     registrationNumber: ['', Validators.required],
     vehicleType: ['Truck', Validators.required],
     make: ['', Validators.required],
@@ -36,36 +108,62 @@ export class VehiclesComponent implements OnInit {
     driverName: ['', Validators.required]
   });
 
-  ngOnInit(): void { this.load(); }
-load(): void {
-  this.api.get<any[]>('VehicleMst/getAllVehicle').subscribe({
-    next: (data) => {
-      console.log('Vehicle API Response:', data);
+  ngOnInit(): void { 
+    this.load(); 
+    this.getVehicleNumber();
+  }
 
-      const vehicles: Vehicle[] = data.map(v => ({
-        id: v.vehicleId,
-        registrationNumber: v.registrationNumber,
-        vehicleType: v.vehicleType ?? '-',
-        make: v.make ?? '-',
-        model: v.model ?? '-',
-        year: v.year ?? new Date().getFullYear(),
-        driverName: v.driverName ?? '-',
-        chassisNumber: v.chassisNumber ?? '-',
-        rcNumber: v.rcNumber ?? '-',
-        fcNumber: v.fcNumber ?? '-',
-        isActive: v.isAvailable ?? true
-      }));
+  changePageSize(size: number) {
+  this.pageSize = size;
+  this.paginator.pageSize = size;
+  this.paginator.firstPage();
 
-      this.vehicles.set(vehicles);
-    },
-    error: (error) => {
-      console.error('Error loading vehicles:', error);
-    }
-  });
+  this.dataSource.paginator = this.paginator;
 }
 
+  firstPage() {
+  this.paginator.firstPage();
+}
+
+previousPage() {
+  this.paginator.previousPage();
+}
+
+nextPage() {
+  this.paginator.nextPage();
+}
+
+lastPage() {
+  this.paginator.pageIndex = this.totalPages - 1;
+  this.paginator._changePageSize(this.paginator.pageSize);
+}
+
+
+
+  getVehicleNumber(){
+    this.apiService.list(`VehicleMst/getAllVehicleForDropDown`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+      this.vehicleList = data?.message;
+    });
+  }
+  load(): void {
+    this.api.get<any[]>('VehicleMst/getAllVehicle').subscribe({
+      next: (data) => {
+        if(data.length > 0){
+         this.dataSource.data = data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading vehicles:', error);
+      }
+    });
+  }
+
+  getVehicleType(id : any){
+    return this.vehicleOption.find(x => x.id === Number(id))?.name ?? '';
+  }
+
   filteredVehicles(): Vehicle[] {
-    return this.vehicles();
+    return this.dataSource.data || this.vehicles();
   }
 
   openCreate(): void {
@@ -93,8 +191,40 @@ load(): void {
     }
   }
 
+  onSearch(){
+    const payload = {
+      registrationNumber : this.serachVehicle.get('registrationNumber')?.value ? this.serachVehicle.get('registrationNumber')?.value : null,
+      vehicleTypeId :this.serachVehicle.get('vehicleType')?.value ? this.serachVehicle.get('vehicleType')?.value : null,
+      vehicleStatusId :this.serachVehicle.get('VehicleStatus')?.value ? this.serachVehicle.get('VehicleStatus')?.value : null,
+      searchTerm :this.serachVehicle.get('searchTerm')?.value ? this.serachVehicle.get('searchTerm')?.value : null
+    }
+
+    this.apiService.create(`VehicleMst/getVehicleBySearch`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+      if(data.message.length > 0){
+         this.dataSource.data = data.message;
+      }
+    });
+  }
+
+  editVehicle(id: any): void {
+    this.router.navigate(['/NewVehiclemaster/edit', id]);
+  }
+
   deleteVehicle(id: number): void {
-    if (!confirm('Deactivate this vehicle?')) return;
+    if(id){
+      this.apiService.delete(`VehicleMst/DeleteVehicleDetails/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+        if(data.success == true){
+           this.load();
+           this.getVehicleNumber()
+            this.alert.success("Vehicle Deleted Successfully");
+        }
+        else{
+          this.alert.error("Failed");
+        }
+      },(error) => {
+            this.alert.error("Failed");
+    });
+    }
     this.api.delete(`vehicles/${id}`).subscribe(() => this.load());
   }
 

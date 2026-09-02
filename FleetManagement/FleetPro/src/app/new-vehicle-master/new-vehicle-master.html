@@ -533,12 +533,21 @@
 
       </button>
 
-      <button
+      <button *ngIf="isSaveButton"
         type="submit"
         class="btn btn-primary"
         [disabled]="vehicleForm.invalid">
 
         Save Vehicle
+
+      </button>
+
+       <button *ngIf="updateButton"
+        type="button"
+        class="btn btn-primary" (click)="updateVehicle()"
+        [disabled]="vehicleForm.invalid">
+
+        Update Vehicle
 
       </button>
 

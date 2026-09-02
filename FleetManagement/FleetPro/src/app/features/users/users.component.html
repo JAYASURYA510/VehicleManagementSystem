@@ -116,11 +116,11 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let user">
-            <button mat-icon-button color="primary" style="color: rgb(228, 63, 118)" (click)="openEdit(user)">
+            <button mat-icon-button color="primary" title="Edit" aria-label="Edit user" style="color: rgb(228, 63, 118)" (click)="openEdit(user)">
               <span class="material-symbols-outlined">edit</span>
             </button>
 
-            <button mat-icon-button color="warn" style="color: rgb(228, 63, 118)" (click)="deleteUser(user.userId)">
+            <button mat-icon-button color="warn" title="Delete" aria-label="Delete user" style="color: rgb(228, 63, 118)" (click)="deleteUser(user.userId)">
               <span class="material-symbols-outlined">delete</span>
             </button>
           </td>

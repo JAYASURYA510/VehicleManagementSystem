@@ -26,7 +26,7 @@
 
     public class searchVehicleDto
     {
-        public string RegistrationNumber { get; set; } = string.Empty;
+        public string? RegistrationNumber { get; set; }
         public int? VehicleTypeId { get; set; }
         public int? VehicleStatusId { get; set; }
         public string? searchTerm { get; set; }
