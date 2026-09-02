@@ -544,7 +544,8 @@
 
        <button *ngIf="updateButton"
         type="button"
-        class="btn btn-primary" (click)="updateVehicle()"
+        class="btn btn-primary btn-update"
+        (click)="updateVehicle()"
         [disabled]="vehicleForm.invalid">
 
         Update Vehicle

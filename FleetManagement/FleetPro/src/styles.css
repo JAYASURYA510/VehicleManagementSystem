@@ -60,6 +60,16 @@ button, input, select, textarea { font: inherit; }
     color:#ffffff;
 }
 
+.btn-update{
+    background:var(--save)!important;
+    border-color: #FF9800!important;
+    color:#ffffff!important;
+}
+
+.btn-update:hover{
+    background:var(--save-hover)!important;
+}
+
 .save-btn:hover{
     background:var(--save-hover);
 }
@@ -712,7 +722,7 @@ input:focus, select:focus, textarea:focus {
   margin-bottom: 1rem;
 }
 .search{
-  width: 50%!important;
+  width: 50%;
   border-radius: 10px;
 }
 
