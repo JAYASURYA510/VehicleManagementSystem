@@ -327,9 +327,18 @@
 </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-outline" (click)="resetForm()">Reset</button>
-          <button *ngIf="isSaveButton" type="submit" class="btn btn-primary" [disabled]="form.invalid">Save</button>
-          <button *ngIf="isUpdateButton" type="button" class="btn btn-primary" (click)="updateUser()">Update</button>
+          <button type="button" class="btn btn-outline" (click)="resetForm()">
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+            Reset
+          </button>
+          <button *ngIf="isSaveButton" type="submit" class="btn btn-primary" [disabled]="form.invalid">
+            <i class="fa-solid fa-check"></i>
+            Save
+          </button>
+          <button *ngIf="isUpdateButton" type="button" class="btn btn-primary" (click)="updateUser()">
+            <i class="fa-solid fa-edit"></i>
+            Update
+          </button>
         </div>
       </form>
     </div>

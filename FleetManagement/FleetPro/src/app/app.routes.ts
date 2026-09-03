@@ -10,6 +10,7 @@ import { AppModule } from './core/models';
 import { FormDataComponent } from './components/form-data/form-data';
 import { DailyLogReport } from './daily-log-report/daily-log-report';
 import { NewVehicleMaster } from './new-vehicle-master/new-vehicle-master';
+import { AssignVehicleMstComponent } from './features/assign-vehicle-mst/assign-vehicle-mst';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
     path: 'form-data',
     component: FormDataComponent
   },
+      { path: 'assign-vehicle', component:  AssignVehicleMstComponent},
       { path: 'NewVehiclemaster', component: NewVehicleMaster},
       { path: 'NewVehiclemaster/edit/:id', component: NewVehicleMaster},
       { path: 'daily-log-report', component: DailyLogReport},

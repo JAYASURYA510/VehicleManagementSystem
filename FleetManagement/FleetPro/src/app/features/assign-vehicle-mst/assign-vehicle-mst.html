@@ -1,0 +1,268 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>Assign Vehicle</h1>
+      <p class="subtitle">Assign a  vehicle to a user and role with scheduled dates and times</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <!-- ASSIGN VEHICLE FORM -->
+    <form [formGroup]="assignVehicleForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-grid">
+
+        <!-- ========================================= -->
+        <!-- 1. FROM DATE & TIME (OwlDateTime Picker)  -->
+        <!-- ========================================= -->
+        <div class="form-group">
+          <label for="fromDate">
+            From Date 
+            <span class="required">*</span>
+          </label>
+
+          <div class="date-input-wrapper">
+            <input
+              id="fromDate"
+              class="date-input"
+              [owlDateTime]="fromDateTimePicker"
+              [owlDateTimeTrigger]="fromDateTimePicker"
+              formControlName="fromDate"
+              placeholder="DD/MM/YYYY, HH:MM"
+              readonly
+            />
+            <span class="calendar-icon" [owlDateTimeTrigger]="fromDateTimePicker">
+              <i class="fa-regular fa-calendar-days"></i>
+            </span>
+          </div>
+
+          <owl-date-time
+            #fromDateTimePicker
+            pickerType="both"
+            [hour12Timer]="true"
+            [firstDayOfWeek]="1"
+            [hideOtherMonths]="true"
+          ></owl-date-time>
+
+          <small class="alert alert-danger" *ngIf="isInvalid('fromDate')">
+            From date and  is required.
+          </small>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 2. TO DATE & TIME (OwlDateTime Picker)    -->
+        <!-- ========================================= -->
+        <div class="form-group">
+          <label for="toDate">
+            To Date 
+            <span class="required">*</span>
+          </label>
+
+          <div class="date-input-wrapper">
+            <input
+              id="toDate"
+              class="date-input"
+              [owlDateTime]="toDateTimePicker"
+              [owlDateTimeTrigger]="toDateTimePicker"
+              formControlName="toDate"
+              placeholder="DD/MM/YYYY, HH:MM"
+              readonly
+            />
+            <span class="calendar-icon" [owlDateTimeTrigger]="toDateTimePicker">
+              <i class="fa-regular fa-calendar-days"></i>
+            </span>
+          </div>
+
+          <owl-date-time
+            #toDateTimePicker
+            pickerType="both"
+            [hour12Timer]="true"
+            [firstDayOfWeek]="1"
+            [hideOtherMonths]="true"
+          ></owl-date-time>
+
+          <small class="alert alert-danger" *ngIf="isInvalid('toDate')">
+            To date and time is required.
+          </small>
+          <small class="alert alert-danger" *ngIf="hasDateRangeError()">
+            To date & time cannot be earlier than From date & time.
+          </small>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 3. ROLE DROPDOWN                         -->
+        <!-- ========================================= -->
+        <div class="form-group">
+          <label>
+            Role
+            <span class="required">*</span>
+          </label>
+
+          <ngx-select
+            formControlName="roleId"
+            [items]="roleList"
+            optionValueField="id"
+            optionTextField="roleName"
+            placeholder="Select Role"
+            [allowClear]="true"
+            (selectionChanges)="onRoleChange($event)"
+          >
+          </ngx-select>
+
+          <small class="alert alert-danger" *ngIf="isInvalid('roleId')">
+            Please select a role.
+          </small>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 4. USER DROPDOWN                         -->
+        <!-- ========================================= -->
+        <div class="form-group">
+          <label>
+            User
+            <span class="required">*</span>
+            <span class="badge-count" *ngIf="filteredUserList.length > 0">
+              ({{ filteredUserList.length }} available)
+            </span>
+          </label>
+
+          <ngx-select
+            formControlName="userId"
+            [items]="filteredUserList"
+            optionValueField="userId"
+            optionTextField="fullName"
+            placeholder="Select User"
+            [allowClear]="true"
+            (selectionChanges)="onUserChange($event)"
+          >
+          </ngx-select>
+
+          <small class="alert alert-danger" *ngIf="isInvalid('userId')">
+            Please select a user.
+          </small>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 5. VEHICLE REGISTRATION NUMBER + CHECKBOX -->
+        <!-- ========================================= -->
+        <div class="form-group vehicle-checkbox-dropdown grid-span-full">
+          <label>
+            Vehicle Registration Number
+            <span class="required">*</span>
+            <span class="badge-count" *ngIf="vehicleList.length > 0">
+              ({{ vehicleList.length }} active vehicles)
+            </span>
+          </label>
+
+          <div class="dropdown">
+            <div
+              class="dropdown-header"
+              [class.active]="vehicleDropdownOpen"
+              (click)="toggleVehicleDropdown()"
+            >
+              <span class="header-text">{{ getSelectedVehiclesHeaderDisplay() }}</span>
+              <span class="arrow-indicator" [class.open]="vehicleDropdownOpen">▼</span>
+            </div>
+
+            <div class="dropdown-body" *ngIf="vehicleDropdownOpen">
+              <!-- Search inside dropdown -->
+              <div class="dropdown-search-wrapper" (click)="$event.stopPropagation()">
+                <i class="fa-solid fa-magnifying-glass dropdown-search-icon"></i>
+                <input
+                  type="text"
+                  class="dropdown-search-input"
+                  placeholder="Search registration number..."
+                  [(ngModel)]="vehicleSearchQuery"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+              </div>
+
+              <!-- Select All Option -->
+              <div
+                class="checkbox-item select-all-item"
+                *ngIf="filteredVehicleList.length > 1"
+                (click)="$event.stopPropagation()"
+              >
+                <input
+                  type="checkbox"
+                  id="selectAllVehicles"
+                  [checked]="isAllVehiclesSelected()"
+                  (change)="selectAllVehicles($event)"
+                />
+                <label for="selectAllVehicles">
+                  <strong>Select All Vehicles</strong>
+                </label>
+              </div>
+
+              <!-- Vehicle Item List with Checkboxes -->
+              <div class="vehicle-list-scroll">
+                <div
+                  class="checkbox-item"
+                  *ngFor="let vehicle of filteredVehicleList"
+                  (click)="$event.stopPropagation()"
+                >
+                  <input
+                    type="checkbox"
+                    [id]="'veh_' + (vehicle.vehicleId || vehicle.registrationNumber)"
+                    [checked]="isVehicleSelected(vehicle)"
+                    (change)="onVehicleCheckboxChange($event, vehicle)"
+                  />
+                  <label [for]="'veh_' + (vehicle.vehicleId || vehicle.registrationNumber)">
+                    <span class="vehicle-reg">{{ vehicle.registrationNumber }}</span>
+                  </label>
+                </div>
+
+                <div class="no-results" *ngIf="filteredVehicleList.length === 0">
+                  No active vehicles found matching "{{ vehicleSearchQuery }}"
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected Vehicles Badges / Chips -->
+          <div class="chips" *ngIf="selectedVehicles.length > 0">
+            <span class="chip" *ngFor="let vehicle of selectedVehicles">
+              <i class="fa-solid fa-truck-pickup chip-icon"></i>
+              {{ vehicle.registrationNumber }}
+              <button
+                type="button"
+                class="chip-remove"
+                (click)="removeVehicle(vehicle); $event.stopPropagation()"
+                title="Remove vehicle"
+              >
+                ×
+              </button>
+            </span>
+          </div>
+
+          <small class="alert alert-danger" *ngIf="isInvalid('registrationNumber')">
+            Please select at least one vehicle registration number.
+          </small>
+        </div>
+
+      </div>
+
+      <!-- ========================================= -->
+      <!-- FORM ACTIONS                             -->
+      <!-- ========================================= -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="onReset()"
+        >
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+          Reset
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+        >
+          <i class="fa-solid fa-check"></i>
+          Assign Vehicle
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
