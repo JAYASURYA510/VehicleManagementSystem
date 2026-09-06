@@ -314,20 +314,11 @@
           Insurance Expiry Date
         </label>
 
-        <input
-          class="date-input"
-          [owlDateTime]="insuranceExpiryPicker"
-          [owlDateTimeTrigger]="insuranceExpiryPicker"
+        <app-datetime-picker
           formControlName="insuranceExpiryDate"
-          placeholder="dd-mm-yyyy"
-          readonly
-        />
-        <owl-date-time
-          #insuranceExpiryPicker
           pickerType="calendar"
-          [firstDayOfWeek]="1"
-          [hideOtherMonths]="true">
-        </owl-date-time>
+          placeholder="dd-mm-yyyy"
+        ></app-datetime-picker>
 
       </div>
 
@@ -401,20 +392,11 @@
            <span class="required">*</span>
         </label>
 
-        <input
-          class="date-input"
-          [owlDateTime]="fcDatePicker"
-          [owlDateTimeTrigger]="fcDatePicker"
+        <app-datetime-picker
           formControlName="fcDate"
-          placeholder="dd-mm-yyyy"
-          readonly
-        />
-        <owl-date-time
-          #fcDatePicker
           pickerType="calendar"
-          [firstDayOfWeek]="1"
-          [hideOtherMonths]="true">
-        </owl-date-time>
+          placeholder="dd-mm-yyyy"
+        ></app-datetime-picker>
 
          @if (
           vehicleForm.controls.fcDate.touched &&
@@ -484,20 +466,11 @@
           Last Service Date
         </label>
 
-        <input
-          class="date-input"
-          [owlDateTime]="lastServicePicker"
-          [owlDateTimeTrigger]="lastServicePicker"
+        <app-datetime-picker
           formControlName="lastServiceDate"
-          placeholder="dd-mm-yyyy"
-          readonly
-        />
-        <owl-date-time
-          #lastServicePicker
           pickerType="calendar"
-          [firstDayOfWeek]="1"
-          [hideOtherMonths]="true">
-        </owl-date-time>
+          placeholder="dd-mm-yyyy"
+        ></app-datetime-picker>
 
       </div>
 

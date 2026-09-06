@@ -740,12 +740,17 @@ input:focus, select:focus, textarea:focus {
   background: #fff;
 }
 
-.custom-table th {
-  background: #f0eeee;
+.custom-table th,
+.custom-table .mat-mdc-header-cell {
+  background: #f0eeee !important;
   color: #7e3285;
   padding: 12px;
-  font-weight:bolder;
+  font-weight: bolder;
   font-size: 15px;
+}
+
+.custom-table .mat-mdc-header-row {
+  background: #f0eeee;
 }
 
 .custom-table td {
@@ -1061,4 +1066,180 @@ input:focus, select:focus, textarea:focus {
     .password-rules{
         grid-template-columns:1fr;
     }
+}
+
+/* Expandable assigned-vehicle table */
+.assignment-table .mat-mdc-header-row {
+  height: 56px;
+}
+
+.assignment-table .mat-mdc-header-cell,
+.assignment-table .mat-mdc-cell {
+  vertical-align: middle;
+}
+
+.assignment-table .mat-column-expand {
+  width: 56px;
+  padding-left: 12px;
+  padding-right: 4px;
+}
+
+.assignment-table .element-row {
+  cursor: pointer;
+  height: 64px;
+}
+
+.assignment-table .element-row .mat-mdc-cell {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.assignment-table .element-row.expanded-row {
+  background: var(--accent-soft);
+}
+
+.assignment-table .element-row.expanded-row:hover {
+  background: var(--accent-soft);
+}
+
+.assignment-table .detail-row:hover {
+  background: transparent;
+}
+
+.assignment-table .detail-row {
+  height: 0;
+}
+
+.assignment-table .detail-row td {
+  padding: 0 !important;
+  border-bottom-width: 0;
+  vertical-align: top;
+}
+
+.expand-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.expand-toggle-btn:hover {
+  background: var(--accent-soft);
+}
+
+.expand-icon {
+  display: inline-flex;
+  transition: transform 0.28s ease;
+}
+
+.expand-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.assignment-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.assignment-expand.expanded {
+  grid-template-rows: 1fr;
+}
+
+.assignment-expand-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.nested-assignment-wrap {
+  padding: 16px 20px 20px;
+}
+
+.nested-assignment-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  background: transparent;
+  margin: 0;
+}
+
+.nested-assignment-table col.col-vehicle,
+.nested-assignment-table col.col-from,
+.nested-assignment-table col.col-to {
+  width: 28%;
+}
+
+.nested-assignment-table col.col-status {
+  width: 16%;
+}
+
+.nested-assignment-table thead th {
+  background: #ece9ea;
+  color: #7e3285;
+  padding: 14px 20px;
+  height: 48px;
+  font-weight: bolder;
+  font-size: 13px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.nested-assignment-table thead th:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+.nested-assignment-table thead th:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.nested-assignment-table tbody td {
+  background: #fff;
+  padding: 16px 20px;
+  height: 56px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.nested-assignment-table tbody td:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+.nested-assignment-table tbody td:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.nested-assignment-table tbody td .status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 0.35rem 0.85rem;
+}
+
+.nested-assignment-table tbody tr:hover td {
+  background: #faf7fb;
+}
+
+.assignment-empty {
+  margin: 16px 20px 20px;
+  padding: 16px 18px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.empty-table {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
 }

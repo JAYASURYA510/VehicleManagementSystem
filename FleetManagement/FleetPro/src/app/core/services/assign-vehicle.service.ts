@@ -23,6 +23,10 @@ export class AssignVehicleService {
   }
 
   assignVehicle(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/VehicleMst/AssignVehicle`, data);
+    return this.http.post(`${this.baseUrl}/VehicleAssignment/saveAssignedVehicle`, data);
+  }
+
+  getUserBasedAssignedVehicle(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/VehicleAssignment/getUserBasedAssignedVehicle`);
   }
 }

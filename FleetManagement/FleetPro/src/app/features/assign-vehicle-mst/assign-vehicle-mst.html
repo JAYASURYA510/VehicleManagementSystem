@@ -20,28 +20,12 @@
             <span class="required">*</span>
           </label>
 
-          <div class="date-input-wrapper">
-            <input
-              id="fromDate"
-              class="date-input"
-              [owlDateTime]="fromDateTimePicker"
-              [owlDateTimeTrigger]="fromDateTimePicker"
-              formControlName="fromDate"
-              placeholder="DD/MM/YYYY, HH:MM"
-              readonly
-            />
-            <span class="calendar-icon" [owlDateTimeTrigger]="fromDateTimePicker">
-              <i class="fa-regular fa-calendar-days"></i>
-            </span>
-          </div>
-
-          <owl-date-time
-            #fromDateTimePicker
+          <app-datetime-picker
+            inputId="fromDate"
+            formControlName="fromDate"
             pickerType="both"
-            [hour12Timer]="true"
-            [firstDayOfWeek]="1"
-            [hideOtherMonths]="true"
-          ></owl-date-time>
+            placeholder="Select From Date"
+          ></app-datetime-picker>
 
           <small class="alert alert-danger" *ngIf="isInvalid('fromDate')">
             From date and  is required.
@@ -57,28 +41,12 @@
             <span class="required">*</span>
           </label>
 
-          <div class="date-input-wrapper">
-            <input
-              id="toDate"
-              class="date-input"
-              [owlDateTime]="toDateTimePicker"
-              [owlDateTimeTrigger]="toDateTimePicker"
-              formControlName="toDate"
-              placeholder="DD/MM/YYYY, HH:MM"
-              readonly
-            />
-            <span class="calendar-icon" [owlDateTimeTrigger]="toDateTimePicker">
-              <i class="fa-regular fa-calendar-days"></i>
-            </span>
-          </div>
-
-          <owl-date-time
-            #toDateTimePicker
+          <app-datetime-picker
+            inputId="toDate"
+            formControlName="toDate"
             pickerType="both"
-            [hour12Timer]="true"
-            [firstDayOfWeek]="1"
-            [hideOtherMonths]="true"
-          ></owl-date-time>
+            placeholder="Select To Date"
+          ></app-datetime-picker>
 
           <small class="alert alert-danger" *ngIf="isInvalid('toDate')">
             To date and time is required.
@@ -234,7 +202,7 @@
             </span>
           </div>
 
-          <small class="alert alert-danger" *ngIf="isInvalid('registrationNumber')">
+          <small class="alert alert-danger" *ngIf="isInvalid('vehicleId')">
             Please select at least one vehicle registration number.
           </small>
         </div>

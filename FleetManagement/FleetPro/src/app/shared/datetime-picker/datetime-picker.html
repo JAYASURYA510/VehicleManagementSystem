@@ -1,0 +1,26 @@
+<div class="date-input-wrapper">
+  <input
+    class="date-input"
+    [id]="inputId"
+    [owlDateTime]="picker"
+    [owlDateTimeTrigger]="picker"
+    [ngModel]="value"
+    [ngModelOptions]="{standalone: true}"
+    (ngModelChange)="onValueChange($event)"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    (blur)="markTouched()"
+    readonly
+  />
+  <span class="calendar-icon" [owlDateTimeTrigger]="picker">
+    <i class="fa-regular fa-calendar-days"></i>
+  </span>
+</div>
+
+<owl-date-time
+  #picker
+  [pickerType]="pickerType"
+  [hour12Timer]="hour12Timer"
+  [firstDayOfWeek]="firstDayOfWeek"
+  [hideOtherMonths]="hideOtherMonths"
+></owl-date-time>

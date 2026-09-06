@@ -1,8 +1,6 @@
 import {
   Component,
   OnInit,
-  Inject,
-  Injectable,
   HostListener,
   ElementRef,
   inject,
@@ -18,117 +16,12 @@ import {
   AbstractControl,
   ValidationErrors
 } from '@angular/forms';
-import { Platform } from '@angular/cdk/platform';
-import {
-  DateTimeAdapter,
-  NativeDateTimeAdapter,
-  OWL_DATE_TIME_FORMATS,
-  OWL_DATE_TIME_LOCALE,
-  OwlDateTimeModule,
-  OwlNativeDateTimeModule
-} from '@danielmoncada/angular-datetime-picker';
 import { NgxSelectModule } from 'ngx-select-ex';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, takeUntil } from 'rxjs';
 import { AssignVehicleService } from '../../core/services/assign-vehicle.service';
-
-// =====================================================
-// DATE & TIME PICKER FORMATS & ADAPTER
-// =====================================================
-const DATE_TIME_PICKER_FORMATS = {
-  parseInput: {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  },
-  fullPickerInput: {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-  },
-  datePickerInput: {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  },
-  timePickerInput: {
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
-  },
-  monthYearLabel: { year: 'numeric', month: 'long' },
-  dateA11yLabel: { year: 'numeric', month: 'long', day: 'numeric' },
-  monthYearA11yLabel: { year: 'numeric', month: 'long' }
-};
-
-@Injectable()
-export class HyphenDateTimeAdapter extends NativeDateTimeAdapter {
-  constructor(
-    @Inject(OWL_DATE_TIME_LOCALE) locale: string,
-    platform: Platform
-  ) {
-    super(locale, platform);
-  }
-
-  override format(date: Date, displayFormat: any): string {
-    if (
-      displayFormat?.year === 'numeric' &&
-      displayFormat?.month === 'long' &&
-      !displayFormat?.day &&
-      !displayFormat?.hour &&
-      !displayFormat?.minute
-    ) {
-      return super.format(date, displayFormat);
-    }
-
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-
-    let hours = date.getHours();
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const strHours = String(hours).padStart(2, '0');
-
-    if (displayFormat?.hour || displayFormat?.minute) {
-      return `${day}/${month}/${year} ${strHours}:${minutes} ${ampm}`;
-    }
-    return `${day}/${month}/${year}`;
-  }
-
-  override parse(value: any, parseFormat: any): Date | null {
-    if (typeof value === 'string' && value.trim()) {
-      const trimmed = value.trim();
-      const parsedDate = new Date(trimmed);
-      if (!Number.isNaN(parsedDate.getTime())) {
-        return parsedDate;
-      }
-      const dParts = trimmed.match(
-        /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})(?:[,\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*(AM|PM))?)?/i
-      );
-      if (dParts) {
-        const day = Number(dParts[1]);
-        const month = Number(dParts[2]);
-        const year = Number(dParts[3]);
-        let hours = dParts[4] ? Number(dParts[4]) : 0;
-        const minutes = dParts[5] ? Number(dParts[5]) : 0;
-        const seconds = dParts[6] ? Number(dParts[6]) : 0;
-        const ampm = dParts[7]?.toUpperCase();
-        if (ampm === 'PM' && hours < 12) hours += 12;
-        if (ampm === 'AM' && hours === 12) hours = 0;
-        return new Date(year, month - 1, day, hours, minutes, seconds);
-      }
-    }
-    return super.parse(value, parseFormat);
-  }
-}
+import { DateTimePickerService } from '../../core/services/datetime-picker.service';
+import { DateTimePickerComponent } from '../../shared/datetime-picker/datetime-picker';
 
 // =====================================================
 // INTERFACES
@@ -145,7 +38,7 @@ export interface Role {
 }
 
 export interface Vehicle {
-  vehicleId: string;
+  vehicleId: any;
   registrationNumber: string;
 }
 
@@ -172,14 +65,7 @@ function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
     FormsModule,
     ReactiveFormsModule,
     NgxSelectModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule
-  ],
-  providers: [
-    { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-GB' },
-    { provide: OWL_DATE_TIME_FORMATS, useValue: DATE_TIME_PICKER_FORMATS },
-    HyphenDateTimeAdapter,
-    { provide: DateTimeAdapter, useExisting: HyphenDateTimeAdapter }
+    DateTimePickerComponent
   ],
   templateUrl: './assign-vehicle-mst.html',
   styleUrl: './assign-vehicle-mst.css'
@@ -187,6 +73,7 @@ function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
 export class AssignVehicleMstComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly assignVehicleService = inject(AssignVehicleService);
+  private readonly dateTimePickerService = inject(DateTimePickerService);
   private readonly alert = inject(ToastrService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef);
@@ -216,10 +103,12 @@ export class AssignVehicleMstComponent implements OnInit {
       toDate: [null as Date | null, Validators.required],
       roleId: [null as number | null, Validators.required],
       userId: [null as number | null, Validators.required],
-      registrationNumber: [null as string[] | null, Validators.required]
+      vehicleId: [null, Validators.required]
     },
     { validators: dateRangeValidator }
   );
+    
+   localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
 
   // =====================================================
   // INITIALIZATION
@@ -461,12 +350,12 @@ export class AssignVehicleMstComponent implements OnInit {
   }
 
   private syncSelectedVehiclesWithForm(): void {
-    const regNumbers = this.selectedVehicles.map((v) => v.registrationNumber);
+    const vehicleIds = this.selectedVehicles.map((vehicle) => vehicle.vehicleId);
     this.assignVehicleForm
-      .get('registrationNumber')
-      ?.setValue(regNumbers.length > 0 ? regNumbers : null);
-    this.assignVehicleForm.get('registrationNumber')?.markAsDirty();
-    this.assignVehicleForm.get('registrationNumber')?.markAsTouched();
+      .get('vehicleId')
+      ?.setValue(vehicleIds.length > 0 ? vehicleIds : null);
+    this.assignVehicleForm.get('vehicleId')?.markAsDirty();
+    this.assignVehicleForm.get('vehicleId')?.markAsTouched();
   }
 
   getSelectedVehiclesHeaderDisplay(): string {
@@ -502,28 +391,30 @@ export class AssignVehicleMstComponent implements OnInit {
 
     const formVal = this.assignVehicleForm.value;
     const payload = {
-      fromDate: this.toApiDateTime(formVal.fromDate),
-      toDate: this.toApiDateTime(formVal.toDate),
+      fromDate: this.dateTimePickerService.toApiDateTime(formVal.fromDate),
+      toDate: this.dateTimePickerService.toApiDateTime(formVal.toDate),
       userId: Number(formVal.userId),
       roleId: Number(formVal.roleId),
-      registrationNumber: Array.isArray(formVal.registrationNumber)
-        ? formVal.registrationNumber
-        : [formVal.registrationNumber]
+      vehicleId: Array.isArray(formVal.vehicleId)? formVal.vehicleId : [formVal.vehicleId],
+      isActive: true,
+      created_date: this.dateTimePickerService.toApiDateTime(new Date()),
+      createdBy: this.localStorageData.userId,
+      updatedDate: this.dateTimePickerService.toApiDateTime(new Date()),
+      updatedBy: this.localStorageData.userId
     };
 
-    console.log('ASSIGN VEHICLE SUBMIT PAYLOAD:', payload);
-
-    this.assignVehicleService
-      .assignVehicle(payload)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
+    this.assignVehicleService.assignVehicle(payload).pipe(takeUntil(this.unsubscribe$)).subscribe({
         next: (response: any) => {
+          if(response.success == true){
           this.alert.success('Vehicle assigned successfully!');
           this.onReset();
+          }
+          else{
+            this.alert.error('Failed to assign vehicle. Please try again.');
+          }
         },
         error: (error: any) => {
-          console.warn('Assign API returned:', error);
-          this.alert.success('Vehicle assigned details submitted successfully!');
+          this.alert.error('Failed to assign vehicle. Please try again.');
           this.onReset();
         }
       });
@@ -535,7 +426,7 @@ export class AssignVehicleMstComponent implements OnInit {
       toDate: null,
       userId: null,
       roleId: null,
-      registrationNumber: null
+      vehicleId: null
     });
 
     this.selectedVehicles = [];
@@ -576,10 +467,4 @@ export class AssignVehicleMstComponent implements OnInit {
     return event;
   }
 
-  private toApiDateTime(value: Date | string | null | undefined): string | null {
-    if (!value) return null;
-    const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) return null;
-    return date.toISOString();
-  }
 }

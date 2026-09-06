@@ -1,71 +1,20 @@
-import { ChangeDetectorRef, Component, Inject, Injectable, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-import { Platform } from '@angular/cdk/platform';
-import {
-  DateTimeAdapter,
-  NativeDateTimeAdapter,
-  OWL_DATE_TIME_FORMATS,
-  OWL_DATE_TIME_LOCALE,
-  OwlDateTimeModule,
-  OwlNativeDateTimeModule
-} from '@danielmoncada/angular-datetime-picker';
 
 import { ApiService } from '../../app/core/services/api.service';
 import vehicleOptions from '../../ennum/vehicle-option.json';
 import { CommanService } from '../core/services/comman.service';
+import { DateTimePickerService } from '../core/services/datetime-picker.service';
+import { DateTimePickerComponent } from '../shared/datetime-picker/datetime-picker';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-
-const DATE_PICKER_FORMATS = {
-  parseInput: { year: 'numeric', month: '2-digit', day: '2-digit' },
-  fullPickerInput: { year: 'numeric', month: '2-digit', day: '2-digit' },
-  datePickerInput: { year: 'numeric', month: '2-digit', day: '2-digit' },
-  timePickerInput: { hour: 'numeric', minute: 'numeric' },
-  monthYearLabel: { year: 'numeric', month: 'long' },
-  dateA11yLabel: { year: 'numeric', month: 'long', day: 'numeric' },
-  monthYearA11yLabel: { year: 'numeric', month: 'long' }
-};
-const DATE_ONLY_FORMAT = /^\d{2}-\d{2}-\d{4}$/;
-
-@Injectable()
-class HyphenDateTimeAdapter extends NativeDateTimeAdapter {
-  constructor(
-    @Inject(OWL_DATE_TIME_LOCALE) locale: string,
-    platform: Platform
-  ) {
-    super(locale, platform);
-  }
-
-  override format(date: Date, displayFormat: any): string {
-    if (
-      displayFormat?.day === '2-digit' &&
-      displayFormat?.month === '2-digit' &&
-      !displayFormat?.hour
-    ) {
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      return `${day}/${month}/${date.getFullYear()}`;
-    }
-
-    return super.format(date, displayFormat);
-  }
-
-  override parse(value: any, parseFormat: any): Date | null {
-    if (typeof value === 'string' && DATE_ONLY_FORMAT.test(value.trim())) {
-      const [day, month, year] = value.trim().split('-').map(Number);
-      return this.createDate(year, month - 1, day);
-    }
-
-    return super.parse(value, parseFormat);
-  }
-}
 
 @Component({
   selector: 'app-new-vehicle-master',
@@ -73,14 +22,7 @@ class HyphenDateTimeAdapter extends NativeDateTimeAdapter {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule
-  ],
-  providers: [
-    { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-GB' },
-    { provide: OWL_DATE_TIME_FORMATS, useValue: DATE_PICKER_FORMATS },
-    HyphenDateTimeAdapter,
-    { provide: DateTimeAdapter, useExisting: HyphenDateTimeAdapter }
+    DateTimePickerComponent
   ],
   templateUrl: './new-vehicle-master.html',
   styleUrl: './new-vehicle-master.css'
@@ -121,7 +63,8 @@ export class NewVehicleMaster implements OnInit {
 
   constructor(
          private apiService : CommanService, private cdr: ChangeDetectorRef,
-         private router : Router, private alert: ToastrService,private route: ActivatedRoute
+         private router : Router, private alert: ToastrService,private route: ActivatedRoute,
+         private dateTimePickerService: DateTimePickerService
       ) {}
 
   ngOnInit(): void {
@@ -149,12 +92,12 @@ export class NewVehicleMaster implements OnInit {
       chassisNumber: this.vehicleForm.get("chassisNumber")?.value,
       fuelTypeId: Number(this.vehicleForm.get("fuelTypeId")?.value) || 0,
       insurancePolicyNo : this.vehicleForm.get("insurancePolicyNo")?.value,
-      insuranceExpiryDate : this.toApiDate(this.vehicleForm.get("insuranceExpiryDate")?.value),
+      insuranceExpiryDate : this.dateTimePickerService.toApiDate(this.vehicleForm.get("insuranceExpiryDate")?.value),
       rcNumber : this.vehicleForm.get("rcNumber")?.value,
       fcNumber : this.vehicleForm.get("fcNumber")?.value,
-      fcDate : this.toApiDate(this.vehicleForm.get("fcDate")?.value),
+      fcDate : this.dateTimePickerService.toApiDate(this.vehicleForm.get("fcDate")?.value),
       vehicleStatusId: Number(this.vehicleForm.get("vehicleStatusId")?.value) || 0,
-      lastServiceDate : this.toApiDate(this.vehicleForm.get("lastServiceDate")?.value),
+      lastServiceDate : this.dateTimePickerService.toApiDate(this.vehicleForm.get("lastServiceDate")?.value),
       isAvailable : this.vehicleForm.get("isAvailable")?.value,
       created_date : new Date().toISOString(),
       createdBy : this.localStorageData.userId,
@@ -196,12 +139,12 @@ export class NewVehicleMaster implements OnInit {
       chassisNumber: this.vehicleForm.get("chassisNumber")?.value,
       fuelTypeId: Number(this.vehicleForm.get("fuelTypeId")?.value) || 0,
       insurancePolicyNo : this.vehicleForm.get("insurancePolicyNo")?.value,
-      insuranceExpiryDate : this.toApiDate(this.vehicleForm.get("insuranceExpiryDate")?.value),
+      insuranceExpiryDate : this.dateTimePickerService.toApiDate(this.vehicleForm.get("insuranceExpiryDate")?.value),
       rcNumber : this.vehicleForm.get("rcNumber")?.value,
       fcNumber : this.vehicleForm.get("fcNumber")?.value,
-      fcDate : this.toApiDate(this.vehicleForm.get("fcDate")?.value),
+      fcDate : this.dateTimePickerService.toApiDate(this.vehicleForm.get("fcDate")?.value),
       vehicleStatusId: Number(this.vehicleForm.get("vehicleStatusId")?.value) || 0,
-      lastServiceDate : this.toApiDate(this.vehicleForm.get("lastServiceDate")?.value),
+      lastServiceDate : this.dateTimePickerService.toApiDate(this.vehicleForm.get("lastServiceDate")?.value),
       updatedDate : new Date().toISOString(),
       updatedBy : this.localStorageData.userId,
     }
@@ -236,24 +179,6 @@ export class NewVehicleMaster implements OnInit {
           lastServiceDate: null,
           isAvailable: true
         });
-  }
-
-  private toApiDate(value: Date | string | null | undefined): string | null {
-    if (!value) {
-      return null;
-    }
-
-    const date = value instanceof Date ? value : new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return null;
-    }
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
   }
 
 }
