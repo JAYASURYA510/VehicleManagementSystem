@@ -9,9 +9,9 @@ public enum UserRole
     [Description("Admin")]
     Admin = 2,
     [Description("Manager")]
-    ManagingAuthority = 3,
+    Manager = 3,
     [Description("Driver")]
-    User = 4
+    Driver = 4
 }
 
 public enum AppModule

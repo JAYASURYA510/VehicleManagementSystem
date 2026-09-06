@@ -46,7 +46,7 @@ public static class SeedData
             Email = "ramesh@fleetpro.com",
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("User@123"),
             FullName = "Ramesh Kumar",
-            Role = UserRole.User,
+            Role = UserRole.Driver,
             IsActive = true,
             Permissions =
             [

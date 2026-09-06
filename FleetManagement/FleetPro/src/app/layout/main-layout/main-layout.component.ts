@@ -94,6 +94,7 @@ export class MainLayoutComponent {
     if (role === UserRole.SuperAdmin || role === 'SuperAdmin') return 'Super Admin';
     if (role === UserRole.Admin || role === 'Admin') return 'Admin';
     if (role === UserRole.Manager || role === 'Manager') return 'Manager';
+    if (role === UserRole.Driver || role === 'Driver') return 'Driver';
     return 'User';
   }
 
