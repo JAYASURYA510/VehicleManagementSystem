@@ -67,5 +67,9 @@ namespace FleetPro.API.Data.Entitys
 
         [Column("updated_by")]
         public int? UpdatedBy { get; set; }
+
+        [Column("vehiclePermit")]
+        public int? VehiclePermit { get; set; }
+
     }
 }

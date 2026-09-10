@@ -95,6 +95,7 @@ namespace FleetPro.API.Repository
                 existingVehicle.LastServiceDate = vehicle.LastServiceDate;
                 existingVehicle.updatedDate = vehicle.updatedDate;
                 existingVehicle.UpdatedBy = vehicle.UpdatedBy;
+                existingVehicle.VehiclePermit = vehicle.vehiclePermit;
 
                 await context.SaveChangesAsync();   
                 return mapper.Map<VehicleMstDto>(existingVehicle);

@@ -6,6 +6,7 @@
         public string RegistrationNumber { get; set; } = string.Empty;
         public int? VehicleTypeId { get; set; }
         public int? VehicleCategory { get; set; }
+        public int? vehiclePermit { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
         public string ChassisNumber { get; set; } = string.Empty;

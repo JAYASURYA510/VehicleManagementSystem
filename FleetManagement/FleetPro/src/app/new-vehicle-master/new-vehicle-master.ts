@@ -16,6 +16,8 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
+
+
 @Component({
   selector: 'app-new-vehicle-master',
   standalone: true,
@@ -33,7 +35,9 @@ export class NewVehicleMaster implements OnInit {
   vehicleTypes = vehicleOptions.vehicleTypes;
   fuelTypes = vehicleOptions.fuelTypes;
   vehicleStatuses = vehicleOptions.vehicleStatuses;
-  
+  vehiclePermits = vehicleOptions.vehiclePermits;
+
+
   isSaveButton : boolean = true;
   updateButton : boolean = false;
   vehicleId : any;
@@ -58,7 +62,8 @@ export class NewVehicleMaster implements OnInit {
     fcDate: [null as Date | null,[Validators.required]],
     vehicleStatusId: ['',Validators.required],
     lastServiceDate: [null as Date | null],
-    isAvailable: [true]
+    isAvailable: [true],
+    vehiclePermit: [1, Validators.required]
   });
 
   constructor(
@@ -103,8 +108,10 @@ export class NewVehicleMaster implements OnInit {
       createdBy : this.localStorageData.userId,
       updatedDate : new Date().toISOString(),
       updatedBy : this.localStorageData.userId,
+       vehiclePermit: this.vehicleForm.get("vehiclePermit")?.value ?? 0
     }
-
+  
+     
    this.apiService.create(`VehicleMst/SaveVehicleDetails`, vehicleData).pipe(takeUntil(this.unsubscribe$)).subscribe((data) =>{
       if(data){
         this.alert.success("Vehicle Master Saved Successfully")
@@ -147,8 +154,9 @@ export class NewVehicleMaster implements OnInit {
       lastServiceDate : this.dateTimePickerService.toApiDate(this.vehicleForm.get("lastServiceDate")?.value),
       updatedDate : new Date().toISOString(),
       updatedBy : this.localStorageData.userId,
+       vehiclePermit: this.vehicleForm.get("vehiclePermit")?.value ?? 0
     }
-
+   
     this.apiService.update(`VehicleMst/UpdateVehicleDetails/${this.vehicleId}`, vehicleData).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
       if(data.success == true){
         this.alert.success("Vehicle Master Updated Successfully")
@@ -159,6 +167,27 @@ export class NewVehicleMaster implements OnInit {
      this.alert.error("Unable to Update Vehicle Master");
    });
   }
+  onRegistrationNumberInput(event: Event): void {
+  const input = event.target as HTMLInputElement;
+
+  let value = input.value.toUpperCase();
+
+  // First character must be a letter
+  if (value[0] && !/[A-Z]/.test(value[0])) {
+    value = value.slice(1);
+  }
+
+  // Second character must be a letter
+  if (value[1] && !/[A-Z]/.test(value[1])) {
+    value = value.slice(0, 1) + value.slice(2);
+  }
+
+  input.value = value;
+
+  this.vehicleForm.get('registrationNumber')?.setValue(value, {
+    emitEvent: false
+  });
+}
 
   reset(){
      this.vehicleForm.reset({
@@ -179,6 +208,6 @@ export class NewVehicleMaster implements OnInit {
           lastServiceDate: null,
           isAvailable: true
         });
-  }
-
+     
+  }  
 }

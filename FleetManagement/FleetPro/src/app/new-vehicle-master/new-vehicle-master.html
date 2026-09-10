@@ -32,14 +32,13 @@
           <span class="required">*</span>
         </label>
 
-        <input
-          type="text"
-          formControlName="registrationNumber"
-          placeholder="Enter registration number"
-          maxlength="20"
-           oninput="this.value = this.value.toUpperCase()"
-          
-        />
+     <input
+  type="text"
+  formControlName="registrationNumber"
+  placeholder="Enter registration number"
+  maxlength="20"
+  (input)="onRegistrationNumberInput($event)"
+/>
 
         @if (
           vehicleForm.controls.registrationNumber.touched &&
@@ -277,6 +276,21 @@
 
       </div>
 
+
+      <!-- Vehicle Permit -->
+      <div class="form-group">
+        <label>Vehicle Permit</label>
+
+        <select formControlName="vehiclePermit">
+         
+
+          @for (permit of vehiclePermits; track permit.id) {
+            <option [value]="permit.id">
+              {{ permit.name }}
+            </option>
+          }
+        </select>
+      </div>
     </div>
 
 

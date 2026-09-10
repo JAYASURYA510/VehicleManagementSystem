@@ -65,5 +65,16 @@
       "id": 3,
       "name": "Maintenance"
     }
+  ],
+
+  "vehiclePermits": [
+    {
+      "id": 1,
+      "name": "Local Permit"
+    },
+    {
+      "id": 2,
+      "name": "National Permit"
+    }
   ]
 }
