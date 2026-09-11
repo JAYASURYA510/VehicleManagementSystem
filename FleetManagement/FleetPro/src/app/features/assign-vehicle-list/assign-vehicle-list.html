@@ -24,35 +24,26 @@
         <ngx-select
          formControlName="registrationNumber"
          [items]="vehicleList || []"
-         optionValueField="registrationNumber"
+         optionValueField="vehicleId"
          optionTextField="registrationNumber"
          placeholder="Select registration"
          [allowClear]="true">
         </ngx-select>
          </div>
          <div class="form-group">
-          <label for="fromDate">From Date</label>
-          <app-datetime-picker
-            inputId="fromDate"
-            formControlName="fromDate"
-            pickerType="both"
-            placeholder="Select From Date">
-          </app-datetime-picker>
-        </div>
 
-        <div class="form-group">
-          <label for="toDate">To Date </label>
-          <app-datetime-picker
-            inputId="toDate"
-            formControlName="toDate"
-            pickerType="both"
-            placeholder="Select To Date">
-            </app-datetime-picker>
-          <small class="alert alert-danger" *ngIf="hasDateRangeError()">
-            To date & time cannot be earlier than From date & time.
-          </small>
-        </div>
-         <button type="button" class="btn btn-primary btn-blue">Search</button>
+        <label>
+          Assigned Date
+        </label>
+
+        <app-datetime-picker
+          formControlName="assignedDate"
+          pickerType="calendar"
+          placeholder="dd-mm-yyyy"
+        ></app-datetime-picker>
+
+      </div>
+         <button type="button" class="btn btn-primary btn-blue" (click)="search()">Search</button>
   </div>
 
   <div class="card">

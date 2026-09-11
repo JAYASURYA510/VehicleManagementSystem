@@ -62,18 +62,142 @@ namespace FleetPro.API.Controllers
             }
         }
 
-        [HttpGet("getUserBasedAssignedVehicle")]
-        public async Task<IActionResult> getUserBasedVehicle()
+        [HttpGet("getUserBasedAssignedVehicle/{RoleId}/{UserId}")]
+        public async Task<IActionResult> getUserBasedVehicle(int RoleId, int UserId)
         {
             try
             {
-                var result = await vehicleAssignmentRepository.getUserBasedVehicle();
+                var result = await vehicleAssignmentRepository.getUserBasedVehicle(RoleId, UserId);
 
                 return Ok(new
                 {
                     success = true,
                     data = result
                 });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        [HttpGet("getUserBasedVehicleDropDown/{RoleId}/{UserId}")]
+        public async Task<IActionResult> VehicleDropDown(int RoleId, int UserId)
+        {
+            var result = await vehicleAssignmentRepository.getUserBasedVehicleDropDown(RoleId, UserId);
+            if (result != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    data = result
+                });
+            }
+            else
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Not Found.",
+                });
+            }
+        }
+
+        [HttpPut("EditVehicleAssignment")]
+        public async Task<IActionResult> EditVehicleAssignment([FromBody] EditVehicleAssignmentDto request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Invalid request data."
+                    });
+                }
+
+                var result = await vehicleAssignmentRepository.EditVehicleAssignmentAsync(request);
+                if(result == true){
+                return Ok(new
+                {
+                   success = result,
+                   message = "Vehicle assignment updated successfully."
+                });
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Failed to update vehicle assignment."
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+
+        [HttpDelete("DeleteVehicleAssignment/{assignmentId}")]
+        public async Task<IActionResult> DeleteVehicleAssignment(Guid assignmentId)
+        {
+            try
+            {
+                var deleteAssignment = await vehicleAssignmentRepository.DeleteVehicleAssignmentAsync(assignmentId);
+               if(deleteAssignment == true){
+                return Ok(new
+                {
+                   success = deleteAssignment,
+                   message = "Vehicle assignment deleted successfully."
+                });
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "Failed to delete vehicle assignment."
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting data.", ex);
+            }
+        }
+
+        [HttpPost("SearchVehicleAssignments")]
+        public async Task<IActionResult> SearchVehicleAssignments([FromBody] VehicleAssignmentSearchDto request)
+        {
+            try
+            {
+                var result = await vehicleAssignmentRepository.SearchVehicleAssignmentsAsync(request);
+                if (result != null && result.Count > 0)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        data = result
+                    });
+                }
+                else
+                {
+                    return NotFound(new
+                    {
+                        success = false,
+                        message = "No vehicle assignments found matching the search criteria."
+                    });
+                }
             }
             catch (Exception ex)
             {

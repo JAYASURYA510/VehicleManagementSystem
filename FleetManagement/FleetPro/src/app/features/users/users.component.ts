@@ -39,6 +39,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   private api = inject(ApiService);
   auth = inject(AuthService);
   private fb = inject(FormBuilder);
+  isAdmin:any;
 
   displayedColumns: string[] = [
   'id',
@@ -126,6 +127,9 @@ ngAfterViewInit() {
   });
 
   ngOnInit(): void {
+    if(this.localStorageData.role === "SuperAdmin" || this.localStorageData.role === "Admin"){
+     this.isAdmin = true;
+    }
     this.load();
      this.getUserData();
     this.loadRoles();

@@ -26,6 +26,8 @@ export class FormDataComponent implements OnInit {
   menus: Menu[] = [];
   permissionForm: FormGroup;
   protected readonly unsubscribe$ = new Subject<void>();
+  localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
+  isAdmin:any;
 
   constructor(
     private apiService: ApiService,
@@ -42,6 +44,9 @@ export class FormDataComponent implements OnInit {
   ngOnInit(): void {
     this.loadRoles();
     this.loadMenus();
+    if(this.localStorageData.role === "SuperAdmin" || this.localStorageData.role === "Admin"){
+     this.isAdmin = true;
+    }
   }
 
   loadRoles() {

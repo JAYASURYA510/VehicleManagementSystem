@@ -1045,6 +1045,16 @@ input:focus, select:focus, textarea:focus {
     margin-top: 6px;
 }
 
+.admin-access{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #dc3545;
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: 25%;
+}
+
 .rule {
     display: flex;
     align-items: center;

@@ -6,6 +6,7 @@ import {
   OWL_DATE_TIME_FORMATS,
   OWL_DATE_TIME_LOCALE
 } from '@danielmoncada/angular-datetime-picker';
+import { formatDate } from '@angular/common';
 
 export type OwlPickerType = 'both' | 'calendar' | 'timer';
 
@@ -40,7 +41,9 @@ export const OWL_DATETIME_FORMATS = {
   monthYearA11yLabel: { year: 'numeric', month: 'long' }
 };
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class HyphenDateTimeAdapter extends NativeDateTimeAdapter {
   constructor(
     @Inject(OWL_DATE_TIME_LOCALE) locale: string,
@@ -149,5 +152,31 @@ export class DateTimePickerService {
       `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +
       `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}Z`
     );
+  }
+
+  public startDate(setDate: any): Date | null {
+
+    if (setDate === null || setDate === undefined) {
+      return null;
+    }
+    const formattedDate = formatDate(setDate,'mediumDate','en-GB');
+    let date = new Date(formattedDate);
+    date.setMinutes(date.getMinutes() +Math.abs(date.getTimezoneOffset()));
+    return date;
+  }
+
+  public endDate(setDate: any): Date | null {
+
+    if (setDate === null || setDate === undefined) {
+      return null;
+    }
+    const formattedDate = formatDate(
+      setDate,'mediumDate','en-GB');
+
+    let date = new Date(formattedDate);
+    date.setHours(23);date.setMinutes(59 + Math.abs(date.getTimezoneOffset()));
+    date.setSeconds(59);
+
+    return date;
   }
 }

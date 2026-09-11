@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using FleetPro.API.Data;
 using FleetPro.API.Data.Entitys;
 using FleetPro.API.DTOs;
@@ -13,7 +14,7 @@ namespace FleetPro.API.Repository
         private readonly IMapper mapper;
         public VehicleAssignmentRepository(ApplicationDbContext context, IMapper mapper)
         {
-             this.context = context;
+            this.context = context;
             this.mapper = mapper;
         }
 
@@ -50,59 +51,154 @@ namespace FleetPro.API.Repository
             }
             catch (Exception ex)
             {
-               throw new Exception("An error occurred while saving data.", ex);
+                throw new Exception("An error occurred while saving data.", ex);
             }
         }
 
-        public async Task<List<VehicleAssignmentUserResponseDto>> getUserBasedVehicle()
+        public async Task<List<VehicleAssignmentUserResponseDto>> getUserBasedVehicle(int RoleId, int UserId)
         {
             try
             {
-                var assignments = await context.VehicleUserAssignments
-            .Select(x => new
-            {
-                x.AssignmentId,
-                x.UserId,
-                x.RoleId,
-                x.VehicleId,
-                x.FromDate,
-                x.ToDate,
-                x.IsActive,
+                if (RoleId == 1 || RoleId == 2)
+                {
+                    var assignments = await context.VehicleUserAssignments.AsNoTracking()
+             .Select(x => new
+             {
+                 x.AssignmentId,
+                 x.UserId,
+                 x.RoleId,
+                 x.VehicleId,
+                 x.FromDate,
+                 x.ToDate,
+                 x.IsActive,
 
-                UserName = x.User.fullName,
-                RoleName = x.Role.roleName,
-                VehicleNumber = x.Vehicle.RegistrationNumber
-            })
-            .ToListAsync();
+                 UserName = x.User.fullName,
+                 RoleName = x.Role.roleName,
+                 VehicleNumber = x.Vehicle.RegistrationNumber
+             })
+             .ToListAsync();
 
-                var result = assignments
-                    .GroupBy(x => new
-                    {
-                        x.UserId,
-                        x.RoleId,
-                        x.UserName,
-                        x.RoleName
-                    })
-                    .Select(g => new VehicleAssignmentUserResponseDto
-                    {
-                        UserId = g.Key.UserId,
-                        UserName = g.Key.UserName,
-                        RoleId = g.Key.RoleId,
-                        RoleName = g.Key.RoleName,
-
-                        Assignments = g.Select(x => new VehicleAssignmentDetailDto
+                    var result = assignments
+                        .GroupBy(x => new
                         {
-                            AssignmentId = x.AssignmentId,
-                            VehicleId = x.VehicleId,
-                            VehicleNumber = x.VehicleNumber,
-                            FromDate = x.FromDate,
-                            ToDate = x.ToDate,
-                            IsActive = x.IsActive
-                        }).ToList()
-                    })
-                    .ToList();
+                            x.UserId,
+                            x.RoleId,
+                            x.UserName,
+                            x.RoleName
+                        })
+                        .Select(g => new VehicleAssignmentUserResponseDto
+                        {
+                            UserId = g.Key.UserId,
+                            UserName = g.Key.UserName,
+                            RoleId = g.Key.RoleId,
+                            RoleName = g.Key.RoleName,
 
-                return result;
+                            Assignments = g.Select(x => new VehicleAssignmentDetailDto
+                            {
+                                AssignmentId = x.AssignmentId,
+                                VehicleId = x.VehicleId,
+                                VehicleNumber = x.VehicleNumber,
+                                FromDate = x.FromDate,
+                                ToDate = x.ToDate,
+                                IsActive = x.IsActive
+                            }).ToList()
+                        })
+                        .ToList();
+
+                    return result;
+                }
+                else
+                {
+                    var assignments = await context.VehicleUserAssignments.Where(x => x.RoleId == RoleId && x.UserId == UserId).AsNoTracking()
+                .Select(x => new
+                {
+                    x.AssignmentId,
+                    x.UserId,
+                    x.RoleId,
+                    x.VehicleId,
+                    x.FromDate,
+                    x.ToDate,
+                    x.IsActive,
+
+                    UserName = x.User.fullName,
+                    RoleName = x.Role.roleName,
+                    VehicleNumber = x.Vehicle.RegistrationNumber
+                })
+                .ToListAsync();
+
+                    var result = assignments
+                        .GroupBy(x => new
+                        {
+                            x.UserId,
+                            x.RoleId,
+                            x.UserName,
+                            x.RoleName
+                        })
+                        .Select(g => new VehicleAssignmentUserResponseDto
+                        {
+                            UserId = g.Key.UserId,
+                            UserName = g.Key.UserName,
+                            RoleId = g.Key.RoleId,
+                            RoleName = g.Key.RoleName,
+
+                            Assignments = g.Select(x => new VehicleAssignmentDetailDto
+                            {
+                                AssignmentId = x.AssignmentId,
+                                VehicleId = x.VehicleId,
+                                VehicleNumber = x.VehicleNumber,
+                                FromDate = x.FromDate,
+                                ToDate = x.ToDate,
+                                IsActive = x.IsActive
+                            }).ToList()
+                        })
+                        .ToList();
+
+                    return result;
+                }
+
+                return new List<VehicleAssignmentUserResponseDto>();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while saving data.", ex);
+            }
+        }
+
+        public async Task<List<vehicleDto>> getUserBasedVehicleDropDown(int RoleId, int UserId)
+        {
+            try
+            {
+                if (RoleId == 1 || RoleId == 2)
+                {
+                    return await context.VehicleMsts.AsNoTracking().Where(x => x.VehicleStatusId == 1 && x.IsAvailable == true)
+                        .Select(vehicle => new vehicleDto
+                        {
+                            VehicleId = vehicle.VehicleId,
+                            RegistrationNumber = vehicle.RegistrationNumber
+                        })
+                        .ToListAsync();
+                }
+                else
+                {
+                    var assignedVehicleIds = await context.VehicleUserAssignments
+                        .Where(x => x.RoleId == RoleId && x.UserId == UserId && x.IsActive)
+                        .Select(x => x.VehicleId)
+                        .ToListAsync();
+
+                    if (assignedVehicleIds.Any())
+                    {
+                        return await context.VehicleMsts.AsNoTracking()
+                            .Where(vehicle => assignedVehicleIds.Contains(vehicle.VehicleId))
+                            .Select(vehicle => new vehicleDto
+                            {
+                                VehicleId = vehicle.VehicleId,
+                                RegistrationNumber = vehicle.RegistrationNumber
+                            })
+                            .ToListAsync();
+                    }
+                }
+
+                return new List<vehicleDto>();
             }
             catch (Exception ex)
             {
@@ -119,10 +215,10 @@ namespace FleetPro.API.Repository
 
                 if (!vehicleIds.Any())
                 {
-                   throw new ArgumentException("Invalid vehicle list.", nameof(vehicleUserAssignmentDto));
+                    throw new ArgumentException("Invalid vehicle list.", nameof(vehicleUserAssignmentDto));
                 }
 
-                var existingAssignments = await context.VehicleUserAssignments.Where(x => x.FromDate == vehicleUserAssignmentDto.FromDate && x.ToDate == vehicleUserAssignmentDto.ToDate && vehicleIds.Contains(x.VehicleId)
+                var existingAssignments = await context.VehicleUserAssignments.Where(x => vehicleIds.Contains(x.VehicleId)
                                            && x.RoleId == vehicleUserAssignmentDto.RoleId && x.IsActive == true).AsNoTracking().ToListAsync();
 
                 // Close old assignment if the vehicle is assigned
@@ -139,7 +235,7 @@ namespace FleetPro.API.Repository
                 }
 
                 // Vehicles already assigned to the same user
-                var alreadyAssignedVehicleIds  = await context.VehicleUserAssignments.Where(x => x.FromDate == vehicleUserAssignmentDto.FromDate && x.ToDate == vehicleUserAssignmentDto.ToDate && vehicleIds.Contains(x.VehicleId)
+                var alreadyAssignedVehicleIds = await context.VehicleUserAssignments.Where(x => x.FromDate == vehicleUserAssignmentDto.FromDate && x.ToDate == vehicleUserAssignmentDto.ToDate && vehicleIds.Contains(x.VehicleId)
                                            && x.UserId == vehicleUserAssignmentDto.UserId && x.IsActive == true).AsNoTracking().ToListAsync();
 
                 // Get only new vehicles
@@ -149,22 +245,22 @@ namespace FleetPro.API.Repository
                 var assignments = newVehicleIds.Select(vehicleId =>
                 new VehicleUserAssignment
                 {
-                   AssignmentId = Guid.NewGuid(),
-                   VehicleId = vehicleId,
-                   UserId = vehicleUserAssignmentDto.UserId,
-                   RoleId = vehicleUserAssignmentDto.RoleId,
-                   FromDate = vehicleUserAssignmentDto.FromDate,
-                   ToDate = vehicleUserAssignmentDto.ToDate,
-                   IsActive = vehicleUserAssignmentDto.IsActive,
-                   created_date = vehicleUserAssignmentDto.created_date,
-                   CreatedBy = vehicleUserAssignmentDto.CreatedBy,
-                   updatedDate = vehicleUserAssignmentDto.updatedDate,
-                   UpdatedBy = vehicleUserAssignmentDto.UpdatedBy
+                    AssignmentId = Guid.NewGuid(),
+                    VehicleId = vehicleId,
+                    UserId = vehicleUserAssignmentDto.UserId,
+                    RoleId = vehicleUserAssignmentDto.RoleId,
+                    FromDate = vehicleUserAssignmentDto.FromDate,
+                    // ToDate = vehicleUserAssignmentDto.ToDate,
+                    IsActive = vehicleUserAssignmentDto.IsActive,
+                    created_date = vehicleUserAssignmentDto.created_date,
+                    CreatedBy = vehicleUserAssignmentDto.CreatedBy,
+                    updatedDate = vehicleUserAssignmentDto.updatedDate,
+                    UpdatedBy = vehicleUserAssignmentDto.UpdatedBy
                 }).ToList();
 
                 if (assignments.Any())
                 {
-                   context.VehicleUserAssignments.AddRange(assignments);
+                    context.VehicleUserAssignments.AddRange(assignments);
                 }
                 await context.SaveChangesAsync();
 
@@ -172,7 +268,148 @@ namespace FleetPro.API.Repository
             }
             catch (Exception ex)
             {
-               throw new Exception("An error occurred while saving data.", ex);
+                throw new Exception("An error occurred while saving data.", ex);
+            }
+        }
+
+        public async Task<bool> EditVehicleAssignmentAsync(EditVehicleAssignmentDto request)
+        {
+            try
+            {
+                var assignment = await context.VehicleUserAssignments.FirstOrDefaultAsync(x => x.AssignmentId == request.AssignmentId);
+                if (assignment == null)
+                {
+                    return false;
+                }
+
+                if (request.VehicleId == Guid.Empty)
+                {
+                    return false;
+                }
+
+                // Check whether another active assignment
+                // already exists for this vehicle
+                var existingAssignment = await context.VehicleUserAssignments.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.VehicleId == request.VehicleId && x.AssignmentId != request.AssignmentId && x.IsActive);
+
+                if (existingAssignment != null)
+                {
+                    if (existingAssignment.UserId != request.UserId)
+                    {
+                        existingAssignment.ToDate = request.FromDate;
+                        existingAssignment.IsActive = false;
+                        existingAssignment.updatedDate = request.UpdatedDate;
+                        existingAssignment.UpdatedBy = request.UpdatedBy;
+                    }
+                }
+
+                assignment.VehicleId = request.VehicleId;
+                assignment.UserId = request.UserId;
+                assignment.RoleId = request.RoleId;
+                assignment.FromDate = request.FromDate;
+                assignment.IsActive = request.IsActive;
+                assignment.updatedDate = request.UpdatedDate;
+                assignment.UpdatedBy = request.UpdatedBy;
+
+                await context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while editing data.", ex);
+            }
+
+        }
+
+        public async Task<bool> DeleteVehicleAssignmentAsync(Guid assignmentId)
+        {
+            try
+            {
+                var assignment = await context.VehicleUserAssignments.AsNoTracking().FirstOrDefaultAsync(x => x.AssignmentId == assignmentId);
+                if (assignment == null)
+                {
+                    return false;
+                }
+
+                context.VehicleUserAssignments.Remove(assignment);
+
+                await context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting data.", ex);
+            }
+        }
+
+        public async Task<List<VehicleAssignmentUserResponseDto>> SearchVehicleAssignmentsAsync(VehicleAssignmentSearchDto request)
+        {
+            try
+            {
+                var query = context.VehicleUserAssignments.AsQueryable().AsNoTracking();
+
+                if (request.VehicleId.HasValue)
+                {
+                    query = query.Where(x => x.Vehicle.VehicleId == request.VehicleId);
+                }
+
+                if (request.AssignedDate.HasValue)
+                {
+                    query = query.Where(x => x.FromDate >= request.AssignedDate.Value);
+                }
+
+                if (request.RoleId.HasValue && request.UserId.HasValue)
+                {
+                    if (request.RoleId == 3 || request.RoleId == 4)
+                    {
+                        query = query.Where(x => x.RoleId == request.RoleId && x.UserId == request.UserId);
+                    }
+                }
+
+                var assignments = await query.Select(x => new
+                {
+                    x.AssignmentId,
+                    x.UserId,
+                    x.RoleId,
+                    x.VehicleId,
+                    x.FromDate,
+                    x.ToDate,
+                    x.IsActive,
+                    UserName = x.User.fullName,
+                    RoleName = x.Role.roleName,
+                    VehicleNumber =
+                      x.Vehicle.RegistrationNumber
+                }).ToListAsync();
+
+                var result = assignments.GroupBy(x => new
+                            {
+                               x.UserId,
+                               x.RoleId,
+                               x.UserName,
+                               x.RoleName
+                            }).Select(g => new VehicleAssignmentUserResponseDto
+                            {
+                            UserId = g.Key.UserId,
+                            UserName = g.Key.UserName,
+                            RoleId = g.Key.RoleId,
+                            RoleName = g.Key.RoleName,
+                            Assignments = g.Select(x =>new VehicleAssignmentDetailDto
+                            {
+                               AssignmentId = x.AssignmentId,
+                               VehicleId = x.VehicleId,
+                               VehicleNumber = x.VehicleNumber,
+                               FromDate = x.FromDate,
+                               ToDate = x.ToDate, 
+                               IsActive = x.IsActive
+                            }).ToList()
+                        }).ToList();
+
+                    return result;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while searching data.", ex);
             }
         }
     }

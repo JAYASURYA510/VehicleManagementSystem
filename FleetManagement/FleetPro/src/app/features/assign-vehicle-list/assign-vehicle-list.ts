@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { AssignVehicleService } from '../../core/services/assign-vehicle.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -23,6 +23,8 @@ import { CommanService } from '../../core/services/comman.service';
 import { NgxSelectModule } from 'ngx-select-ex';
 import { User } from '../assign-vehicle-mst/assign-vehicle-mst';
 import { Router } from '@angular/router';
+import { DateTimePickerService } from '../../core/services/datetime-picker.service';
+import { UserRole } from '../../core/models';
 
 export interface VehicleAssignment {
   assignmentId: string;
@@ -59,6 +61,9 @@ export interface AssignedVehicleUser {
     MatSortModule,
     NgxSelectModule,
   ],
+  providers: [
+    DatePipe
+  ],
   templateUrl: './assign-vehicle-list.html',
 })
 export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
@@ -71,16 +76,20 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   searchAssignList: FormGroup;
   vehicleList: any;
   filteredUserList: User[] = [];
+  localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
+  role = this.localStorageData.role;
+  userId = this.localStorageData.userId;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private fb: FormBuilder,private api: AssignVehicleService, private alert: ToastrService,private apiService : CommanService) {
+  constructor(private fb: FormBuilder,private api: AssignVehicleService, private alert: ToastrService,private apiService : CommanService,
+              private dateTimePickerService : DateTimePickerService, private cdr: ChangeDetectorRef
+  ) {
       this.searchAssignList = this.fb.group({
         searchTerm : this.fb.control(null),
         registrationNumber : this.fb.control(null),
-        fromDate: [null as Date | null],
-        toDate: [null as Date | null]
+        assignedDate: [new Date()],
       }, { validators: dateRangeValidator });
   }
 
@@ -109,6 +118,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.getVehicleNumber();
     this.getAssignedVehicles();
+    this.search();
   }
 
   ngAfterViewInit() {
@@ -121,8 +131,9 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
     this.unsubscribe$.complete();
   }
    getVehicleNumber(){
-    this.apiService.list(`VehicleMst/getAllVehicleForDropDown`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
-      this.vehicleList = data?.message;
+    this.asignRole = UserRole[this.role as keyof typeof UserRole];
+    this.apiService.list(`VehicleAssignment/getUserBasedVehicleDropDown/${this.asignRole}/${this.userId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((response : any)=>{
+      this.vehicleList = response?.data;
     });
    }
 
@@ -131,8 +142,11 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   this.router.navigate(['/assign-vehicle']);
    }
    
+  asignRole : any;
   getAssignedVehicles() {
-    this.api.getUserBasedAssignedVehicle().pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.asignRole = UserRole[this.role as keyof typeof UserRole];
+
+    this.apiService.list(`VehicleAssignment/getUserBasedAssignedVehicle/${this.asignRole}/${this.userId}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response: any) => {
         const rows = (response?.data ?? []).map((row: AssignedVehicleUser) => ({
           ...row,
@@ -145,6 +159,35 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
       },
       error: () => {
         this.alert.error('Failed to load assigned vehicles. Please try again.');
+      },
+    });
+  }
+
+  search(){
+    const roleId = UserRole[this.role as keyof typeof UserRole];
+    const searchData = {
+      vehicleId : this.searchAssignList.get('registrationNumber')?.value,
+      assignedDate : this.dateTimePickerService.startDate(this.searchAssignList.get('assignedDate')?.value),
+      roleId : roleId,
+      userId : this.userId,
+    }
+    this.apiService.create(`VehicleAssignment/SearchVehicleAssignments`, searchData).pipe(takeUntil(this.unsubscribe$)).subscribe({
+      next: (response: any) => {
+        if(response.data.length > 0){
+          const rows = (response?.data ?? []).map((row: AssignedVehicleUser) => ({
+          ...row,
+          assignments: row.assignments ?? [],
+          }));
+          this.dataSource.data = rows;
+        if (this.paginator) {
+          this.dataSource.paginator = this.paginator;
+        }
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.alert.error('Failed to load assigned vehicles. Please try again.');
+        this.cdr.detectChanges();
       },
     });
   }

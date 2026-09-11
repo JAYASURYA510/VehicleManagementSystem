@@ -22,6 +22,9 @@ import { Subject, takeUntil } from 'rxjs';
 import { AssignVehicleService } from '../../core/services/assign-vehicle.service';
 import { DateTimePickerService } from '../../core/services/datetime-picker.service';
 import { DateTimePickerComponent } from '../../shared/datetime-picker/datetime-picker';
+import { CommanService } from '../../core/services/comman.service';
+import { UserRole } from '../../core/models';
+import { Router } from '@angular/router';
 
 // =====================================================
 // INTERFACES
@@ -65,7 +68,6 @@ function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
     FormsModule,
     ReactiveFormsModule,
     NgxSelectModule,
-    DateTimePickerComponent
   ],
   templateUrl: './assign-vehicle-mst.html',
   styleUrl: './assign-vehicle-mst.css'
@@ -74,6 +76,7 @@ export class AssignVehicleMstComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly assignVehicleService = inject(AssignVehicleService);
   private readonly dateTimePickerService = inject(DateTimePickerService);
+  private readonly apiService = inject(CommanService);
   private readonly alert = inject(ToastrService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef);
@@ -99,8 +102,6 @@ export class AssignVehicleMstComponent implements OnInit {
   // =====================================================
   assignVehicleForm: FormGroup = this.fb.group(
     {
-      fromDate: [null as Date | null, Validators.required],
-      toDate: [null as Date | null, Validators.required],
       roleId: [null as number | null, Validators.required],
       userId: [null as number | null, Validators.required],
       vehicleId: [null, Validators.required]
@@ -108,7 +109,9 @@ export class AssignVehicleMstComponent implements OnInit {
     { validators: dateRangeValidator }
   );
     
-   localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
+  localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
+  role = this.localStorageData.role;
+  userId = this.localStorageData.userId;
 
   // =====================================================
   // INITIALIZATION
@@ -122,6 +125,7 @@ export class AssignVehicleMstComponent implements OnInit {
   // =====================================================
   // LOAD USERS (API: User/getallUserForSelection)
   // =====================================================
+  asignRole : any;
   loadUsers(): void {
     this.assignVehicleService
       .getUsers()
@@ -187,16 +191,16 @@ export class AssignVehicleMstComponent implements OnInit {
   // LOAD ACTIVE VEHICLES (API: VehicleMst/getActiveAllVehicle)
   // =====================================================
   loadVehicles(): void {
-    this.assignVehicleService
-      .getActiveVehicles()
+    this.asignRole = UserRole[this.role as keyof typeof UserRole];
+    this.apiService
+      .list(`VehicleAssignment/getUserBasedVehicleDropDown/${this.asignRole}/${this.userId}`)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response: any) => {
-          if (response && Array.isArray(response.message)) {
-            this.vehicleList = response.message;
-          } else if (Array.isArray(response)) {
-            this.vehicleList = response;
-          } else {
+          if(response.data.length > 0){
+              this.vehicleList = response.data;
+          }
+          else{
             this.vehicleList = [];
           }
           this.cdr.detectChanges();
@@ -382,6 +386,7 @@ export class AssignVehicleMstComponent implements OnInit {
   // =====================================================
   // SUBMIT & RESET
   // =====================================================
+  private router = inject(Router);
   onSubmit(): void {
     if (this.assignVehicleForm.invalid) {
       this.assignVehicleForm.markAllAsTouched();
@@ -391,8 +396,8 @@ export class AssignVehicleMstComponent implements OnInit {
 
     const formVal = this.assignVehicleForm.value;
     const payload = {
-      fromDate: this.dateTimePickerService.toApiDateTime(formVal.fromDate),
-      toDate: this.dateTimePickerService.toApiDateTime(formVal.toDate),
+      fromDate: this.dateTimePickerService.toApiDateTime(new Date()),
+      // toDate: this.dateTimePickerService.toApiDateTime(new Date()),
       userId: Number(formVal.userId),
       roleId: Number(formVal.roleId),
       vehicleId: Array.isArray(formVal.vehicleId)? formVal.vehicleId : [formVal.vehicleId],
@@ -408,6 +413,7 @@ export class AssignVehicleMstComponent implements OnInit {
           if(response.success == true){
           this.alert.success('Vehicle assigned successfully!');
           this.onReset();
+          this.router.navigate(['/assign-vehicle-list']);
           }
           else{
             this.alert.error('Failed to assign vehicle. Please try again.');

@@ -16,9 +16,9 @@ namespace FleetPro.API.Data.Entitys
         [Column("role_id")]
         public int RoleId { get; set; }
         [Column("from_date")]
-        public DateTime FromDate { get; set; }
+        public DateTime? FromDate { get; set; }
         [Column("to_date")]
-        public DateTime ToDate { get; set; }
+        public DateTime? ToDate { get; set; }
         [Column("is_active")]
         public bool IsActive { get; set; }
         [Column("created_date")]

@@ -32,4 +32,10 @@
         public int? VehicleStatusId { get; set; }
         public string? searchTerm { get; set; }
     }
+
+    public class vehicleDto
+    {
+        public Guid? VehicleId { get; set; }
+        public string? RegistrationNumber { get; set; }
+    }
 }
