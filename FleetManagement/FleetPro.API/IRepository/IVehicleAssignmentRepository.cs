@@ -11,5 +11,6 @@ namespace FleetPro.API.IRepository
         Task<bool> EditVehicleAssignmentAsync(EditVehicleAssignmentDto request);
         Task<bool> DeleteVehicleAssignmentAsync(Guid assignmentId);
         Task<List<VehicleAssignmentUserResponseDto>>SearchVehicleAssignmentsAsync(VehicleAssignmentSearchDto request);
+        Task<VehicleAssignmentByIdDto> GetVehicleAssignmentByIdAsync(Guid assignmentId);
     }
 }

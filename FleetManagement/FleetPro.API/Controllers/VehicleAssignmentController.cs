@@ -208,5 +208,35 @@ namespace FleetPro.API.Controllers
                 });
             }
         }
+
+        [HttpGet("GetVehicleAssignmentById/{assignmentId}")]
+        public async Task<IActionResult> GetVehicleAssignmentById(Guid assignmentId)
+        {
+            if (assignmentId == Guid.Empty)
+            {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Assignment ID is required."
+            });
+            }
+
+            var result = await vehicleAssignmentRepository.GetVehicleAssignmentByIdAsync(assignmentId);
+
+            if (result == null)
+            {
+            return NotFound(new
+            {
+                success = false,
+                message = "Vehicle assignment not found."
+            });
+            }
+
+             return Ok(new
+            {
+               success = true,
+               data = result
+            });
+        }
     }
 }

@@ -412,5 +412,33 @@ namespace FleetPro.API.Repository
                 throw new Exception("An error occurred while searching data.", ex);
             }
         }
+
+        public async Task<VehicleAssignmentByIdDto> GetVehicleAssignmentByIdAsync(Guid assignmentId)
+        {
+            try
+            {
+                var assignment = await context.VehicleUserAssignments.Where(x => x.AssignmentId == assignmentId).AsNoTracking()
+                                          .Select(x => new VehicleAssignmentByIdDto
+                                {
+                                   AssignmentId = x.AssignmentId,
+                                   VehicleId = x.VehicleId,
+                                   VehicleNumber = x.Vehicle.RegistrationNumber,
+                                   FromDate = x.FromDate,
+                                   ToDate = x.ToDate,
+                                   IsActive = x.IsActive
+                                }).FirstOrDefaultAsync();
+
+                if (assignment != null)
+                {
+                    return assignment;
+                }
+
+                return new VehicleAssignmentByIdDto();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while getting data.", ex);
+            }
+        }
     }
 }
