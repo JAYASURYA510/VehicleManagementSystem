@@ -13,6 +13,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<RoleMenu> RoleMenus { get; set; }
     public DbSet<VehicleMst> VehicleMsts { get; set; }
     public DbSet<VehicleUserAssignment> VehicleUserAssignments { get; set; }
+    public DbSet<DailyTrackingRecord> DailyTrackingRecords { get; set; }
     public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<DieselExpense> DieselExpenses => Set<DieselExpense>();
