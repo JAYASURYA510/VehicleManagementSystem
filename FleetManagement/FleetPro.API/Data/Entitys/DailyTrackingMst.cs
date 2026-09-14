@@ -2,12 +2,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("dailytracking_records")]
+namespace FleetPro.API.Data.Entitys
+{
+[Table("daily_tracking_mst")]
 public class DailyTrackingRecord
 {
     [Key]
     [Column("id")]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     [Column("vehicle_id")]
     [ForeignKey(nameof(VehicleMst))]
@@ -27,10 +29,10 @@ public class DailyTrackingRecord
     public string? FuelStation { get; set; }
 
     [Column("diesel_litres")]
-    public decimal DieselLitres { get; set; }
+    public decimal? DieselLitres { get; set; }
 
     [Column("diesel_cost")]
-    public decimal DieselCost { get; set; }
+    public decimal? DieselCost { get; set; }
 
     [Column("from_km")]
     public decimal? FromKm { get; set; }
@@ -42,25 +44,25 @@ public class DailyTrackingRecord
     public decimal? KmBeforeFueling { get; set; }
 
     [Column("toll_charges")]
-    public decimal TollCharges { get; set; }
+    public decimal? TollCharges { get; set; }
 
     [Column("workshop_expenses")]
-    public decimal WorkshopExpenses { get; set; }
+    public decimal? WorkshopExpenses { get; set; }
 
     [Column("tyre_maintenance")]
-    public decimal TyreMaintenance { get; set; }
+    public decimal? TyreMaintenance { get; set; }
 
     [Column("driver_salary")]
-    public decimal DriverSalary { get; set; }
+    public decimal? DriverSalary { get; set; }
 
     [Column("rto_charges")]
-    public decimal RtoCharges { get; set; }
+    public decimal? RtoCharges { get; set; }
 
     [Column("trip_revenue")]
-    public decimal TripRevenue { get; set; }
+    public decimal? TripRevenue { get; set; }
 
     [Column("other_expenses")]
-    public decimal OtherExpenses { get; set; }
+    public decimal? OtherExpenses { get; set; }
 
     [Column("notes")]
     public string? Notes { get; set; }
@@ -69,7 +71,7 @@ public class DailyTrackingRecord
     public int? StatusType { get; set; }
 
     [Column("is_delete")]
-    public int IsDelete { get; set; }
+    public bool? IsDelete { get; set; }
 
     [Column("created_at")]
     public DateTime? CreatedAt { get; set; }
@@ -83,4 +85,7 @@ public class DailyTrackingRecord
     [Column("updated_by")]
     public int? UpdatedBy { get; set; }
 
+    // public ICollection<ImageAttachment> Images { get; set; } = new List<ImageAttachment>();
+
+}
 }
