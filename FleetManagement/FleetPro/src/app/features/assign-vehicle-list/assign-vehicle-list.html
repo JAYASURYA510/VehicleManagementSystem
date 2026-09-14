@@ -10,56 +10,47 @@
   </div>
 
   <div [formGroup]="searchAssignList" class="filter-panel">
-       
-        <div class="form-group filter-search">
-       <label>Search</label>
-       <div class="search-input-wrapper">
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
-      <input class="search" formControlName="searchTerm" style = "font-size: 15px;" placeholder="Search User Name and Role">
+
+    <div class="form-group filter-search">
+      <label>Search</label>
+      <div class="search-input-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input class="search" formControlName="searchTerm" style="font-size: 15px;"
+          placeholder="Search User Name and Role">
       </div>
-      </div>
+    </div>
 
-        <div class="form-group">
-        <label>Registration Number</label>
-        <ngx-select
-         formControlName="registrationNumber"
-         [items]="vehicleList || []"
-         optionValueField="vehicleId"
-         optionTextField="registrationNumber"
-         placeholder="Select registration"
-         [allowClear]="true">
-        </ngx-select>
-         </div>
-         <div class="form-group">
+    <div class="form-group">
+      <label>Registration Number</label>
+      <ngx-select formControlName="registrationNumber" [items]="vehicleList || []" optionValueField="vehicleId"
+        optionTextField="registrationNumber" placeholder="Select registration" [allowClear]="true">
+      </ngx-select>
+    </div>
+    <div class="form-group">
 
-        <label>
-          Assigned Date
-        </label>
+      <label>
+        Assigned Date
+      </label>
 
-        <app-datetime-picker
-          formControlName="assignedDate"
-          pickerType="calendar"
-          placeholder="dd-mm-yyyy"
-        ></app-datetime-picker>
+      <app-datetime-picker formControlName="assignedDate" pickerType="calendar"
+        placeholder="dd-mm-yyyy"></app-datetime-picker>
 
-      </div>
-         <button type="button" class="btn btn-primary btn-blue" (click)="search()">Search</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-blue" (click)="search()">Search</button>
   </div>
 
   <div class="card">
     <div class="table-responsive">
-    <div class="mat-elevation-z2">
+      <div class="mat-elevation-z2">
         <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="custom-table assignment-table">
           <ng-container matColumnDef="expand">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let row">
-              <button
-                type="button"
-                class="expand-toggle-btn"
-                [attr.aria-expanded]="isExpanded(row)"
+              <button type="button" class="expand-toggle-btn" [attr.aria-expanded]="isExpanded(row)"
                 [attr.aria-label]="isExpanded(row) ? 'Collapse assigned vehicles' : 'Expand assigned vehicles'"
                 (click)="toggleRow(row, $event)">
-                <span class="material-symbols-outlined expand-icon" [class.expanded]="isExpanded(row)">chevron_right</span>
+                <span class="material-symbols-outlined expand-icon"
+                  [class.expanded]="isExpanded(row)">chevron_right</span>
               </button>
             </td>
           </ng-container>
@@ -84,62 +75,59 @@
               <div class="assignment-expand" [class.expanded]="isExpanded(row)">
                 <div class="assignment-expand-inner">
                   @if (row.assignments?.length) {
-                    <div class="nested-assignment-wrap">
-                      <table class="nested-assignment-table">
-                        <colgroup>
-                          <col class="col-vehicle">
-                          <col class="col-from">
-                          <col class="col-to">
-                          <col class="col-status">
-                        </colgroup>
-                        <thead>
-                          <tr>
-                            <th>Vehicle Number</th>
-                            <th>From Date</th>
-                            <th>To Date</th>
-                            <th>Status</th>
-                            <!-- <th>Actions</th> -->
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @for (assignment of row.assignments; track assignment.assignmentId) {
-                            <tr>
-                              <td><strong>{{ assignment.vehicleNumber }}</strong></td>
-                              <td>{{ assignment.fromDate | date:'dd MMM yyyy, hh:mm a' }}</td>
-                              <td>{{ assignment.toDate | date:'dd MMM yyyy, hh:mm a' }}</td>
-                              <td>
-                                <span class="status-badge" [class.active]="assignment.isActive" [class.inactive]="!assignment.isActive">
-                                  {{ assignment.isActive ? 'Active' : 'Inactive' }}
-                                </span>
-                              </td>
-                              <!-- <td>
-                                <button mat-icon-button color="primary" title="Edit" aria-label="Edit assignment" style="color: rgb(228, 63, 118)">
-                                  <span class="material-symbols-outlined">edit</span>
-                                </button>
-
-                                <button mat-icon-button color="warn" title="Delete" aria-label="Delete assignment" style="color: rgb(228, 63, 118)">
-                                  <span class="material-symbols-outlined">delete</span>
-                                </button>
-                              </td> -->
-                            </tr>
-                          }
-                        </tbody>
-                      </table>
-                    </div>
+                  <div class="nested-assignment-wrap">
+                    <table class="nested-assignment-table">
+                      <colgroup>
+                        <col class="col-vehicle">
+                        <col class="col-from">
+                        <col class="col-to">
+                        <col class="col-status">
+                        <col class="col-actions">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th>Vehicle Number</th>
+                          <th>From Date</th>
+                          <th>To Date</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (assignment of row.assignments; track assignment.assignmentId) {
+                        <tr>
+                          <td><strong>{{ assignment.vehicleNumber }}</strong></td>
+                          <td>{{ assignment.fromDate | date:'dd MMM yyyy, hh:mm a' }}</td>
+                          <td>{{ assignment.toDate | date:'dd MMM yyyy, hh:mm a' }}</td>
+                          <td>
+                            <span class="status-badge" [class.active]="assignment.isActive"
+                              [class.inactive]="!assignment.isActive">
+                              {{ assignment.isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                          </td>
+                          <td>
+                            <button mat-icon-button color="primary" title="Edit" aria-label="Edit user" style="color: rgb(228, 63, 118)" (click)="openEdit(assignment, row, $event)">
+                              <span class="material-symbols-outlined">edit</span>
+                            </button>
+                            <button mat-icon-button color="warn" title="Delete" aria-label="Delete user" style="color: rgb(228, 63, 118)" (click)="deleteUser(assignment.assignmentId, $event)">
+                              <span class="material-symbols-outlined">delete</span>
+                            </button>
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
                   } @else {
-                    <p class="assignment-empty">No vehicles assigned to this user.</p>
+                  <p class="assignment-empty">No vehicles assigned to this user.</p>
                   }
                 </div>
               </div>
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr
-            mat-row
-            *matRowDef="let row; columns: displayedColumns"
-            class="element-row"
-            [class.expanded-row]="isExpanded(row)"
-            (click)="toggleRow(row)">
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="element-row"
+            [class.expanded-row]="isExpanded(row)" (click)="toggleRow(row)">
           </tr>
           <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
           <tr class="mat-row" *matNoDataRow>
@@ -152,12 +140,10 @@
             <span>Item per page :</span>
 
             <mat-form-field appearance="fill" class="page-size-select">
-              <mat-select
-                [value]="pageSize || 5"
-                [placeholder]="(pageSize || 5).toString()"
+              <mat-select [value]="pageSize || 5" [placeholder]="(pageSize || 5).toString()"
                 (selectionChange)="changePageSize($event.value)">
                 @for (size of pageSizeOptions; track size) {
-                  <mat-option [value]="size">{{ size }}</mat-option>
+                <mat-option [value]="size">{{ size }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -176,24 +162,204 @@
               <mat-icon>chevron_left</mat-icon>
             </button>
 
-            <button mat-icon-button (click)="nextPage()" [disabled]="!paginator || paginator.pageIndex >= totalPages - 1">
+            <button mat-icon-button (click)="nextPage()"
+              [disabled]="!paginator || paginator.pageIndex >= totalPages - 1">
               <mat-icon>chevron_right</mat-icon>
             </button>
 
-            <button mat-icon-button (click)="lastPage()" [disabled]="!paginator || paginator.pageIndex >= totalPages - 1">
+            <button mat-icon-button (click)="lastPage()"
+              [disabled]="!paginator || paginator.pageIndex >= totalPages - 1">
               <mat-icon>last_page</mat-icon>
             </button>
           </div>
         </div>
 
-        <mat-paginator
-          #paginator
-          [length]="totalRecords"
-          [pageSize]="pageSize"
-          [pageSizeOptions]="pageSizeOptions"
+        <mat-paginator #paginator [length]="totalRecords" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
           style="display: none">
         </mat-paginator>
       </div>
     </div>
   </div>
 </div>
+
+@if (showEditModal()) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Vehicle Assignment</h3>
+        <button type="button" class="btn-icon" (click)="closeEditModal()">✕</button>
+      </div>
+      <form [formGroup]="editForm" (ngSubmit)="updateAssignment()">
+        <div class="form-grid">
+          <!-- Role (Disabled / Cannot be edited) -->
+          <div class="form-group">
+            <label>
+              Role
+              <span class="required">*</span>
+            </label>
+            <ngx-select
+              formControlName="roleId"
+              [items]="roleList"
+              optionValueField="id"
+              optionTextField="roleName"
+              placeholder="Select Role"
+              [allowClear]="false"
+              [disabled]="true">
+            </ngx-select>
+            <small class="alert alert-danger" *ngIf="isEditFieldInvalid('roleId')">
+              Please select a role.
+            </small>
+          </div>
+
+          <!-- User (Can be edited) -->
+          <div class="form-group">
+            <label>
+              User
+              <span class="required">*</span>
+              <!-- <span class="badge-count" *ngIf="editFilteredUserList.length > 0">
+                ({{ editFilteredUserList.length }} available)
+              </span> -->
+            </label>
+            <ngx-select
+              formControlName="userId"
+              [items]="editFilteredUserList"
+              optionValueField="userId"
+              optionTextField="fullName"
+              placeholder="Select User"
+              [allowClear]="true"
+              (selectionChanges)="onEditUserChange($event)"
+              [disabled]="true">
+            </ngx-select>
+            <small class="alert alert-danger" *ngIf="isEditFieldInvalid('userId')">
+              Please select a user.
+            </small>
+          </div>
+
+          <!-- Vehicle Registration Number (Multi-select checkbox dropdown with chips) -->
+          <div class="form-group vehicle-checkbox-dropdown grid-span-full">
+            <label>
+              Vehicle Registration Number
+              <span class="required">*</span>
+              <span class="badge-count" *ngIf="selectableEditVehicles.length > 0">
+                ({{ selectableEditVehicles.length }} active vehicles)
+              </span>
+            </label>
+
+            <div class="dropdown">
+              <div
+                class="dropdown-header"
+                [class.active]="editVehicleDropdownOpen"
+                (click)="toggleEditVehicleDropdown()"
+              >
+                <span class="header-text">{{ getEditSelectedVehiclesHeaderDisplay() }}</span>
+                <span class="arrow-indicator" [class.open]="editVehicleDropdownOpen">▼</span>
+              </div>
+
+              <div class="dropdown-body" *ngIf="editVehicleDropdownOpen">
+                <!-- Search inside dropdown -->
+                <div class="dropdown-search-wrapper" (click)="$event.stopPropagation()">
+                  <i class="fa-solid fa-magnifying-glass dropdown-search-icon"></i>
+                  <input
+                    type="text"
+                    class="dropdown-search-input"
+                    placeholder="Search registration number..."
+                    [(ngModel)]="editVehicleSearchQuery"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+                </div>
+
+                <!-- Select All Option -->
+                <div
+                  class="checkbox-item select-all-item"
+                  *ngIf="filteredEditVehicleList.length > 1"
+                  (click)="$event.stopPropagation()"
+                >
+                  <input
+                    type="checkbox"
+                    id="selectAllEditVehicles"
+                    [checked]="isAllEditVehiclesSelected()"
+                    (change)="selectAllEditVehicles($event)"
+                  />
+                  <label for="selectAllEditVehicles">
+                    <strong>Select All Vehicles</strong>
+                  </label>
+                </div>
+
+                <!-- Vehicle Item List with Checkboxes -->
+                <div class="vehicle-list-scroll">
+                  <div
+                    class="checkbox-item"
+                    *ngFor="let vehicle of filteredEditVehicleList"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <input
+                      type="checkbox"
+                      [id]="'edit_veh_' + (vehicle.vehicleId || vehicle.registrationNumber)"
+                      [checked]="isEditVehicleSelected(vehicle)"
+                      (change)="onEditVehicleCheckboxChange($event, vehicle)"
+                    />
+                    <label [for]="'edit_veh_' + (vehicle.vehicleId || vehicle.registrationNumber)">
+                      <span class="vehicle-reg">{{ vehicle.registrationNumber }}</span>
+                    </label>
+                  </div>
+
+                  <div class="no-results" *ngIf="filteredEditVehicleList.length === 0">
+                    No active vehicles found matching "{{ editVehicleSearchQuery }}"
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected Vehicles Badges / Chips -->
+            <div class="chips" *ngIf="editSelectedVehicles.length > 0">
+              <span class="chip" *ngFor="let vehicle of editSelectedVehicles">
+                <i class="fa-solid fa-truck-pickup chip-icon"></i>
+                {{ vehicle.registrationNumber }}
+                <button
+                  type="button"
+                  class="chip-remove"
+                  (click)="removeEditVehicle(vehicle); $event.stopPropagation()"
+                  title="Remove vehicle"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
+
+            <small class="alert alert-danger" *ngIf="isEditFieldInvalid('vehicleId') || (editForm.touched && editSelectedVehicles.length === 0)">
+              Please select at least one vehicle registration number.
+            </small>
+          </div>
+        </div>
+<!-- 
+        <div class="form-group" style="margin-top: 1rem;">
+          <label>Status</label>
+          <div class="status-toggle">
+            <input
+              type="checkbox"
+              id="editStatusToggle"
+              formControlName="isActive"
+            />
+            <label for="editStatusToggle" class="toggle-label">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="status-text">
+              {{ editForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+        </div> -->
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" (click)="closeEditModal()">
+            <i class="fa-solid fa-xmark"></i>
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary btn-update" [disabled]="editForm.invalid || editSelectedVehicles.length === 0">
+            <i class="fa-solid fa-edit"></i>
+            Update
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

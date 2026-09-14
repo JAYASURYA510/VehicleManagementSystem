@@ -1171,10 +1171,13 @@ input:focus, select:focus, textarea:focus {
 
 .nested-assignment-wrap {
   padding: 16px 20px 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .nested-assignment-table {
   width: 100%;
+  min-width: 650px;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0 10px;
@@ -1185,11 +1188,22 @@ input:focus, select:focus, textarea:focus {
 .nested-assignment-table col.col-vehicle,
 .nested-assignment-table col.col-from,
 .nested-assignment-table col.col-to {
-  width: 28%;
+  width: 24%;
 }
 
 .nested-assignment-table col.col-status {
-  width: 16%;
+  width: 14%;
+}
+
+.nested-assignment-table col.col-actions {
+  width: 14%;
+}
+
+.badge-count {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--accent);
+  margin-left: 4px;
 }
 
 .nested-assignment-table thead th {
@@ -1252,4 +1266,212 @@ input:focus, select:focus, textarea:focus {
   padding: 1.25rem 1rem;
   text-align: center;
   color: var(--text-muted);
+}
+
+/* ========================================= */
+/* VEHICLE CHECKBOX DROPDOWN & CHIPS         */
+/* ========================================= */
+.vehicle-checkbox-dropdown {
+  position: relative;
+}
+
+.dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-header {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: #ffffff;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  user-select: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dropdown-header:hover,
+.dropdown-header.active {
+  border-color: var(--search);
+}
+
+.dropdown-header.active {
+  box-shadow: 0 0 0 3px rgba(93, 5, 101, 0.14);
+}
+
+.header-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow-indicator {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.arrow-indicator.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-body {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  max-height: 280px;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 150;
+  box-sizing: border-box;
+  padding: 8px 0;
+}
+
+.dropdown-search-wrapper {
+  position: relative;
+  padding: 6px 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdown-search-icon {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.dropdown-search-input {
+  width: 100%;
+  padding: 0.45rem 0.75rem 0.45rem 2rem !important;
+  font-size: 0.85rem !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  box-sizing: border-box;
+}
+
+.dropdown-search-input:focus {
+  border-color: var(--search);
+  background: #ffffff;
+}
+
+.vehicle-list-scroll {
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.checkbox-item:hover {
+  background-color: var(--accent-soft);
+}
+
+.select-all-item {
+  background-color: #fafafa;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 14px;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.checkbox-item label {
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.vehicle-reg {
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.no-results {
+  padding: 14px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease;
+}
+
+.chip:hover {
+  background: var(--accent-hover);
+}
+
+.chip-icon {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.chip-remove {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0 0 2px;
+  display: flex;
+  align-items: center;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.chip-remove:hover {
+  opacity: 1;
 }
