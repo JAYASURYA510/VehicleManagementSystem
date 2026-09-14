@@ -16,7 +16,7 @@
       <div class="search-input-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input class="search" formControlName="searchTerm" style="font-size: 15px;"
-          placeholder="Search User Name and Role">
+          placeholder="Search User Name and Role" (keyup)="applyFilter($event)">
       </div>
     </div>
 

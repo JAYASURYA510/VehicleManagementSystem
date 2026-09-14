@@ -146,7 +146,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.getVehicleNumber();
-    this.getAssignedVehicles();
+    // this.getAssignedVehicles();
     this.search();
     this.loadRoles();
     this.loadUsers();
@@ -454,7 +454,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
     if (id != null) {
       this.apiService.delete(`VehicleAssignment/DeleteVehicleAssignment/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
         next: () => {
-          this.getAssignedVehicles();
+          this.search();
           this.alert.success('Vehicle assignment deleted successfully.');
         },
         error: () => {
@@ -530,6 +530,16 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  applyFilter(event: Event) : void{
+    const filterValue = (event.target as HTMLInputElement).value;
+
+  this.dataSource.filter = filterValue.trim().toLowerCase();
+
+  if (this.dataSource.paginator) {
+    this.dataSource.paginator.firstPage();
+  }
+  }
+
   updateAssignment(): void {
     if (this.editForm.invalid || this.editSelectedVehicles.length === 0) {
       Object.values(this.editForm.controls).forEach((control: AbstractControl) => {
@@ -577,18 +587,18 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
               next: () => {
                 this.alert.success('Vehicle assignment updated and additional vehicles assigned successfully.');
                 this.closeEditModal();
-                this.getAssignedVehicles();
+                this.search();
               },
               error: () => {
                 this.alert.warning('Vehicle assignment updated, but could not assign additional vehicles.');
                 this.closeEditModal();
-                this.getAssignedVehicles();
+                this.search();
               }
             });
           } else {
             this.alert.success(response.message || 'Vehicle assignment updated successfully.');
             this.closeEditModal();
-            this.getAssignedVehicles();
+            this.search();
           }
         } else {
           this.alert.error(response?.message || 'Failed to update vehicle assignment.');

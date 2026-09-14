@@ -181,23 +181,12 @@ namespace FleetPro.API.Controllers
         {
             try
             {
-                var result = await vehicleAssignmentRepository.SearchVehicleAssignmentsAsync(request);
-                if (result != null && result.Count > 0)
-                {
+                var result = await vehicleAssignmentRepository.SearchVehicleAssignmentsAsync(request);        
                     return Ok(new
                     {
                         success = true,
                         data = result
                     });
-                }
-                else
-                {
-                    return NotFound(new
-                    {
-                        success = false,
-                        message = "No vehicle assignments found matching the search criteria."
-                    });
-                }
             }
             catch (Exception ex)
             {
