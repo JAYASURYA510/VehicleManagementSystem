@@ -8,6 +8,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<UserMst> UserMaster {  get; set; }
+    public DbSet<TenantMst> Tenants { get; set; }
     public DbSet<MenuMst> MenuMsts { get; set; }
     public DbSet<RoleMst> RoleMsts { get; set; }
     public DbSet<RoleMenu> RoleMenus { get; set; }

@@ -33,5 +33,7 @@ namespace FleetPro.API.Data.Entitys
         public DateTime? created_at { get; set; }
         [Column("updated_at")]
         public DateTime? updated_at { get; set; }
+        [Column("tenant_id")]
+        public Guid? TenantId { get; set; }
     }
 }
