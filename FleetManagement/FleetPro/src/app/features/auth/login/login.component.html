@@ -1,117 +1,176 @@
-
 <div class="login-page">
 
-    <div class="login-wrapper">
+  <div class="login-wrapper">
 
-        <!-- LEFT SIDE -->
-        <div class="login-left">
+    <!-- LEFT SIDE -->
+    <div class="login-left">
 
-            <div class="logo-circle">
-                🚛
-            </div>
+      <div class="logo-circle">
+        🚛
+      </div>
 
-            <h2>NAS Transport</h2>
+      <h2>NAS Transport</h2>
 
-            <div class="bottom-links">
-                <span>
-                    © 2026 NAS Transport. All Rights Reserved.
-                </span>
-            </div>
+      <div class="bottom-links">
+        <span>
+          © 2026 NAS Transport. All Rights Reserved.
+        </span>
+      </div>
+
+    </div>
+
+    <div class="wave"></div>
+
+    <!-- RIGHT SIDE -->
+    <div class="login-right">
+
+      <h2>Welcome Back</h2>
+
+      <p class="subtitle">
+        {{ customerValidated() ? 'Sign in to continue' : 'Enter your Customer ID to continue' }}
+      </p>
+
+
+      <!-- CUSTOMER ID STEP -->
+      <form
+        *ngIf="!customerValidated()"
+        [formGroup]="customerForm"
+        (ngSubmit)="validateCustomer()"
+      >
+
+        <div class="form-group floating-group">
+
+          <input
+            type="text"
+            id="customerId"
+            formControlName="customerId"
+            placeholder=" "
+            autocomplete="off"
+          >
+
+          <label for="customerId">
+            Customer ID
+          </label>
+
+          <small
+            class="error-text"
+            *ngIf="
+              customerForm.get('customerId')?.touched &&
+              customerForm.get('customerId')?.hasError('required')
+            "
+          >
+            Customer ID is required.
+          </small>
 
         </div>
 
-        <div class="wave"></div>
 
-        <!-- RIGHT SIDE -->
-        <div class="login-right">
+        <!-- CUSTOMER VALIDATION ERROR -->
+        <div
+          class="login-error"
+          *ngIf="error()"
+        >
+          <span class="error-icon">⚠</span>
+          <span>{{ error() }}</span>
+        </div>
 
-            <h2>Welcome Back</h2>
 
-            <p class="subtitle">
-                Sign in to continue
-            </p>
+        <!-- CONTINUE BUTTON -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="loading()"
+        >
+          {{ loading() ? 'Validating...' : 'Continue' }}
+        </button>
 
-            <!-- LOGIN FORM -->
-            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      </form>
 
-                <!-- USERNAME -->
-                <div class="form-group floating-group">
 
-                    <input
-                        type="text"
-                        id="username"
-                        formControlName="username"
-                        placeholder=" "
-                        autocomplete="username"
-                    >
+      <!-- LOGIN STEP -->
+      <form
+        *ngIf="customerValidated()"
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+      >
+
+        <!-- USERNAME -->
+        <div class="form-group floating-group">
+
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            placeholder=" "
+            autocomplete="username"
+          >
 
                     <label for="username">Username</label>
 
-                    <!-- Required validation -->
-                    <small
-                        class="error-text"
-                        *ngIf="
-                            form.get('username')?.touched &&
-                            form.get('username')?.hasError('required')
-                        "
-                    >
-                        Username is required.
-                    </small>
+          <small
+            class="error-text"
+            *ngIf="
+              form.get('username')?.touched &&
+              form.get('username')?.hasError('required')
+            "
+          >
+            Username is required.
+          </small>
 
-                </div>
+        </div>
 
 
-                <!-- PASSWORD -->
-                <div class="form-group floating-group">
+        <!-- PASSWORD -->
+        <div class="form-group floating-group">
 
-                    <input
-                        type="password"
-                        id="password"
-                        formControlName="password"
-                        placeholder=" "
-                        autocomplete="current-password"
-                    >
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder=" "
+            autocomplete="current-password"
+          >
 
                     <label for="password">Password</label>
 
                     <!-- Required validation -->
-                    <small
-                        class="error-text"
-                        *ngIf="
-                            form.get('password')?.touched &&
-                            form.get('password')?.hasError('required')
-                        "
-                    >
-                        Password is required.
-                    </small>
-
-                </div>
-
-
-                <!-- LOGIN ERROR -->
-                <div
-                    class="login-error"
-                    *ngIf="error()"
-                >
-                    <span class="error-icon">⚠</span>
-                    <span>{{ error() }}</span>
-                </div>
-
-
-                <!-- LOGIN BUTTON -->
-                <button
-                    type="submit"
-                    class="login-btn"
-                    [disabled]="loading()"
-                >
-                    {{ loading() ? 'Signing In...' : 'Sign In' }}
-                </button>
-
-            </form>
+          <small
+            class="error-text"
+            *ngIf="
+              form.get('password')?.touched &&
+              form.get('password')?.hasError('required')
+            "
+          >
+            Password is required.
+          </small>
 
         </div>
 
+
+        <!-- LOGIN ERROR -->
+        <div
+          class="login-error"
+          *ngIf="error()"
+        >
+          <span class="error-icon">⚠</span>
+          <span>{{ error() }}</span>
+        </div>
+
+
+        <!-- SIGN IN BUTTON -->
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="loading()"
+        >
+          {{ loading() ? 'Signing In...' : 'Sign In' }}
+        </button>
+
+      </form>
+
     </div>
+
+  </div>
 
 </div>
 
