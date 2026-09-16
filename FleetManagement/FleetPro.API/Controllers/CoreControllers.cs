@@ -46,6 +46,46 @@ public class UserRoleController : ControllerBase
 
 [ApiController]
 [Route("api/[controller]")]
+public class CustomerController : ControllerBase
+{
+    private readonly ApplicationDbContext context;
+    public CustomerController(ApplicationDbContext context)
+    {
+        this.context = context;
+    }
+
+    [HttpGet("validtenant/{customerId}")]
+    public async Task<ActionResult> customerValidation(string customerId)
+    {
+        customerDetails customerDetails = new customerDetails();
+        var existingCustomer = await context.Tenants.Where(x => x.CustomerId == customerId).AsNoTracking().FirstOrDefaultAsync();
+
+        if (existingCustomer != null)
+        {
+            customerDetails.TenantId = existingCustomer.TenantId;
+            customerDetails.CustomerId = existingCustomer.CustomerId;
+            customerDetails.CustomerName = existingCustomer.CustomerName;
+            customerDetails.EmailId = existingCustomer.EmailId;
+            customerDetails.PhoneNo = existingCustomer.PhoneNo;
+             return Ok(new
+                {
+                    success = true,
+                    message = customerDetails,
+                });
+        }
+        else
+        {
+             return NotFound(new
+                {
+                    success = false,
+                    message = "Enter Valid Customer Id",
+                });
+        }
+    }
+}
+
+[ApiController]
+[Route("api/[controller]")]
 [Authorize]
 public class DashboardController(DashboardService dashboardService) : ControllerBase
 {

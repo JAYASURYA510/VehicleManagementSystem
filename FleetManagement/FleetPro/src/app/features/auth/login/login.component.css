@@ -4,6 +4,19 @@
     box-sizing:border-box;
     font-family:"Segoe UI",sans-serif;
 }
+
+mat-icon {
+    font-family: 'Material Icons' !important;
+    font-weight:600;
+    font-style: normal;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    word-wrap: normal;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
 html,
 body{
     overflow-x:hidden;
@@ -420,5 +433,35 @@ body{
 .login-btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+}
+
+.back_div{
+    margin-top: 10%;
+}
+
+.back-to-customer {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 22px;
+    color: #3398DA;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.back-to-customer:hover {
+    color: #207dbb;
+}
+
+.back-to-customer mat-icon {
+    font-family: 'Material Icons' !important;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    overflow: visible;
 }
 

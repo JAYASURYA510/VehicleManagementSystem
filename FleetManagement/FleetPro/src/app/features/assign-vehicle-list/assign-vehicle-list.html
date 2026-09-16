@@ -105,13 +105,15 @@
                               {{ assignment.isActive ? 'Active' : 'Inactive' }}
                             </span>
                           </td>
-                          <td>
-                            <button mat-icon-button color="primary" title="Edit" aria-label="Edit user" style="color: rgb(228, 63, 118)" (click)="openEdit(assignment, row, $event)">
-                              <span class="material-symbols-outlined">edit</span>
-                            </button>
-                            <button mat-icon-button color="warn" title="Delete" aria-label="Delete user" style="color: rgb(228, 63, 118)" (click)="deleteUser(assignment.assignmentId, $event)">
-                              <span class="material-symbols-outlined">delete</span>
-                            </button>
+                          <td class="actions-cell">
+                            <div class="action-buttons">
+                              <button mat-icon-button class="action-button edit-button" title="Edit" aria-label="Edit assignment" (click)="openEdit(assignment, row, $event)">
+                                <mat-icon>edit</mat-icon>
+                              </button>
+                              <button mat-icon-button class="action-button delete-button" title="Delete" aria-label="Delete assignment" (click)="deleteUser(assignment.assignmentId, $event)">
+                                <mat-icon>delete</mat-icon>
+                              </button>
+                            </div>
                           </td>
                         </tr>
                         }

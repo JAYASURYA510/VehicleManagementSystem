@@ -23,6 +23,15 @@ namespace FleetPro.API.DTOs
         public string RoleName { get; set; }
     }
 
+    public class customerDetails
+    {
+        public Guid TenantId { get; set; }
+        public string CustomerId { get; set; }
+        public string CustomerName { get; set; }
+        public string? EmailId { get; set; }
+        public string? PhoneNo { get; set; }
+    }
+
     public class MenuTypesDto
     {
         public int Id { get; set; }

@@ -12,6 +12,7 @@ import { DailyLogReport } from './daily-log-report/daily-log-report';
 import { NewVehicleMaster } from './new-vehicle-master/new-vehicle-master';
 import { AssignVehicleMstComponent } from './features/assign-vehicle-mst/assign-vehicle-mst';
 import { AssignVehicleList } from './features/assign-vehicle-list/assign-vehicle-list';
+import { SuperAdminList } from './features/super-admin-list/super-admin-list';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -24,6 +25,7 @@ export const routes: Routes = [
     path: 'form-data',
     component: FormDataComponent
   },
+      { path: 'superAdminList', component:  SuperAdminList},
       { path: 'assign-vehicle', component:  AssignVehicleMstComponent},
       { path: 'assign-vehicle-list', component:  AssignVehicleList},
       { path: 'NewVehiclemaster', component: NewVehicleMaster},

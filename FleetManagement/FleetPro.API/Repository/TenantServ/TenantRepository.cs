@@ -25,6 +25,38 @@ namespace FleetPro.API.Repository.TenantServ
             this._passwordService = _passwordService;
         }
 
+        public async Task<List<AdminListResponse>> getSuperAdminAsyc()
+        {
+            try
+            {
+                var getData = await context.Tenants.Where(x => x.IsSuperAdmin == "yes").AsNoTracking().ToListAsync();
+
+                var adminListResponses = new List<AdminListResponse>();
+                foreach (var data in getData)
+                {
+                    adminListResponses.Add(new AdminListResponse
+                    {
+                        TenantId = data.TenantId,
+                        CustomerId = data.CustomerId,
+                        CustomerName = data.CustomerName,
+                        UserName = data.UserName,
+                        EmailId = data.EmailId,
+                        PhoneNo = data.PhoneNo,
+                        Address = data.Address,
+                        GstNo = data.GstNo,
+                        TanNo = data.TanNo,
+                        IsSuperAdmin = data.IsSuperAdmin,
+                    });
+                }
+
+                return adminListResponses;
+
+            }
+            catch (Exception ex) {
+                throw new Exception("facing error while creating the customer");
+            }
+        }
+
         public async Task<(bool Success, string Message, object? Data)> OnboardClientAsync(OnboardClientRequest request)
         {
             using var transaction = await context.Database.BeginTransactionAsync();

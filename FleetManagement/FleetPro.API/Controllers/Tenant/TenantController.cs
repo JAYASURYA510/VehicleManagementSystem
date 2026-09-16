@@ -20,6 +20,28 @@ namespace FleetPro.API.Controllers.Tenant
             this.TenantServiceRepository = TenantServiceRepository;
         }
 
+        [HttpGet("getSuperAdmin")]
+        public async Task<IActionResult> getSuperAdmin()
+        {
+            var result = await TenantServiceRepository.getSuperAdminAsyc();
+            if (result != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = result,
+                });
+            }
+            else
+            {
+                 return NotFound(new
+                {
+                    success = true,
+                    message = result,
+                });
+            }
+        }
+
         [HttpPost("AddOnboardClient")]
         public async Task<IActionResult> OnboardClient([FromBody] OnboardClientRequest request)
         {

@@ -11,13 +11,16 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
+import { CommanService } from '../../../core/services/comman.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatIconModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -25,7 +28,7 @@ import { ApiService } from '../../../core/services/api.service';
 export class LoginComponent implements OnInit, OnDestroy {
 
   protected readonly unsubscribe$ = new Subject<void>();
-
+  localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
 
   // Username + Password form
   form: any;
@@ -53,7 +56,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private apiService: ApiService,
+    private apiService: CommanService,
     private router: Router
   ) {
 
@@ -124,75 +127,41 @@ export class LoginComponent implements OnInit, OnDestroy {
   /*
    * Validate Customer ID
    */
+  errorMessage : boolean = false;
+  customerData : any;
   validateCustomer(): void {
-
-    // Clear previous error
+    this.errorMessage = false;
     this.error.set('');
-
-
     // Validate customer form
     if (this.customerForm.invalid) {
-
       this.customerForm.markAllAsTouched();
-
       return;
-
     }
-
-
     // Start loading
     this.loading.set(true);
 
+    const customerId =this.customerForm.get('customerId')?.value;
 
-    const customerId =
-      this.customerForm
-        .get('customerId')
-        ?.value;
-
-
-    /*
-     * Call existing ApiService
-     *
-     * Endpoint:
-     * /api/customer/validate
-     */
-    this.apiService
-      .post('/api/customer/validate', {
-        customerId: customerId
-      })
-      .subscribe({
-
-        /*
-         * Customer ID valid
-         */
+    this.apiService.list(`Customer/validtenant/${customerId}`).subscribe({
         next: (response: any) => {
-
-          console.log(
-            'Customer validation response:',
-            response
-          );
-
+          if(response.success == true){
+          this.customerData = response.message;
           this.loading.set(false);
-
+          localStorage.setItem('fleetPro_TenantId', this.customerData?.tenantId);
+          localStorage.setItem('fleetPro_CustomerId', this.customerData?.customerId);
+          localStorage.setItem('fleetPro_CustomerName', this.customerData?.customerName);
+          localStorage.setItem('fleetPro_Email', this.customerData?.emailId);
+          localStorage.setItem('fleetPro_PhoneNum', this.customerData?.phoneNo);
           this.customerValidated.set(true);
-
-          // Clear old error
           this.error.set('');
-
+          }
+          else{
+            this.errorMessage = true;
+          }
         },
-
-
-        /*
-         * Customer ID invalid
-         */
         error: (err: any) => {
 
           this.loading.set(false);
-
-          console.error(
-            'Customer validation error:',
-            err
-          );
 
 
           if (err.status === 0) {
@@ -244,6 +213,13 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
 
+  backToCustomer(): void {
+    this.customerValidated.set(false);
+    this.form.reset();
+    this.error.set('');
+    this.loading.set(false);
+  }
+
   /*
    * Login
    */
@@ -273,11 +249,16 @@ export class LoginComponent implements OnInit, OnDestroy {
         /*
          * Login Success
          */
-        next: () => {
-
-          this.loading.set(false);
-
-        this.router.navigate(['/dashboard']);
+        next: (data) => {
+        
+        this.loading.set(false);
+        console.log("Role", data.role);
+        if(data.role == "SuperAdmin"){
+          this.router.navigate(['/superAdminList']);
+        }
+        else{
+          this.router.navigate(['/dashboard']);
+        }
 
         },
 

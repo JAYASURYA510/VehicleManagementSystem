@@ -111,14 +111,15 @@
   <!-- Actions -->
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let v">
-            <button mat-icon-button color="primary" title="Edit" aria-label="Edit vehicle" style="color: rgb(228, 63, 118)" (click)="editVehicle(v.vehicleId)">
-              <span class="material-symbols-outlined">edit</span>
-            </button>
-
-            <button mat-icon-button color="warn" title="Delete" aria-label="Delete vehicle" style="color: rgb(228, 63, 118)" (click)="deleteVehicle(v.vehicleId)">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
+          <td mat-cell *matCellDef="let v" class="actions-cell">
+            <div class="action-buttons">
+              <button mat-icon-button class="action-button edit-button" title="Edit" aria-label="Edit vehicle" (click)="editVehicle(v.vehicleId)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="action-button delete-button" title="Delete" aria-label="Delete vehicle" (click)="deleteVehicle(v.vehicleId)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </td>
         </ng-container>
 

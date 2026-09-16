@@ -217,6 +217,54 @@ input:focus, select:focus, textarea:focus {
 
 .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
 
+.actions-cell {
+  white-space: nowrap!important;
+}
+
+.action-buttons {
+  display: inline-flex!important;
+  align-items: center!important;
+  gap: 0.35rem!important;
+}
+
+.action-button {
+  width: 34px!important;
+  height: 34px!important;
+  padding: 0!important;
+  border: 1px solid transparent!important;
+  border-radius: 8px!important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease!important;
+}
+
+.action-button mat-icon {
+  width: 18px!important;
+  height: 18px!important;
+  font-size: 18px!important;
+  line-height: 18px!important;
+}
+
+.edit-button {
+  color: #7e3285!important;
+  background: #f7eefa!important;
+}
+
+.edit-button:hover {
+  color: #fff!important;
+  background: #7e3285!important;
+  border-color: #7e3285!important;
+}
+
+.delete-button {
+  color: #dc2626!important;
+  background: #fff1f2!important;
+}
+
+.delete-button:hover {
+  color: #fff!important;
+  background: #dc2626!important;
+  border-color: #dc2626!important;
+}
+
 .card {
   background: #fff;
   border-radius: var(--radius);

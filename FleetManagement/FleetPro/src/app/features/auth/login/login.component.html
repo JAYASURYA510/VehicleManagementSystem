@@ -40,7 +40,7 @@
 
         <div class="form-group floating-group">
 
-          <input
+          <input style="font-size: 17px;"
             type="text"
             id="customerId"
             formControlName="customerId"
@@ -48,7 +48,7 @@
             autocomplete="off"
           >
 
-          <label for="customerId">
+          <label for="customerId" style="font-size: 14px;">
             Customer ID
           </label>
 
@@ -71,7 +71,7 @@
           *ngIf="error()"
         >
           <span class="error-icon">⚠</span>
-          <span>{{ error() }}</span>
+          <span>Enter Valid Customer Id</span>
         </div>
 
 
@@ -165,6 +165,13 @@
         >
           {{ loading() ? 'Signing In...' : 'Sign In' }}
         </button>
+
+        <div class="back_div">
+        <a class="back-to-customer" (click)="backToCustomer()">
+          <mat-icon>chevron_left</mat-icon>
+          <span>Back to customer</span>
+        </a>
+        </div>
 
       </form>
 
