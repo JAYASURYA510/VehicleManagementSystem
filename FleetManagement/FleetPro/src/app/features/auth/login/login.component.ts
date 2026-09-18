@@ -162,54 +162,35 @@ export class LoginComponent implements OnInit, OnDestroy {
         error: (err: any) => {
 
           this.loading.set(false);
-
-
           if (err.status === 0) {
-
             this.error.set(
               'Cannot connect to server. Please try again later.'
             );
-
           }
-
           else if (err.status === 401) {
-
             this.error.set(
               'Invalid Customer ID.'
             );
-
           }
-
           else if (err.status === 404) {
-
             this.error.set(
               'Customer ID not found.'
             );
-
           }
-
           else if (err.status === 400) {
-
             this.error.set(
               err.error?.message ||
               'Invalid Customer ID.'
             );
-
           }
-
           else {
-
             this.error.set(
               err.error?.message ||
               'Customer validation failed.'
             );
-
           }
-
         }
-
       });
-
   }
 
 
@@ -223,120 +204,74 @@ export class LoginComponent implements OnInit, OnDestroy {
   /*
    * Login
    */
+  tenantId : any;
   onSubmit(): void {
-
-    // Clear previous API error
     this.error.set('');
-
     // Validate form
     if (this.form.invalid) {
-
       this.form.markAllAsTouched();
-
       return;
     }
-
+    this.tenantId = localStorage.getItem('fleetPro_TenantId');
 
     // Start loading
     this.loading.set(true);
-
-
     const { username, password } = this.form.getRawValue();
-
-
-    this.auth.login(username, password).subscribe({
-
-        /*
-         * Login Success
-         */
+    this.auth.login(username, password, this.tenantId).subscribe({
         next: (data) => {
-        
         this.loading.set(false);
-        console.log("Role", data.role);
         if(data.role == "SuperAdmin"){
           this.router.navigate(['/superAdminList']);
         }
         else{
           this.router.navigate(['/dashboard']);
         }
-
         },
-
-
-        /*
-         * Login Error
-         */
         error: (err: any) => {
-
           this.loading.set(false);
-
         console.error('Login error:', err);
-
-
         /*
          * Backend not available
          */
           if (err.status === 0) {
-
             this.error.set(
               'Cannot connect to server. Please try again later.'
             );
-
           }
-
-
         /*
          * Wrong username/password
          */
           else if (err.status === 401) {
-
             this.error.set(
               'Invalid username or password.'
             );
-
           }
-
-
         /*
          * Bad request
          */
           else if (err.status === 400) {
-
             this.error.set(
             err.error?.message || 'Invalid login details.'
             );
-
           }
-
-
         /*
          * Other errors
          */
           else {
-
             this.error.set(
               err.error?.message ||
               'Login failed. Please try again.'
             );
-
           }
-
         }
-
       });
-
   }
-
-
   /*
    * Destroy
    */
   ngOnDestroy(): void {
-
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-
   }
-
 }
 

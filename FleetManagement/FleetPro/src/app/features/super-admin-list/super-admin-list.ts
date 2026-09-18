@@ -9,11 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormField, MatOption, MatSelect } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { CommonModule, DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-super-admin-list',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatSortModule, MatIconModule],
+  imports: [CommonModule, MatTableModule, MatSortModule, MatIconModule, RouterLink],
   templateUrl: './super-admin-list.html',
   styleUrl: './super-admin-list.css',
 })

@@ -52,5 +52,11 @@
         public string? TanNo { get; set; }
 
         public string IsSuperAdmin { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
+
+        public int? CreatedBy { get; set; }
     }
 }

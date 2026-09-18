@@ -7,6 +7,11 @@ import {
   Validators
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { CommanService } from '../../core/services/comman.service';
+import { DateTimePickerService } from '../../core/services/datetime-picker.service';
+import { Subject, takeUntil } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-newonboard-client',
@@ -22,17 +27,18 @@ export class NewonboardClientComponent {
 
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
+  protected readonly unsubscribe$ = new Subject<void>();
 
   clientForm: FormGroup;
-
-  // Replace this with your actual API URL
-  private apiUrl = 'https://localhost:7236/api/Tenant/AddOnboardClient';
 
   isSubmitting = false;
   successMessage = '';
   errorMessage = '';
+  localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
 
-  constructor() {
+  constructor(private apiService: CommanService, private dateTimePickerService : DateTimePickerService, private alert : ToastrService,
+      private router : Router
+  ) {
     this.clientForm = this.fb.group({
       customerId: ['', Validators.required, Validators.pattern(/^[0-9]{6}$/)],
       customerName: ['', Validators.required],
@@ -72,53 +78,28 @@ submitForm(): void {
     address: formValue.address,
     gstNo: formValue.gstNo,
     tanNo: formValue.tanNo,
-
-    // Always send "no"
     isSuperAdmin: 'no',
-
-    createdDate: new Date().toISOString(),
-    createdBy: 0,
-    updatedDate: new Date().toISOString(),
-    updatedBy: 0
+    createdDate: this.dateTimePickerService.toApiDateTime(new Date()),
+    createdBy: this.localStorageData.userId,
+    updatedDate: this.dateTimePickerService.toApiDateTime(new Date()),
+    updatedBy: this.localStorageData.userId
   };
 
-  // Log payload before sending
-  console.log('Payload sent to backend:', payload);
+  this.apiService.create(`Tenant/AddOnboardClient`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe({
+         next: (response: any) => {
+          if(response.success == true){
+          this.alert.success('Client and Admin account created successfully.');
+          this.router.navigate(['/superAdminList/onboardedClients']);
+          }
+          else{
+            this.alert.error('Facing error while creating the customer');
+          }
+        },
+        error: (error: any) => {
+          this.alert.error('Facing error while creating the customer');
+        }
+  })
 
-  this.http.post(this.apiUrl, payload).subscribe({
-
-    next: (response) => {
-
-      // Log complete backend response
-      console.log('Backend response:', response);
-
-      // Optional: log response as JSON
-      console.log(
-        'Backend response JSON:',
-        JSON.stringify(response, null, 2)
-      );
-
-      this.successMessage = 'Client onboarded successfully!';
-      this.isSubmitting = false;
-
-      this.clientForm.reset();
-    },
-
-    error: (error) => {
-
-      // Log backend error response
-      console.error('Backend error:', error);
-
-      // Log error body returned by API
-      console.error('Backend error response:', error?.error);
-
-      this.errorMessage =
-        error?.error?.message ||
-        'Unable to onboard client. Please try again.';
-
-      this.isSubmitting = false;
-    }
-  });
 }
 
 

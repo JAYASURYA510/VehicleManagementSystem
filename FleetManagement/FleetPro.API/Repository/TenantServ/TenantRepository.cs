@@ -46,6 +46,9 @@ namespace FleetPro.API.Repository.TenantServ
                         GstNo = data.GstNo,
                         TanNo = data.TanNo,
                         IsSuperAdmin = data.IsSuperAdmin,
+                        IsActive = data.IsActive,
+                        CreatedBy = data.CreatedBy,
+                        CreatedDate = data.CreatedDate,
                     });
                 }
 
@@ -53,6 +56,42 @@ namespace FleetPro.API.Repository.TenantServ
 
             }
             catch (Exception ex) {
+                throw new Exception("facing error while creating the customer");
+            }
+        }
+
+        public async Task<List<AdminListResponse>> getAdminDetailsAsyc()
+        {
+            try
+            {
+                var getData = await context.Tenants.Where(x => x.IsSuperAdmin == "no").AsNoTracking().ToListAsync();
+
+                var adminListResponses = new List<AdminListResponse>();
+                foreach (var data in getData)
+                {
+                    adminListResponses.Add(new AdminListResponse
+                    {
+                        TenantId = data.TenantId,
+                        CustomerId = data.CustomerId,
+                        CustomerName = data.CustomerName,
+                        UserName = data.UserName,
+                        EmailId = data.EmailId,
+                        PhoneNo = data.PhoneNo,
+                        Address = data.Address,
+                        GstNo = data.GstNo,
+                        TanNo = data.TanNo,
+                        IsSuperAdmin = data.IsSuperAdmin,
+                        IsActive = data.IsActive,
+                        CreatedBy = data.CreatedBy,
+                        CreatedDate = data.CreatedDate,
+                    });
+                }
+
+                return adminListResponses;
+
+            }
+            catch (Exception ex)
+            {
                 throw new Exception("facing error while creating the customer");
             }
         }

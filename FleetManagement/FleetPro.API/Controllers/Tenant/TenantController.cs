@@ -42,6 +42,28 @@ namespace FleetPro.API.Controllers.Tenant
             }
         }
 
+        [HttpGet("getAdminDetails")]
+        public async Task<IActionResult> getAdminDetails()
+        {
+            var result = await TenantServiceRepository.getAdminDetailsAsyc();
+            if (result != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = result,
+                });
+            }
+            else
+            {
+                return NotFound(new
+                {
+                    success = true,
+                    message = result,
+                });
+            }
+        }
+
         [HttpPost("AddOnboardClient")]
         public async Task<IActionResult> OnboardClient([FromBody] OnboardClientRequest request)
         {

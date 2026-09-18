@@ -14,6 +14,7 @@ import { AssignVehicleMstComponent } from './features/assign-vehicle-mst/assign-
 import { AssignVehicleList } from './features/assign-vehicle-list/assign-vehicle-list';
 import { SuperAdminList } from './features/super-admin-list/super-admin-list';
 import { NewonboardClientComponent } from './features/newonboard-client/newonboard-client';
+import { OnboardingClientList } from './features/onboarding-client-list/onboarding-client-list';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -29,6 +30,7 @@ export const routes: Routes = [
       
       { path: 'superAdminList', component:  SuperAdminList},
       { path: 'superAdmin/NewonboardClient', component:  NewonboardClientComponent},
+      { path: 'superAdminList/onboardedClients', component:  OnboardingClientList},
       { path: 'assign-vehicle', component:  AssignVehicleMstComponent},
       { path: 'assign-vehicle-list', component:  AssignVehicleList},
       { path: 'NewVehiclemaster', component: NewVehicleMaster},
