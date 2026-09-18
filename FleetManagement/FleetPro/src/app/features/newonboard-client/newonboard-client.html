@@ -1,0 +1,284 @@
+<div class="page-container">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>New Onboarding Client </h1>
+      <p class="subtitle">
+        Enter the client details to onboard a new customer
+      </p>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="card">
+
+    <form
+      [formGroup]="clientForm"
+      (ngSubmit)="submitForm()"
+      novalidate
+    >
+
+      <div class="form-grid">
+
+        <!-- Customer ID -->
+        <div class="form-group">
+          <label for="customerId">
+            Customer ID
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="customerId"
+            type="text"
+            formControlName="customerId"
+            placeholder="Enter Customer ID"
+            maxlength="6"
+             oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+          />
+
+          <small
+            class="alert alert-danger"
+            *ngIf="isInvalid('customerId')"
+            
+          >
+            Customer ID is required.
+          </small>
+        </div>
+
+
+        <!-- Customer Name -->
+        <div class="form-group">
+          <label for="customerName">
+            Customer Name
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="customerName"
+            type="text"
+            formControlName="customerName"
+            placeholder="Enter Customer Name"
+          />
+
+          <small
+            class="alert alert-danger"
+            *ngIf="isInvalid('customerName')"
+          >
+            Customer Name is required.
+          </small>
+        </div>
+
+
+        <!-- Username -->
+        <div class="form-group">
+          <label for="userName">
+            Username
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="userName"
+            type="text"
+            formControlName="userName"
+            placeholder="Enter Username"
+          />
+
+          <small
+            class="alert alert-danger"
+            *ngIf="isInvalid('userName')"
+          >
+            Username is required.
+          </small>
+        </div>
+<!-- PASSWORD -->
+<div class="form-group">
+
+  <label for="password">
+    Password
+    <span class="required">*</span>
+  </label>
+
+  <input
+    id="password"
+    type="password"
+    formControlName="password"
+    placeholder="Enter Password"
+    minlength="8"
+    autocomplete="new-password"
+  />
+
+  <small
+    class="alert alert-danger"
+    *ngIf="isInvalid('password')"
+  >
+    Password must contain at least 8 characters,
+    one uppercase letter, one lowercase letter,
+    one number, and one special character.
+  </small>
+
+</div>
+
+
+
+
+        <!-- Email -->
+       <!-- ========================================= --> <!-- EMAIL ID --> <!-- ========================================= -->
+         <div class="form-group"> <label for="emailId"> Email ID 
+          <span class="required">*</span> </label> 
+          <input id="emailId" type="email" formControlName="emailId" placeholder="example@gmail.com" autocomplete="email" />
+           <small class="alert alert-danger" *ngIf="isInvalid('emailId')" >
+             Please enter a valid email address, for example example@gmail.com. 
+
+           </small> </div>
+
+
+        <!-- Phone Number -->
+        <div class="form-group"> 
+          <label for="phoneNo"> Phone Number <span class="required">*</span> </label> 
+          <input id="phoneNo" 
+          type="text" 
+          formControlName="phoneNo" 
+          placeholder="Enter Phone Number" 
+          inputmode="numeric" 
+          pattern="[0-9]*" 
+          maxlength="10" 
+          oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+           <small class="alert alert-danger" *ngIf="isInvalid('phoneNo')" > Phone Number is required  </small> </div>
+
+
+        <!-- Address -->
+        <div class="form-group grid-span-full">
+          <label for="address">
+            Address
+            <span class="required">*</span>
+          </label>
+
+          <textarea
+            id="address"
+            formControlName="address"
+            placeholder="Enter Address"
+            rows="3"
+          ></textarea>
+
+          <small
+            class="alert alert-danger"
+            *ngIf="isInvalid('address')"
+          >
+            Address is required.
+          </small>
+        </div>
+
+
+        <!-- GST Number -->
+        <div class="form-group">
+          <label for="gstNo">
+            GST Number
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="gstNo"
+            type="text"
+            formControlName="gstNo"
+            placeholder="Enter GST Number"
+          />
+
+          <small
+            class="alert alert-danger"
+            *ngIf="isInvalid('gstNo')"
+          >
+            GST Number is required.
+          </small>
+        </div>
+
+
+        <!-- TAN Number -->
+        <div class="form-group">
+          <label for="tanNo">
+            TAN Number
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="tanNo"
+            type="text"
+            formControlName="tanNo"
+            placeholder="Enter TAN Number"
+          />
+
+          <small
+            class="alert alert-danger"
+            *ngIf="isInvalid('tanNo')"
+          >
+            TAN Number is required.
+          </small>
+        </div>
+
+      </div>
+
+
+      <!-- SUCCESS MESSAGE -->
+      <div
+        class="alert alert-success"
+        *ngIf="successMessage"
+      >
+        {{ successMessage }}
+      </div>
+
+
+      <!-- ERROR MESSAGE -->
+      <div
+        class="alert alert-danger"
+        *ngIf="errorMessage"
+      >
+        {{ errorMessage }}
+      </div>
+
+
+      <!-- ================================ -->
+      <!-- RESET + SUBMIT BUTTONS           -->
+      <!-- ================================ -->
+      <div class="form-actions">
+
+        <!-- RESET BUTTON -->
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="clientForm.reset()"
+        >
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+          Reset
+        </button>
+
+
+        <!-- SUBMIT BUTTON -->
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isSubmitting"
+        >
+          <i
+            class="fa-solid"
+            [ngClass]="isSubmitting
+              ? 'fa-spinner fa-spin'
+              : 'fa-user-plus'"
+          ></i>
+
+          <span *ngIf="!isSubmitting">
+            Onboard Client
+          </span>
+
+          <span *ngIf="isSubmitting">
+            Saving...
+          </span>
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
