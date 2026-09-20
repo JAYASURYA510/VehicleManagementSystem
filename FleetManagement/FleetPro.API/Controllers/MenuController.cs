@@ -38,24 +38,25 @@ namespace FleetPro.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("GetMenuByRoleId/{roleId}")]
-        public async Task<IActionResult> getMenu(int roleId)
+        [HttpGet("{tenantId}/GetMenuByRoleId/{roleId}")]
+        public async Task<IActionResult> getMenu(Guid tenantId, int roleId)
         {
-            var menus = await menuRepository.getNavMenu(roleId);
+            var menus = await menuRepository.getNavMenu(tenantId, roleId);
             return Ok(menus);
         }
 
-        [HttpPost("SaveMenu")]
-        public async Task<IActionResult> saveMenu(saveMenuDto menu)
+        [HttpPost("{tenantId}/SaveMenu")]
+        public async Task<IActionResult> saveMenu(Guid tenantId, saveMenuDto menu)
         {
-            var existingRecords = await context.RoleMenus.Where(x => x.RoleId == menu.RoleId).ToListAsync();
+            var existingRecords = await context.RoleMenus.Where(x => x.RoleId == menu.RoleId && x.TenantId == tenantId).ToListAsync();
 
             context.RoleMenus.RemoveRange(existingRecords);
 
             var roleMenu = new RoleMenu
             {
                 RoleId = menu.RoleId,
-                MenuId = string.Join(",", menu.MenuIds)
+                MenuId = string.Join(",", menu.MenuIds),
+                TenantId = tenantId
             };
 
             context.RoleMenus.AddRange(roleMenu);

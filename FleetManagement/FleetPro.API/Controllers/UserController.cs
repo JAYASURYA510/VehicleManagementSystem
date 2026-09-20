@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FleetPro.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{tenantId}")]
     [Authorize]
     [ApiController]
     public class UserController : ControllerBase
@@ -27,21 +27,21 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpGet("getUser")]
-        public async Task<List<userDatasDto>> Get()
+        public async Task<List<userDatasDto>> Get(Guid tenantId)
         {
-            return await userRepository.getAllUser();
+            return await userRepository.getAllUser(tenantId);
         }
 
         [HttpPost("SaveUser")]
-        public async Task<UserDetailsDto> newUser(UserDetailsDto user)
+        public async Task<UserDetailsDto> newUser(Guid tenantId, UserDetailsDto user)
         {
-            return await userRepository.saveUser(user);
+            return await userRepository.saveUser(tenantId, user);
         }
 
         [HttpPut("EditUser/{id}")]
-        public async Task<IActionResult> update(UserDetailsDto user)
+        public async Task<IActionResult> update(Guid tenantId, UserDetailsDto user)
         {
-            var result = await userRepository.updateUser(user);
+            var result = await userRepository.updateUser(tenantId, user);
             if (result == "User updated successfully.")
             {
                 return Ok(new
@@ -61,9 +61,9 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpDelete("DeleteUser/{id}")]
-        public async Task<IActionResult> delete(int id)
+        public async Task<IActionResult> delete(Guid tenantId, int id)
         {
-            var result = await userRepository.deleteUser(id);
+            var result = await userRepository.deleteUser(tenantId, id);
             if(result == "User Deleted Successfully")
             {
                 return Ok(new

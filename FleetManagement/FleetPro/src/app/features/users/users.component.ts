@@ -40,6 +40,7 @@ export class UsersComponent implements OnInit, AfterViewInit {
   auth = inject(AuthService);
   private fb = inject(FormBuilder);
   isAdmin:any;
+  private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   displayedColumns: string[] = [
   'id',
@@ -213,7 +214,7 @@ lastPage() {
         updated_at : new Date().toISOString(),
     }
 
-    this.apiService.update(`User/EditUser/${this.editedData.userId}`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
+    this.apiService.update(`User/${this.tenandId}/EditUser/${this.editedData.userId}`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
       if(data){
        this.closeForm();
       this.getUserData();
@@ -246,7 +247,7 @@ lastPage() {
   }
 
   getUserData(){
-   this.apiService.list(`User/getUser`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+   this.apiService.list(`User/${this.tenandId}/getUser`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
     this.dataSource.data = data;
      if (this.paginator) {
         this.paginator.length = data.length;
@@ -257,7 +258,7 @@ lastPage() {
 
   deleteUser(id: number): void {
      if(id != null){
-          this.apiService.delete(`User/DeleteUser/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
+          this.apiService.delete(`User/${this.tenandId}/DeleteUser/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
             this.getUserData();
             this.alert.success("User Deleted Successfully");
           },(error) => {
@@ -383,7 +384,7 @@ saveData(): void {
      updated_at : new Date().toISOString(),
   }
 
-  this.apiService.create(`User/SaveUser`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data) =>{
+  this.apiService.create(`User/${this.tenandId}/SaveUser`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data) =>{
     this.closeForm();
     this.getUserData();
     this.alert.success("User Saved Successfully");

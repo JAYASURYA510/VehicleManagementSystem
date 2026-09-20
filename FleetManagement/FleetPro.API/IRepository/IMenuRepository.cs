@@ -6,6 +6,6 @@ namespace FleetPro.API.IRepository
     {
         Task<List<RoleDto>> getrole();
         Task<List<MenuTypesDto>> getMenuTypes();
-        Task<List<MenuDto>> getNavMenu(int roleId);
+        Task<List<MenuDto>> getNavMenu(Guid tenantId, int roleId);
     }
 }

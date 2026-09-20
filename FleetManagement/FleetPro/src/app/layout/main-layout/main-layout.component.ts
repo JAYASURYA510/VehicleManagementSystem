@@ -32,6 +32,7 @@ export class MainLayoutComponent {
   userMenuRef = viewChild<ElementRef>('userMenuRef');
   getRoleId : any;
   navList : any;
+  private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   constructor(
        private fb : FormBuilder,private api : CommanService, private cdr: ChangeDetectorRef,
@@ -81,7 +82,7 @@ export class MainLayoutComponent {
       this.getRoleId = 4;
     }
 
-    this.api.list(`Menu/GetMenuByRoleId/${this.getRoleId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.api.list(`Menu/${this.tenandId}/GetMenuByRoleId/${this.getRoleId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
       this.navList = [];
       this.navList = data;
        this.cdr.detectChanges();

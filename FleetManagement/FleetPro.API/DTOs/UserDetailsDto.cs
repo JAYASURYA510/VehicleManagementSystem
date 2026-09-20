@@ -29,5 +29,6 @@ namespace FleetPro.API.DTOs
         public string phoneNumber { get; set; }
         public int role { get; set; }
         public bool is_active { get; set; }
+        public Guid? TenantId { get; set; }
     }
 }

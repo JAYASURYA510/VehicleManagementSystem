@@ -5,9 +5,9 @@ namespace FleetPro.API.IRepository
 {
     public interface IUserRepository
     {
-        Task<UserDetailsDto> saveUser(UserDetailsDto user);
-        Task<List<userDatasDto>> getAllUser();
-        Task<string> updateUser(UserDetailsDto user);
-        Task<string> deleteUser(int id);
+        Task<UserDetailsDto> saveUser(Guid tenantId, UserDetailsDto user);
+        Task<List<userDatasDto>> getAllUser(Guid tenantId);
+        Task<string> updateUser(Guid tenantId, UserDetailsDto user);
+        Task<string> deleteUser(Guid tenantId, int id);
     }
 }

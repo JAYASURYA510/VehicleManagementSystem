@@ -28,6 +28,7 @@ export class FormDataComponent implements OnInit {
   protected readonly unsubscribe$ = new Subject<void>();
   localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
   isAdmin:any;
+  private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   constructor(
     private apiService: ApiService,
@@ -101,7 +102,7 @@ export class FormDataComponent implements OnInit {
       MenuIds: this.selectedPages.map((page) => page.id),
     }
 
-    this.apiService.post("Menu/SaveMenu", payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.apiService.post(`Menu/${this.tenandId}/SaveMenu`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
         this.alert.success('Role permissions saved successfully.');
         this.reset();
     },

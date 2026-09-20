@@ -20,7 +20,7 @@ namespace FleetPro.API.Repository
         public async Task<List<RoleDto>> getrole()
         {
             try{
-            var roleData = await context.RoleMsts.AsNoTracking().ToListAsync();
+            var roleData = await context.RoleMsts.Where(x => x.id != 1).AsNoTracking().ToListAsync();
 
             return roleData.Select(data => new RoleDto
             {
@@ -47,13 +47,13 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<List<MenuDto>> getNavMenu(int roleId)
+        public async Task<List<MenuDto>> getNavMenu(Guid tenantId, int roleId)
         {
             try
             {
                 var roleMenu = await context.RoleMenus
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.RoleId == roleId);
+                    .FirstOrDefaultAsync(x => x.RoleId == roleId && x.TenantId == tenantId);
 
                 if (roleMenu == null || string.IsNullOrWhiteSpace(roleMenu.MenuId))
                 {

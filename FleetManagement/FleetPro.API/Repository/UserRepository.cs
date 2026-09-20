@@ -22,12 +22,12 @@ namespace FleetPro.API.Repository
             this.mapper = mapper;   
         }
 
-        public async Task<List<userDatasDto>> getAllUser()
+        public async Task<List<userDatasDto>> getAllUser(Guid tenantId)
         {
             try
             {
                 var userDatas = new List<userDatasDto>();
-                var getUser = await context.UserMaster.ToListAsync();
+                var getUser = await context.UserMaster.Where(x => x.TenantId == tenantId).AsNoTracking().ToListAsync();
 
                 foreach (var item in getUser)
                 {
@@ -39,7 +39,8 @@ namespace FleetPro.API.Repository
                         emailId = item.emailId,
                         phoneNumber = item.phoneNumber,
                         role = item.role,
-                        is_active = item.is_active
+                        is_active = item.is_active,
+                        TenantId = item.TenantId,
                     };
                     userDatas.Add(data);
                 }
@@ -52,7 +53,7 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<UserDetailsDto> saveUser(UserDetailsDto user)
+        public async Task<UserDetailsDto> saveUser(Guid tenantId, UserDetailsDto user)
         {
             try
             {
@@ -73,6 +74,7 @@ namespace FleetPro.API.Repository
                 var userEntity = mapper.Map<UserMst>(user);
                 userEntity.userId = 0;
                 userEntity.password = password;
+                userEntity.TenantId = tenantId;
                 context.UserMaster.Add(userEntity);
                 await context.SaveChangesAsync();
                 return user;
@@ -83,13 +85,13 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<string> updateUser(UserDetailsDto user)
+        public async Task<string> updateUser(Guid tenantId, UserDetailsDto user)
         {
             try
             {
 
                 var userData = await context.UserMaster
-                    .Where(x => x.userId == user.userId)
+                    .Where(x => x.userId == user.userId && x.TenantId == tenantId)
                     .FirstOrDefaultAsync();
              
                if(userData == null)
@@ -116,11 +118,11 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<string> deleteUser(int id)
+        public async Task<string> deleteUser(Guid tenantId, int id)
         {
             try
             {
-                var userData = await context.UserMaster.Where(x => x.userId == id).FirstOrDefaultAsync();
+                var userData = await context.UserMaster.Where(x => x.userId == id && x.TenantId == tenantId).FirstOrDefaultAsync();
                 if (userData == null) return "User Not Found";
 
                 context.UserMaster.Remove(userData);
