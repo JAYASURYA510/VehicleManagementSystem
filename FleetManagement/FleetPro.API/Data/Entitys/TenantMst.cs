@@ -11,10 +11,6 @@ namespace FleetPro.API.Data.Entitys
         public Guid TenantId { get; set; }
 
         [Required]
-        [Column("customer_id")]
-        public string CustomerId { get; set; }
-
-        [Required]
         [Column("user_name")]
         public string UserName { get; set; }
 
@@ -38,8 +34,8 @@ namespace FleetPro.API.Data.Entitys
         [Column("gst_no")]
         public string? GstNo { get; set; }
 
-        [Column("tan_no")]
-        public string? TanNo { get; set; }
+        [Column("pan_no")]
+        public string? PanNo { get; set; }
 
         [Required]
         [Column("is_super_admin")]

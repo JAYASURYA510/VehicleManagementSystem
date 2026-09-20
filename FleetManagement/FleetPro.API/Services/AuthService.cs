@@ -40,12 +40,14 @@ public class AuthService(ApplicationDbContext db, JwtSettings jwtSettings)
     public async Task<LoginResponse?> LoginAsync(LoginRequest request)
     {
         var user = await db.UserMaster
-            .FirstOrDefaultAsync(u => u.username == request.Username && u.TenantId == request.TenantId && u.is_active == true);
+            .FirstOrDefaultAsync(u => u.username == request.Username && u.is_active == true);
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.password))
             return null;
 
+        var customerDetails = await db.Tenants.AsNoTracking().FirstOrDefaultAsync(u => u.TenantId == user.TenantId);
+
         var token = GenerateUserToken(user);
-        return new LoginResponse(token, user.userId, user.username, user.fullName, user.emailId, (UserRole)user.role, user.TenantId.ToString(), new List<PermissionDto>(), new List<int>());
+        return new LoginResponse(token, user.userId, user.username, user.fullName, user.emailId, (UserRole)user.role, user.TenantId.ToString(), customerDetails.CustomerName, customerDetails.PhoneNo, new List<PermissionDto>(), new List<int>());
     }
     public static List<PermissionDto> GetEffectivePermissions(User user)
     {

@@ -18,10 +18,10 @@ namespace FleetPro.API.Repository.TenantServ
             this.mapper = mapper;
         }
 
-        public async Task<bool> CustomerIdExistsAsync(string customerId)
-        {
-            return await context.Tenants.AnyAsync(x =>x.CustomerId == customerId);
-        }
+        //public async Task<bool> CustomerIdExistsAsync(string customerId)
+        //{
+        //    return await context.Tenants.AnyAsync(x =>x.CustomerId == customerId);
+        //}
 
         public async Task<bool> UserNameExistsAsync(string userName)
         {

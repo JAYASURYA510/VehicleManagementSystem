@@ -2,7 +2,6 @@
 {
     public class OnboardClientRequest
     {
-        public string CustomerId { get; set; }
 
         public string CustomerName { get; set; }
 
@@ -18,7 +17,7 @@
 
         public string? GstNo { get; set; }
 
-        public string? TanNo { get; set; }
+        public string? PanNo { get; set; }
 
         public string IsSuperAdmin { get; set; }
 
@@ -34,8 +33,6 @@
     public class AdminListResponse
     {
         public Guid TenantId { get; set; }
-        
-        public string CustomerId { get; set; }
 
         public string CustomerName { get; set; }
 
@@ -49,7 +46,7 @@
 
         public string? GstNo { get; set; }
 
-        public string? TanNo { get; set; }
+        public string? PanNo { get; set; }
 
         public string IsSuperAdmin { get; set; }
 

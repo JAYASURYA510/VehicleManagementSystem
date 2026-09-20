@@ -217,9 +217,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     // Start loading
     this.loading.set(true);
     const { username, password } = this.form.getRawValue();
-    this.auth.login(username, password, this.tenantId).subscribe({
+    this.auth.login(username, password).subscribe({
         next: (data) => {
         this.loading.set(false);
+         this.customerData = data;
+          this.loading.set(false);
+          localStorage.setItem('fleetPro_TenantId', this.customerData?.tenantId);   
+          localStorage.setItem('fleetPro_CustomerName', this.customerData?.customerName);
+          localStorage.setItem('fleetPro_PhoneNum', this.customerData?.phoneNum);
         if(data.role == "SuperAdmin"){
           this.router.navigate(['/superAdminList']);
         }

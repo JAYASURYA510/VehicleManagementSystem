@@ -5,7 +5,7 @@ namespace FleetPro.API.IRepository.ITenant
 {
     public interface ITenantService
     {
-        Task<bool> CustomerIdExistsAsync(string customerId);
+        //Task<bool> CustomerIdExistsAsync(string customerId);
 
         Task<bool> UserNameExistsAsync(string userName);
 

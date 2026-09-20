@@ -27,12 +27,11 @@
       <h2>Welcome Back</h2>
 
       <p class="subtitle">
-        {{ customerValidated() ? 'Sign in to continue' : 'Enter your Customer ID to continue' }}
+        {{  'Sign in to continue'  }}
       </p>
 
 
-      <!-- CUSTOMER ID STEP -->
-      <form
+      <!-- <form
         *ngIf="!customerValidated()"
         [formGroup]="customerForm"
         (ngSubmit)="validateCustomer()"
@@ -65,7 +64,6 @@
         </div>
 
 
-        <!-- CUSTOMER VALIDATION ERROR -->
         <div
           class="login-error"
           *ngIf="error()"
@@ -75,7 +73,6 @@
         </div>
 
 
-        <!-- CONTINUE BUTTON -->
         <button
           type="submit"
           class="login-btn"
@@ -84,12 +81,9 @@
           {{ loading() ? 'Validating...' : 'Continue' }}
         </button>
 
-      </form>
+      </form> -->
 
-
-      <!-- LOGIN STEP -->
       <form
-        *ngIf="customerValidated()"
         [formGroup]="form"
         (ngSubmit)="onSubmit()"
       >
@@ -166,12 +160,12 @@
           {{ loading() ? 'Signing In...' : 'Sign In' }}
         </button>
 
-        <div class="back_div">
+        <!-- <div class="back_div">
         <a class="back-to-customer" (click)="backToCustomer()">
           <mat-icon>chevron_left</mat-icon>
           <span>Back to customer</span>
         </a>
-        </div>
+        </div> -->
 
       </form>
 

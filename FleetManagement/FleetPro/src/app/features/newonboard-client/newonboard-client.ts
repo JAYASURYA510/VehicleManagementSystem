@@ -40,7 +40,6 @@ export class NewonboardClientComponent {
       private router : Router
   ) {
     this.clientForm = this.fb.group({
-      customerId: ['', Validators.required, Validators.pattern(/^[0-9]{6}$/)],
       customerName: ['', Validators.required],
       userName: ['', Validators.required],
       password: ['', Validators.required,Validators.pattern( /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/ )],
@@ -49,7 +48,7 @@ export class NewonboardClientComponent {
 
       address: ['', Validators.required],
       gstNo: ['', Validators.required],
-      tanNo: ['', Validators.required]
+      panNo: ['', Validators.required]
     });
   }
 
@@ -69,7 +68,6 @@ submitForm(): void {
   const formValue = this.clientForm.value;
 
   const payload = {
-    customerId: formValue.customerId,
     customerName: formValue.customerName,
     userName: formValue.userName,
     password: formValue.password,
@@ -77,7 +75,7 @@ submitForm(): void {
     phoneNo: formValue.phoneNo,
     address: formValue.address,
     gstNo: formValue.gstNo,
-    tanNo: formValue.tanNo,
+    panNo: formValue.panNo,
     isSuperAdmin: 'no',
     createdDate: this.dateTimePickerService.toApiDateTime(new Date()),
     createdBy: this.localStorageData.userId,

@@ -37,14 +37,13 @@ namespace FleetPro.API.Repository.TenantServ
                     adminListResponses.Add(new AdminListResponse
                     {
                         TenantId = data.TenantId,
-                        CustomerId = data.CustomerId,
                         CustomerName = data.CustomerName,
                         UserName = data.UserName,
                         EmailId = data.EmailId,
                         PhoneNo = data.PhoneNo,
                         Address = data.Address,
                         GstNo = data.GstNo,
-                        TanNo = data.TanNo,
+                        PanNo = data.PanNo,
                         IsSuperAdmin = data.IsSuperAdmin,
                         IsActive = data.IsActive,
                         CreatedBy = data.CreatedBy,
@@ -72,14 +71,13 @@ namespace FleetPro.API.Repository.TenantServ
                     adminListResponses.Add(new AdminListResponse
                     {
                         TenantId = data.TenantId,
-                        CustomerId = data.CustomerId,
                         CustomerName = data.CustomerName,
                         UserName = data.UserName,
                         EmailId = data.EmailId,
                         PhoneNo = data.PhoneNo,
                         Address = data.Address,
                         GstNo = data.GstNo,
-                        TanNo = data.TanNo,
+                        PanNo = data.PanNo,
                         IsSuperAdmin = data.IsSuperAdmin,
                         IsActive = data.IsActive,
                         CreatedBy = data.CreatedBy,
@@ -110,23 +108,23 @@ namespace FleetPro.API.Repository.TenantServ
                     );
                 }
 
-                var customerId = request.CustomerId.Trim();
+                //var customerId = request.CustomerId.Trim();
 
                 var customerName = request.CustomerName;
 
                 var userName = request.UserName.Trim();
 
-                var customerExists = await _tenantService.CustomerIdExistsAsync(customerId);
+                //var customerExists = await _tenantService.CustomerIdExistsAsync(customerId);
                 var createPassword = _passwordService.HashPassword(request.Password);
 
-                if (customerExists)
-                {
-                    return (
-                        false,
-                        "Customer ID already exists.",
-                        null
-                    );
-                }
+                //if (customerExists)
+                //{
+                //    return (
+                //        false,
+                //        "Customer ID already exists.",
+                //        null
+                //    );
+                //}
 
                 var userNameExists = await _tenantService.UserNameExistsAsync(userName);
 
@@ -141,7 +139,6 @@ namespace FleetPro.API.Repository.TenantServ
 
                 var tenant = new TenantMst
                 {
-                    CustomerId = customerId,
                     UserName = userName,
                     Password = createPassword,
                     CustomerName = customerName,
@@ -149,7 +146,7 @@ namespace FleetPro.API.Repository.TenantServ
                     PhoneNo = request.PhoneNo,
                     Address = request.Address,
                     GstNo = request.GstNo,
-                    TanNo = request.TanNo,
+                    PanNo = request.PanNo,
                     IsSuperAdmin = request.IsSuperAdmin,
                     IsActive = true,
                     CreatedDate = request.CreatedDate,
@@ -182,7 +179,6 @@ namespace FleetPro.API.Repository.TenantServ
                 var responseData = new
                 {
                     tenantId = tenant.TenantId,
-                    customerId = tenant.CustomerId,
                     customerName = tenant.CustomerName,
                     adminUserId = adminUser.userId,
                     adminUserName = adminUser.username,
