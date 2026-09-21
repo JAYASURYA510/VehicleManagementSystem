@@ -71,5 +71,10 @@ namespace FleetPro.API.Data.Entitys
         [Column("vehiclePermit")]
         public int? VehiclePermit { get; set; }
 
+        [Column("tenant_id")]
+        [ForeignKey(nameof(tenantMst))]
+        public Guid TenantId { get; set; }
+        public TenantMst tenantMst { get; set; }
+
     }
 }

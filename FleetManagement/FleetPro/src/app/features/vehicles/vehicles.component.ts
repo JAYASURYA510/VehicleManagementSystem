@@ -40,6 +40,7 @@ export class VehiclesComponent implements OnInit, AfterViewInit {
   vehicleList : any;
   vehicleOption : typeof vehicleoption.vehicleTypes = vehicleoption.vehicleTypes;
   vehicleStatuses : typeof vehicleoption.vehicleStatuses = vehicleoption.vehicleStatuses;
+  private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   dataSource = new MatTableDataSource<Vehicle>();
 
@@ -141,12 +142,12 @@ lastPage() {
 
 
   getVehicleNumber(){
-    this.apiService.list(`VehicleMst/getAllVehicleForDropDown`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.apiService.list(`VehicleMst/${this.tenandId}/getAllVehicleForDropDown`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
       this.vehicleList = data?.message;
     });
   }
   load(): void {
-    this.api.get<any[]>('VehicleMst/getAllVehicle').subscribe({
+    this.api.get<any[]>(`VehicleMst/${this.tenandId}/getAllVehicle`).subscribe({
       next: (data) => {
         if(data.length > 0){
          this.dataSource.data = data;
@@ -191,6 +192,10 @@ lastPage() {
     }
   }
 
+  AddVehicle(){
+    this.router.navigate(['/NewVehiclemaster']);
+  }
+
   onSearch(){
     const payload = {
       registrationNumber : this.serachVehicle.get('registrationNumber')?.value ? this.serachVehicle.get('registrationNumber')?.value : null,
@@ -199,7 +204,7 @@ lastPage() {
       searchTerm :this.serachVehicle.get('searchTerm')?.value ? this.serachVehicle.get('searchTerm')?.value : null
     }
 
-    this.apiService.create(`VehicleMst/getVehicleBySearch`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.apiService.create(`VehicleMst/${this.tenandId}/getVehicleBySearch`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
       if(data.message.length > 0){
          this.dataSource.data = data.message;
       }
@@ -212,7 +217,7 @@ lastPage() {
 
   deleteVehicle(id: number): void {
     if(id){
-      this.apiService.delete(`VehicleMst/DeleteVehicleDetails/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+      this.apiService.delete(`VehicleMst/${this.tenandId}/DeleteVehicleDetails/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
         if(data.success == true){
            this.load();
            this.getVehicleNumber()

@@ -36,6 +36,7 @@ export class NewVehicleMaster implements OnInit {
   fuelTypes = vehicleOptions.fuelTypes;
   vehicleStatuses = vehicleOptions.vehicleStatuses;
   vehiclePermits = vehicleOptions.vehiclePermits;
+  private tenandId = localStorage.getItem("fleetPro_TenantId");
 
 
   isSaveButton : boolean = true;
@@ -112,10 +113,11 @@ export class NewVehicleMaster implements OnInit {
     }
   
      
-   this.apiService.create(`VehicleMst/SaveVehicleDetails`, vehicleData).pipe(takeUntil(this.unsubscribe$)).subscribe((data) =>{
+   this.apiService.create(`VehicleMst/${this.tenandId}/SaveVehicleDetails`, vehicleData).pipe(takeUntil(this.unsubscribe$)).subscribe((data) =>{
       if(data){
         this.alert.success("Vehicle Master Saved Successfully")
         this.reset(); 
+        this.router.navigate(['/vehicles']);
       }
    },(error) =>{
      this.alert.error("Unable to Save Vehicle Master");
@@ -124,7 +126,7 @@ export class NewVehicleMaster implements OnInit {
   }
 
   getVehicleById(id: any): void {
-    this.apiService.list(`VehicleMst/getVehicleById/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.apiService.list(`VehicleMst/${this.tenandId}/getVehicleById/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
       if(data){
         this.vehicleForm.patchValue(data);
       }
@@ -157,7 +159,7 @@ export class NewVehicleMaster implements OnInit {
        vehiclePermit: this.vehicleForm.get("vehiclePermit")?.value ?? 0
     }
    
-    this.apiService.update(`VehicleMst/UpdateVehicleDetails/${this.vehicleId}`, vehicleData).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.apiService.update(`VehicleMst/${this.tenandId}/UpdateVehicleDetails/${this.vehicleId}`, vehicleData).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
       if(data.success == true){
         this.alert.success("Vehicle Master Updated Successfully")
         this.reset();

@@ -17,11 +17,11 @@ namespace FleetPro.API.Repository
             this.mapper = mapper;
         }
 
-        public async Task<List<VehicleMstDto>> getAllVehicle()
+        public async Task<List<VehicleMstDto>> getAllVehicle(Guid tenantId)
         {
             try
             {
-                var vehicleData = await context.VehicleMsts.Where(x => x.IsAvailable == true).AsNoTracking().ToListAsync();
+                var vehicleData = await context.VehicleMsts.Where(x => x.TenantId == tenantId && x.IsAvailable == true).AsNoTracking().ToListAsync();
                 return mapper.Map<List<VehicleMstDto>>(vehicleData);
             }
             catch (Exception ex)
@@ -30,11 +30,11 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<VehicleMstDto> getVehicleById(Guid VehicleId)
+        public async Task<VehicleMstDto> getVehicleById(Guid tenantId, Guid VehicleId)
         {
             try
             {
-                var vehicleData = await context.VehicleMsts.AsNoTracking().FirstOrDefaultAsync(v => v.VehicleId == VehicleId);
+                var vehicleData = await context.VehicleMsts.AsNoTracking().FirstOrDefaultAsync(v => v.TenantId == tenantId && v.VehicleId == VehicleId);
                 if (vehicleData == null)
                 {
                     throw new Exception($"Vehicle with ID {VehicleId} not found.");
@@ -47,17 +47,18 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<VehicleMstDto> saveVehicle(VehicleMstDto vehicle)
+        public async Task<VehicleMstDto> saveVehicle(Guid tenantId, VehicleMstDto vehicle)
         {
             try{
                 
-                var existingVehicle = await context.VehicleMsts.Where(x=> x.RegistrationNumber == vehicle.RegistrationNumber).AsNoTracking().FirstOrDefaultAsync();
+                var existingVehicle = await context.VehicleMsts.Where(x=> x.TenantId == tenantId && x.RegistrationNumber == vehicle.RegistrationNumber).AsNoTracking().FirstOrDefaultAsync();
                 if (existingVehicle != null)
                 {
                     throw new Exception("A vehicle with the same registration number already exists.");
                 }
 
                 var vehicleEntity = mapper.Map<VehicleMst>(vehicle);
+                vehicleEntity.TenantId = tenantId;
                 context.VehicleMsts.Add(vehicleEntity);
                 await context.SaveChangesAsync();
                 return mapper.Map<VehicleMstDto>(vehicleEntity);
@@ -68,11 +69,12 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<VehicleMstDto> updateVehicle(Guid VehicleId, VehicleMstDto vehicle)
+        public async Task<VehicleMstDto> updateVehicle(Guid tenantId, Guid VehicleId, VehicleMstDto vehicle)
         {
             try
             {
-                var existingVehicle = await context.VehicleMsts.FindAsync(VehicleId);
+                var existingVehicle = await context.VehicleMsts
+                    .FirstOrDefaultAsync(v => v.VehicleId == VehicleId && v.TenantId == tenantId);
 
                 if (existingVehicle == null)
                 {
@@ -106,11 +108,12 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<bool> deleteVehicle(Guid VehicleId)
+        public async Task<bool> deleteVehicle(Guid tenantId, Guid VehicleId)
         {
             try
             {
-                var existingVehicle = await context.VehicleMsts.FindAsync(VehicleId);
+                var existingVehicle =  await context.VehicleMsts
+                    .FirstOrDefaultAsync(v => v.VehicleId == VehicleId && v.TenantId == tenantId);
 
                 if (existingVehicle == null)
                 {
@@ -127,11 +130,11 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<List<VehicleMstDto>> getsearchedVehicle(searchVehicleDto searchVehicleDto)
+        public async Task<List<VehicleMstDto>> getsearchedVehicle(Guid tenantId, searchVehicleDto searchVehicleDto)
         {
             try
             {
-                var query = context.VehicleMsts.AsQueryable().AsNoTracking();
+                var query = context.VehicleMsts.Where(x => x.TenantId == tenantId).AsQueryable().AsNoTracking();
                 if (!string.IsNullOrWhiteSpace(searchVehicleDto.RegistrationNumber))
                 {
                     query = query.Where(x => x.RegistrationNumber.Contains(searchVehicleDto.RegistrationNumber));
