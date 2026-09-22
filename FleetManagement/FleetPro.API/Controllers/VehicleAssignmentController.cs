@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FleetPro.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{tenantId}")]
     [Authorize]
     [ApiController]
     public class VehicleAssignmentController : ControllerBase
@@ -19,9 +19,9 @@ namespace FleetPro.API.Controllers
             this.vehicleAssignmentRepository = vehicleAssignmentRepository;
         }
         [HttpGet("getAllAssignedVehicle")]
-        public async Task<IActionResult> getAllData()
+        public async Task<IActionResult> getAllData(Guid tenantId)
         {
-            var getData = await vehicleAssignmentRepository.getAllAssignedVehicle();
+            var getData = await vehicleAssignmentRepository.getAllAssignedVehicle(tenantId);
             if(getData != null)
             {
                 return Ok(new
@@ -41,9 +41,9 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpPost("saveAssignedVehicle")]
-        public async Task<IActionResult> Save([FromBody] VehicleUserAssignmentDto vehicleUserAssignmentDto)
+        public async Task<IActionResult> Save([FromBody] VehicleUserAssignmentDto vehicleUserAssignmentDto, Guid tenantId)
         {
-            var savedData = await vehicleAssignmentRepository.saveAssignedVehicle(vehicleUserAssignmentDto);
+            var savedData = await vehicleAssignmentRepository.saveAssignedVehicle(tenantId, vehicleUserAssignmentDto);
             if(savedData != null)
             {
                 return Ok(new
@@ -63,11 +63,11 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpGet("getUserBasedAssignedVehicle/{RoleId}/{UserId}")]
-        public async Task<IActionResult> getUserBasedVehicle(int RoleId, int UserId)
+        public async Task<IActionResult> getUserBasedVehicle(Guid tenantId, int RoleId, int UserId)
         {
             try
             {
-                var result = await vehicleAssignmentRepository.getUserBasedVehicle(RoleId, UserId);
+                var result = await vehicleAssignmentRepository.getUserBasedVehicle(tenantId, RoleId, UserId);
 
                 return Ok(new
                 {
@@ -86,9 +86,9 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpGet("getUserBasedVehicleDropDown/{RoleId}/{UserId}")]
-        public async Task<IActionResult> VehicleDropDown(int RoleId, int UserId)
+        public async Task<IActionResult> VehicleDropDown(Guid tenantId, int RoleId, int UserId)
         {
-            var result = await vehicleAssignmentRepository.getUserBasedVehicleDropDown(RoleId, UserId);
+            var result = await vehicleAssignmentRepository.getUserBasedVehicleDropDown(tenantId, RoleId, UserId);
             if (result != null)
             {
                 return Ok(new
@@ -108,7 +108,7 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpPut("EditVehicleAssignment")]
-        public async Task<IActionResult> EditVehicleAssignment([FromBody] EditVehicleAssignmentDto request)
+        public async Task<IActionResult> EditVehicleAssignment([FromBody] EditVehicleAssignmentDto request, Guid tenantId)
         {
             try
             {
@@ -121,7 +121,7 @@ namespace FleetPro.API.Controllers
                     });
                 }
 
-                var result = await vehicleAssignmentRepository.EditVehicleAssignmentAsync(request);
+                var result = await vehicleAssignmentRepository.EditVehicleAssignmentAsync(tenantId, request);
                 if(result == true){
                 return Ok(new
                 {
@@ -149,11 +149,11 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpDelete("DeleteVehicleAssignment/{assignmentId}")]
-        public async Task<IActionResult> DeleteVehicleAssignment(Guid assignmentId)
+        public async Task<IActionResult> DeleteVehicleAssignment(Guid tenantId, Guid assignmentId)
         {
             try
             {
-                var deleteAssignment = await vehicleAssignmentRepository.DeleteVehicleAssignmentAsync(assignmentId);
+                var deleteAssignment = await vehicleAssignmentRepository.DeleteVehicleAssignmentAsync(tenantId, assignmentId);
                if(deleteAssignment == true){
                 return Ok(new
                 {
@@ -177,11 +177,11 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpPost("SearchVehicleAssignments")]
-        public async Task<IActionResult> SearchVehicleAssignments([FromBody] VehicleAssignmentSearchDto request)
+        public async Task<IActionResult> SearchVehicleAssignments([FromBody] VehicleAssignmentSearchDto request, Guid tenantId)
         {
             try
             {
-                var result = await vehicleAssignmentRepository.SearchVehicleAssignmentsAsync(request);        
+                var result = await vehicleAssignmentRepository.SearchVehicleAssignmentsAsync(tenantId, request);        
                     return Ok(new
                     {
                         success = true,
@@ -199,7 +199,7 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpGet("GetVehicleAssignmentById/{assignmentId}")]
-        public async Task<IActionResult> GetVehicleAssignmentById(Guid assignmentId)
+        public async Task<IActionResult> GetVehicleAssignmentById(Guid tenantId, Guid assignmentId)
         {
             if (assignmentId == Guid.Empty)
             {
@@ -210,7 +210,7 @@ namespace FleetPro.API.Controllers
             });
             }
 
-            var result = await vehicleAssignmentRepository.GetVehicleAssignmentByIdAsync(assignmentId);
+            var result = await vehicleAssignmentRepository.GetVehicleAssignmentByIdAsync(tenantId, assignmentId);
 
             if (result == null)
             {

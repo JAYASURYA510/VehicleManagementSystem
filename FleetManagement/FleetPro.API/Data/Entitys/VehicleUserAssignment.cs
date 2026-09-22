@@ -33,6 +33,11 @@ namespace FleetPro.API.Data.Entitys
         [Column("updated_by")]
         public int? UpdatedBy { get; set; }
 
+        [Column("tenant_id")]
+        [ForeignKey(nameof(tenantMst))]
+        public Guid TenantId { get; set; }
+        public TenantMst tenantMst { get; set; }
+
         [ForeignKey(nameof(VehicleId))]
         public virtual VehicleMst Vehicle { get; set; }
 

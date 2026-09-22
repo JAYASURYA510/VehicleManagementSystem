@@ -81,6 +81,7 @@ export class AssignVehicleMstComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef);
   protected readonly unsubscribe$ = new Subject<void>();
+  private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   // =====================================================
   // API DATA LISTS
@@ -127,8 +128,8 @@ export class AssignVehicleMstComponent implements OnInit {
   // =====================================================
   asignRole : any;
   loadUsers(): void {
-    this.assignVehicleService
-      .getUsers()
+     this.apiService
+      .list(`User/${this.tenandId}/getallUserForSelection`)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response: any) => {
@@ -193,7 +194,7 @@ export class AssignVehicleMstComponent implements OnInit {
   loadVehicles(): void {
     this.asignRole = UserRole[this.role as keyof typeof UserRole];
     this.apiService
-      .list(`VehicleAssignment/getUserBasedVehicleDropDown/${this.asignRole}/${this.userId}`)
+      .list(`VehicleAssignment/${this.tenandId}/getUserBasedVehicleDropDown/${this.asignRole}/${this.userId}`)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response: any) => {
@@ -408,7 +409,7 @@ export class AssignVehicleMstComponent implements OnInit {
       updatedBy: this.localStorageData.userId
     };
 
-    this.assignVehicleService.assignVehicle(payload).pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.apiService.create(`VehicleAssignment/${this.tenandId}/saveAssignedVehicle`,payload).pipe(takeUntil(this.unsubscribe$)).subscribe({
         next: (response: any) => {
           if(response.success == true){
           this.alert.success('Vehicle assigned successfully!');

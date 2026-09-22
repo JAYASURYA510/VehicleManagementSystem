@@ -18,12 +18,12 @@ namespace FleetPro.API.Repository
             this.mapper = mapper;
         }
 
-        public async Task<List<getVehicleAssignmentDto>> getAllAssignedVehicle()
+        public async Task<List<getVehicleAssignmentDto>> getAllAssignedVehicle(Guid tenantId)
         {
             try
             {
                 var allData = new List<getVehicleAssignmentDto>();
-                var getAllAssignedData = await context.VehicleUserAssignments.AsNoTracking().ToListAsync();
+                var getAllAssignedData = await context.VehicleUserAssignments.Where(x => x.TenantId == tenantId).AsNoTracking().ToListAsync();
 
                 if (!getAllAssignedData.Any())
                 {
@@ -43,7 +43,8 @@ namespace FleetPro.API.Repository
                         created_date = data.created_date,
                         CreatedBy = data.CreatedBy,
                         updatedDate = data.updatedDate,
-                        UpdatedBy = data.UpdatedBy
+                        UpdatedBy = data.UpdatedBy,
+                        tenantId = data.TenantId,
                     });
                 }
 
@@ -55,13 +56,13 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<List<VehicleAssignmentUserResponseDto>> getUserBasedVehicle(int RoleId, int UserId)
+        public async Task<List<VehicleAssignmentUserResponseDto>> getUserBasedVehicle(Guid tenantId, int RoleId, int UserId)
         {
             try
             {
                 if (RoleId == 1 || RoleId == 2)
                 {
-                    var assignments = await context.VehicleUserAssignments.AsNoTracking()
+                    var assignments = await context.VehicleUserAssignments.Where(x => x.TenantId == tenantId).AsNoTracking()
              .Select(x => new
              {
                  x.AssignmentId,
@@ -109,7 +110,7 @@ namespace FleetPro.API.Repository
                 }
                 else
                 {
-                    var assignments = await context.VehicleUserAssignments.Where(x => x.RoleId == RoleId && x.UserId == UserId).AsNoTracking()
+                    var assignments = await context.VehicleUserAssignments.Where(x => x.TenantId == tenantId && x.RoleId == RoleId && x.UserId == UserId).AsNoTracking()
                 .Select(x => new
                 {
                     x.AssignmentId,
@@ -164,13 +165,13 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<List<vehicleDto>> getUserBasedVehicleDropDown(int RoleId, int UserId)
+        public async Task<List<vehicleDto>> getUserBasedVehicleDropDown(Guid tenantId, int RoleId, int UserId)
         {
             try
             {
                 if (RoleId == 1 || RoleId == 2)
                 {
-                    return await context.VehicleMsts.AsNoTracking().Where(x => x.VehicleStatusId == 1 && x.IsAvailable == true)
+                    return await context.VehicleMsts.AsNoTracking().Where(x =>x.TenantId == tenantId && x.VehicleStatusId == 1 && x.IsAvailable == true)
                         .Select(vehicle => new vehicleDto
                         {
                             VehicleId = vehicle.VehicleId,
@@ -181,14 +182,14 @@ namespace FleetPro.API.Repository
                 else
                 {
                     var assignedVehicleIds = await context.VehicleUserAssignments
-                        .Where(x => x.RoleId == RoleId && x.UserId == UserId && x.IsActive)
+                        .Where(x => x.TenantId == tenantId && x.RoleId == RoleId && x.UserId == UserId && x.IsActive)
                         .Select(x => x.VehicleId)
                         .ToListAsync();
 
                     if (assignedVehicleIds.Any())
                     {
                         return await context.VehicleMsts.AsNoTracking()
-                            .Where(vehicle => assignedVehicleIds.Contains(vehicle.VehicleId))
+                            .Where(vehicle => assignedVehicleIds.Contains(vehicle.VehicleId) && vehicle.TenantId == tenantId)
                             .Select(vehicle => new vehicleDto
                             {
                                 VehicleId = vehicle.VehicleId,
@@ -206,7 +207,7 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<VehicleUserAssignmentDto> saveAssignedVehicle(VehicleUserAssignmentDto vehicleUserAssignmentDto)
+        public async Task<VehicleUserAssignmentDto> saveAssignedVehicle(Guid tenantId, VehicleUserAssignmentDto vehicleUserAssignmentDto)
         {
             try
             {
@@ -218,7 +219,7 @@ namespace FleetPro.API.Repository
                     throw new ArgumentException("Invalid vehicle list.", nameof(vehicleUserAssignmentDto));
                 }
 
-                var existingAssignments = await context.VehicleUserAssignments.Where(x => vehicleIds.Contains(x.VehicleId)
+                var existingAssignments = await context.VehicleUserAssignments.Where(x => vehicleIds.Contains(x.VehicleId) && x.TenantId == tenantId
                                            && x.RoleId == vehicleUserAssignmentDto.RoleId && x.IsActive == true).AsNoTracking().ToListAsync();
 
                 // Close old assignment if the vehicle is assigned
@@ -235,7 +236,7 @@ namespace FleetPro.API.Repository
                 }
 
                 // Vehicles already assigned to the same user
-                var alreadyAssignedVehicleIds = await context.VehicleUserAssignments.Where(x => x.FromDate == vehicleUserAssignmentDto.FromDate && x.ToDate == vehicleUserAssignmentDto.ToDate && vehicleIds.Contains(x.VehicleId)
+                var alreadyAssignedVehicleIds = await context.VehicleUserAssignments.Where(x => x.FromDate == vehicleUserAssignmentDto.FromDate && x.ToDate == vehicleUserAssignmentDto.ToDate && vehicleIds.Contains(x.VehicleId) && x.TenantId == tenantId
                                            && x.UserId == vehicleUserAssignmentDto.UserId && x.IsActive == true).AsNoTracking().ToListAsync();
 
                 // Get only new vehicles
@@ -255,7 +256,8 @@ namespace FleetPro.API.Repository
                     created_date = vehicleUserAssignmentDto.created_date,
                     CreatedBy = vehicleUserAssignmentDto.CreatedBy,
                     updatedDate = vehicleUserAssignmentDto.updatedDate,
-                    UpdatedBy = vehicleUserAssignmentDto.UpdatedBy
+                    UpdatedBy = vehicleUserAssignmentDto.UpdatedBy,
+                    TenantId = tenantId,
                 }).ToList();
 
                 if (assignments.Any())
@@ -272,11 +274,11 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<bool> EditVehicleAssignmentAsync(EditVehicleAssignmentDto request)
+        public async Task<bool> EditVehicleAssignmentAsync(Guid tenantId, EditVehicleAssignmentDto request)
         {
             try
             {
-                var assignment = await context.VehicleUserAssignments.FirstOrDefaultAsync(x => x.AssignmentId == request.AssignmentId);
+                var assignment = await context.VehicleUserAssignments.FirstOrDefaultAsync(x => x.AssignmentId == request.AssignmentId && x.TenantId == tenantId);
                 if (assignment == null)
                 {
                     return false;
@@ -290,7 +292,7 @@ namespace FleetPro.API.Repository
                 // Check whether another active assignment
                 // already exists for this vehicle
                 var existingAssignment = await context.VehicleUserAssignments.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.VehicleId == request.VehicleId && x.AssignmentId != request.AssignmentId && x.IsActive);
+                    .FirstOrDefaultAsync(x => x.VehicleId == request.VehicleId && x.TenantId == tenantId && x.AssignmentId != request.AssignmentId && x.IsActive);
 
                 if (existingAssignment != null)
                 {
@@ -321,11 +323,11 @@ namespace FleetPro.API.Repository
 
         }
 
-        public async Task<bool> DeleteVehicleAssignmentAsync(Guid assignmentId)
+        public async Task<bool> DeleteVehicleAssignmentAsync(Guid tenantId, Guid assignmentId)
         {
             try
             {
-                var assignment = await context.VehicleUserAssignments.AsNoTracking().FirstOrDefaultAsync(x => x.AssignmentId == assignmentId);
+                var assignment = await context.VehicleUserAssignments.AsNoTracking().FirstOrDefaultAsync(x => x.AssignmentId == assignmentId && x.TenantId == tenantId);
                 if (assignment == null)
                 {
                     return false;
@@ -342,11 +344,11 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<List<VehicleAssignmentUserResponseDto>> SearchVehicleAssignmentsAsync(VehicleAssignmentSearchDto request)
+        public async Task<List<VehicleAssignmentUserResponseDto>> SearchVehicleAssignmentsAsync(Guid tenantId, VehicleAssignmentSearchDto request)
         {
             try
             {
-                var query = context.VehicleUserAssignments.AsQueryable().AsNoTracking();
+                var query = context.VehicleUserAssignments.Where(x => x.TenantId == tenantId).AsQueryable().AsNoTracking();
 
                 if (request.VehicleId.HasValue)
                 {
@@ -413,11 +415,11 @@ namespace FleetPro.API.Repository
             }
         }
 
-        public async Task<VehicleAssignmentByIdDto> GetVehicleAssignmentByIdAsync(Guid assignmentId)
+        public async Task<VehicleAssignmentByIdDto> GetVehicleAssignmentByIdAsync(Guid tenantId, Guid assignmentId)
         {
             try
             {
-                var assignment = await context.VehicleUserAssignments.Where(x => x.AssignmentId == assignmentId).AsNoTracking()
+                var assignment = await context.VehicleUserAssignments.Where(x => x.AssignmentId == assignmentId && x.TenantId == tenantId).AsNoTracking()
                                           .Select(x => new VehicleAssignmentByIdDto
                                 {
                                    AssignmentId = x.AssignmentId,

@@ -85,7 +85,12 @@ public class DailyTrackingRecord
     [Column("updated_by")]
     public int? UpdatedBy { get; set; }
 
-    // public ICollection<ImageAttachment> Images { get; set; } = new List<ImageAttachment>();
+    [Column("tenant_id")]
+    [ForeignKey(nameof(tenantMst))]
+    public Guid TenantId { get; set; }
+    public TenantMst tenantMst { get; set; }
 
-}
+        // public ICollection<ImageAttachment> Images { get; set; } = new List<ImageAttachment>();
+
+    }
 }

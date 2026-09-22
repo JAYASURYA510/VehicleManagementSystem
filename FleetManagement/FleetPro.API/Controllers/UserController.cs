@@ -83,10 +83,10 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpGet("getDriverDetailsOnly")]
-        public async Task<List<UserDetailsDto>> GetDriverDetails()
+        public async Task<List<UserDetailsDto>> GetDriverDetails(Guid tenantId)
         {
            var roleData = await context.RoleMsts.Where(x => x.roleName == "Driver").AsNoTracking().FirstOrDefaultAsync();
-           var driverData = await context.UserMaster.Where(x => x.role == roleData.id && x.is_active == true).AsNoTracking().ToListAsync();
+           var driverData = await context.UserMaster.Where(x => x.TenantId == tenantId && x.role == roleData.id && x.is_active == true).AsNoTracking().ToListAsync();
 
            var result = mapper.Map<List<UserDetailsDto>>(driverData);
 
@@ -99,11 +99,11 @@ namespace FleetPro.API.Controllers
         }
 
         [HttpGet("getallUserForSelection")]
-        public async Task<IActionResult> getAllUser()
+        public async Task<IActionResult> getAllUser(Guid tenantId)
         {
             try
             {
-                var allUser = await context.UserMaster.AsNoTracking().Select(
+                var allUser = await context.UserMaster.Where(x => x.TenantId == tenantId).AsNoTracking().Select(
                     x => new
                     {
                         x.userId,

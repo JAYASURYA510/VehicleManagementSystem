@@ -94,6 +94,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   localStorageData = JSON.parse(localStorage.getItem('fleetpro_user') || '{}');
   role = this.localStorageData.role;
   userId = this.localStorageData.userId;
+  private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -173,7 +174,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadUsers(): void {
-    this.api.getUsers().pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.apiService.list(`User/${this.tenandId}/getallUserForSelection`).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response: any) => {
         if (response && Array.isArray(response.message)) {
           this.userList = response.message;
@@ -191,7 +192,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadAllActiveVehicles(): void {
-    this.api.getActiveVehicles().pipe(takeUntil(this.unsubscribe$)).subscribe({
+     this.apiService.list(`VehicleMst/${this.tenandId}/getActiveAllVehicle`).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (res: any) => {
         this.allActiveVehicles = Array.isArray(res) ? res : (res?.data ?? []);
       },
@@ -201,7 +202,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
 
   getVehicleNumber() {
     this.asignRole = UserRole[this.role as keyof typeof UserRole];
-    this.apiService.list(`VehicleAssignment/getUserBasedVehicleDropDown/${this.asignRole}/${this.userId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((response: any) => {
+    this.apiService.list(`VehicleAssignment/${this.tenandId}/getUserBasedVehicleDropDown/${this.asignRole}/${this.userId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((response: any) => {
       this.vehicleList = response?.data;
     });
   }
@@ -215,7 +216,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   getAssignedVehicles() {
     this.asignRole = UserRole[this.role as keyof typeof UserRole];
 
-    this.apiService.list(`VehicleAssignment/getUserBasedAssignedVehicle/${this.asignRole}/${this.userId}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.apiService.list(`VehicleAssignment/${this.tenandId}/getUserBasedAssignedVehicle/${this.asignRole}/${this.userId}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response: any) => {
         const rows = (response?.data ?? []).map((row: AssignedVehicleUser) => ({
           ...row,
@@ -240,7 +241,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
       roleId: roleId,
       userId: this.userId,
     };
-    this.apiService.create(`VehicleAssignment/SearchVehicleAssignments`, searchData).pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.apiService.create(`VehicleAssignment/${this.tenandId}/SearchVehicleAssignments`, searchData).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response: any) => {
         if (response.data.length > 0) {
           const rows = (response?.data ?? []).map((row: AssignedVehicleUser) => ({
@@ -375,7 +376,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
     const assignmentId = assignmentOrUser?.assignmentId || assignmentOrUser?.id || assignmentOrUser;
     this.editingAssignmentId.set(assignmentId);
 
-    this.apiService.list(`VehicleAssignment/GetVehicleAssignmentById/${assignmentId}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.apiService.list(`VehicleAssignment/${this.tenandId}/GetVehicleAssignmentById/${assignmentId}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response: any) => {
         const data = response?.data || response?.message || assignmentOrUser;
         const roleId = parentRow?.roleId || data.roleId;
@@ -452,7 +453,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
     }
     const id = assignmentIdOrUserId;
     if (id != null) {
-      this.apiService.delete(`VehicleAssignment/DeleteVehicleAssignment/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+      this.apiService.delete(`VehicleAssignment/${this.tenandId}/DeleteVehicleAssignment/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
         next: () => {
           this.search();
           this.alert.success('Vehicle assignment deleted successfully.');
@@ -567,7 +568,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
       updatedBy: this.localStorageData.userId
     };
 
-    this.apiService.update('VehicleAssignment/EditVehicleAssignment', payload).pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.apiService.update(`VehicleAssignment/${this.tenandId}/EditVehicleAssignment`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (response: any) => {
         if (response?.success) {
           if (additionalVehicles.length > 0) {
@@ -583,7 +584,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
               updatedBy: this.localStorageData.userId
             };
 
-            this.apiService.create('VehicleAssignment/saveAssignedVehicle', additionalPayload).pipe(takeUntil(this.unsubscribe$)).subscribe({
+            this.apiService.create(`VehicleAssignment/${this.tenandId}/saveAssignedVehicle`, additionalPayload).pipe(takeUntil(this.unsubscribe$)).subscribe({
               next: () => {
                 this.alert.success('Vehicle assignment updated and additional vehicles assigned successfully.');
                 this.closeEditModal();

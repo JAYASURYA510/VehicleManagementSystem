@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FleetPro.API.Controllers.DailyTracking
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{tenantId}")]
     [Authorize]
     [ApiController]
     public class DailyTrackingController : ControllerBase
@@ -20,9 +20,9 @@ namespace FleetPro.API.Controllers.DailyTracking
         }
 
         [HttpPost("SaveDailyTracking")]
-        public async Task<IActionResult> SaveDailyTracking([FromForm] SaveDailyTrackingRequest request)
+        public async Task<IActionResult> SaveDailyTracking(Guid tenantId, [FromForm] SaveDailyTrackingRequest request)
         {
-            var id = await DailyTrackingRepository.SaveDailyTrackingAsync(request);
+            var id = await DailyTrackingRepository.SaveDailyTrackingAsync(tenantId, request);
 
             if (id != Guid.Empty)
             {

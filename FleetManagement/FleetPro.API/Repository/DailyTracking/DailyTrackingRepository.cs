@@ -23,7 +23,7 @@ namespace FleetPro.API.Repository.DailyTracking
             this.environment = environment;
         }
 
-        public async Task<Guid> SaveDailyTrackingAsync(SaveDailyTrackingRequest request)
+        public async Task<Guid> SaveDailyTrackingAsync(Guid tenantId, SaveDailyTrackingRequest request)
         {
             using var transaction = await context.Database.BeginTransactionAsync();
             try
@@ -52,7 +52,8 @@ namespace FleetPro.API.Repository.DailyTracking
                     StatusType =  request.StatusType,
                     IsDelete = false,
                     CreatedAt = request.CreatedDate,
-                    CreatedBy = request.CreatedBy
+                    CreatedBy = request.CreatedBy,
+                    TenantId = tenantId,
                 };
 
                 await dailyTrackingService.AddAsync(tracking);
@@ -118,7 +119,8 @@ namespace FleetPro.API.Repository.DailyTracking
                             ImageType = "dailylog",                         
                             IsDelete = false,
                             CreatedAt = request.CreatedDate,       
-                            CreatedBy = request.CreatedBy      
+                            CreatedBy = request.CreatedBy,
+                            TenantId = tenantId,
                         };
 
                         imageRecords.Add(imageRecord);
