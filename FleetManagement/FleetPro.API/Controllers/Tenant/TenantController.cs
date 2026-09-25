@@ -98,5 +98,20 @@ namespace FleetPro.API.Controllers.Tenant
                 });
             }
         }
+
+        [HttpPut("UpdateAdminData")]
+        public async Task<IActionResult> updateAdmin([FromBody] OnboardClientRequestForUpdate request)
+        {
+            var result = await TenantServiceRepository.updateAdminAsync(request);
+
+            if (result == true)
+            {
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest(false);
+            }
+        }
     }
 }

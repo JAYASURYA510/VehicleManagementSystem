@@ -17,13 +17,6 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="customerId">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Id</th>
-          <td mat-cell *matCellDef="let user">
-            <strong>{{ user.customerId }}</strong>
-          </td>
-        </ng-container>
-
         <ng-container matColumnDef="customerName">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Name</th>
              <td mat-cell *matCellDef="let user">{{ user.customerName }}</td>
@@ -51,12 +44,13 @@
           <th mat-header-cell *matHeaderCellDef>Action</th>
           <td mat-cell *matCellDef="let user" class="actions-cell">
             <div class="action-buttons">
-              <button mat-icon-button class="action-button edit-button" title="Edit" aria-label="Edit user">
+              <button mat-icon-button class="action-button edit-button" title="Edit" aria-label="Edit user" (click)="openAdminDashBoard(user)">
                 <mat-icon>edit</mat-icon>
               </button>
             </div>
           </td>
         </ng-container>
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>

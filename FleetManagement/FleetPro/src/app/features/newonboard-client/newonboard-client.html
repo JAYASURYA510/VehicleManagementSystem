@@ -1,7 +1,13 @@
 <div class="page-container">
 
+  <!-- VIEW MODE BANNER (shown only when embedded in admin-dashboard) -->
+  <!-- <div class="view-mode-banner" *ngIf="viewMode">
+    <i class="fa-solid fa-circle-info"></i>
+    Viewing client profile. Fields are read-only.
+  </div> -->
+
   <!-- PAGE HEADER -->
-  <div class="page-header">
+  <div class="page-header" *ngIf="!viewMode">
     <div>
       <h1>New Onboarding Client </h1>
       <p class="subtitle">
@@ -50,7 +56,7 @@
         <!-- Customer Name -->
         <div class="form-group">
           <label for="customerName">
-            Customer Name
+            Company Name
             <span class="required">*</span>
           </label>
 
@@ -71,7 +77,7 @@
 
 
         <!-- Username -->
-        <div class="form-group">
+        <div *ngIf="!viewMode" class="form-group">
           <label for="userName">
             Username
             <span class="required">*</span>
@@ -92,7 +98,7 @@
           </small>
         </div>
 <!-- PASSWORD -->
-<div class="form-group">
+<div *ngIf="!viewMode" class="form-group">
 
   <label for="password">
     Password
@@ -215,6 +221,12 @@
           </small>
         </div>
 
+        <div *ngIf="viewMode" class="form-group">
+          <label class="Active">
+            <input type="checkbox" formControlName="isAvailable"/>
+            <span>Active</span>
+          </label>
+        </div>
       </div>
 
 
@@ -239,7 +251,7 @@
       <!-- ================================ -->
       <!-- RESET + SUBMIT BUTTONS           -->
       <!-- ================================ -->
-      <div class="form-actions">
+      <div class="form-actions" *ngIf="!viewMode">
 
         <!-- RESET BUTTON -->
         <button
@@ -272,6 +284,22 @@
           <span *ngIf="isSubmitting">
             Saving...
           </span>
+        </button>
+
+      </div>
+
+      <div class="form-actions" *ngIf="viewMode">
+
+        
+        
+        <!-- RESET BUTTON -->
+        <button
+          type="button"
+          class="btn btn-primary btn-update"
+          (click)="updateAdmin()"
+        >
+           <i class="fa-solid fa-edit"></i>
+          Update
         </button>
 
       </div>

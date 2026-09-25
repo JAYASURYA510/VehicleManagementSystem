@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormField, MatOption, MatSelect } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
   selector: 'app-super-admin-list',
@@ -25,7 +25,6 @@ export class SuperAdminList {
 
    displayedColumns: string[] = [
   'id',
-  'customerId',
   'customerName',
   'email',
   'phoneNo',
@@ -33,7 +32,14 @@ export class SuperAdminList {
   'actions'
   ];
 
-  constructor(private apiService : CommanService, private cdr : ChangeDetectorRef){}
+  constructor(private apiService : CommanService, private cdr : ChangeDetectorRef, private router: Router){}
+
+  openAdminDashBoard(user: any): void {
+    this.router.navigate(['/superAdminList/adminDashboard'], {
+      state: { client: user }
+    });
+  }
+
 
   ngOnInit(){
     this.getSuperAdminList();

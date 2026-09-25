@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { CommanService } from '../../core/services/comman.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-onboarding-client-list',
@@ -58,7 +59,7 @@ export class OnboardingClientList implements OnInit, OnDestroy {
   filter : any;
   isfilter: boolean | undefined;
 
-  constructor(private apiService: CommanService, private cdr: ChangeDetectorRef) {}
+  constructor(private apiService: CommanService, private cdr: ChangeDetectorRef,private router : Router) {}
 
   ngOnInit(): void {
     // TODO: load data via apiService
@@ -128,6 +129,11 @@ export class OnboardingClientList implements OnInit, OnDestroy {
     this.updatePaginationInfo();
   }
 
+ openAdminDashBoard(user: any): void {
+    this.router.navigate(['/superAdminList/adminDashboard'], {
+      state: { client: user }
+    });
+  }
   firstPage(): void { this.paginator?.firstPage(); this.updatePaginationInfo(); }
   previousPage(): void { this.paginator?.previousPage(); this.updatePaginationInfo(); }
   nextPage(): void { this.paginator?.nextPage(); this.updatePaginationInfo(); }

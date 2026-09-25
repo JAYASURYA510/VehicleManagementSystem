@@ -7,3 +7,14 @@
 .view-link:hover {
   text-decoration: underline;
 }
+
+.dashboard-button {
+  color: #5d0565 !important;
+  background: #f5e8f6 !important;
+}
+
+.dashboard-button:hover {
+  color: #fff !important;
+  background: #5d0565 !important;
+  border-color: #5d0565 !important;
+}

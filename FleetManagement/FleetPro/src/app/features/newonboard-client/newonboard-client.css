@@ -1,0 +1,27 @@
+/* ── View Mode Banner (shown when embedded as profile in admin-dashboard) ── */
+.view-mode-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  border-radius: 10px;
+  color: #0369a1;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.Active {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+}
+
+.Active input {
+  width: 18px !important;
+  height: 18px !important;
+  accent-color: #d58ad1 !important;
+}

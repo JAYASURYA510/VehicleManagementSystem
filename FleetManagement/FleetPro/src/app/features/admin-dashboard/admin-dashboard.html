@@ -1,0 +1,38 @@
+<div class="page-container">
+    <div class="page-header">
+    <div>
+      <h1>Admin Dashboard</h1>
+      <p class="subtitle">List of Features are Availabe</p>
+    </div>
+
+    <div class="icon-nav">
+      <button
+        *ngFor="let item of navItems"
+        class="icon-nav-btn"
+        [class.icon-nav-btn--active]="activeView === item.view"
+        (click)="setView(item.view)"
+        [title]="item.label"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span class="icon-nav-label">{{ item.label }}</span>
+      </button>
+    </div>
+  </div>
+<div class="admin-dashboard-wrapper">
+  <!-- ===== CONTENT PANEL ===== -->
+  <div class="dashboard-content">
+
+    <!-- Profile View -->
+    <div *ngIf="activeView === 'profile'" class="view-panel">
+      <app-newonboard-client [clientData]="client" [viewMode]="true"></app-newonboard-client>
+    </div>
+
+    <!-- Subscription View -->
+    <div *ngIf="activeView === 'subscription'" class="view-panel">
+      <app-admin-subscription [client]="client"></app-admin-subscription>
+    </div>
+
+  </div>
+
+</div>
+</div>

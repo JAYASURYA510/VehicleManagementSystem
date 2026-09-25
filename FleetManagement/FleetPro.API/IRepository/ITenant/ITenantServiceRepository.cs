@@ -7,5 +7,6 @@ namespace FleetPro.API.IRepository.ITenant
         Task<List<AdminListResponse>> getSuperAdminAsyc();
         Task<List<AdminListResponse>> getAdminDetailsAsyc();
         Task<(bool Success, string Message, object? Data)>OnboardClientAsync(OnboardClientRequest request);
+        Task<bool> updateAdminAsync(OnboardClientRequestForUpdate request);
     }
 }

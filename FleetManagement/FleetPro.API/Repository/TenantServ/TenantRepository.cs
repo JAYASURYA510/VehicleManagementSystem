@@ -196,5 +196,54 @@ namespace FleetPro.API.Repository.TenantServ
                 throw new Exception("facing error while creating the customer");
             }
         }
+
+        public async Task<bool> updateAdminAsync(OnboardClientRequestForUpdate request)
+        {
+            try{
+            if (request == null)
+            {
+                return false;
+            }
+
+            await using var transaction = await context.Database.BeginTransactionAsync();
+
+            var existingTenant = await context.Tenants
+                .SingleOrDefaultAsync(x => x.TenantId == request.TenantId);
+
+            var existingUser = await context.UserMaster
+                .FirstOrDefaultAsync(x =>
+                    x.TenantId == request.TenantId && x.role != 3 && x.role != 4);
+
+            if (existingTenant == null || existingUser == null)
+            {
+                return false;
+            }
+
+            existingTenant.CustomerName = request.CustomerName;
+            existingTenant.EmailId = request.EmailId;
+            existingTenant.PhoneNo = request.PhoneNo;
+            existingTenant.Address = request.Address;
+            existingTenant.GstNo = request.GstNo;
+            existingTenant.PanNo = request.PanNo;
+            existingTenant.IsActive = request.IsActive;
+            existingTenant.UpdatedBy = request.UpdatedBy;
+            existingTenant.UpdatedDate = request.UpdatedDate;
+
+            existingUser.fullName = request.CustomerName;
+            existingUser.emailId = request.EmailId;
+            existingUser.phoneNumber = request.PhoneNo;
+            existingUser.is_active = request.IsActive;
+            existingUser.updated_at = request.UpdatedDate;
+            existingUser.updatedBy = request.UpdatedBy;
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }
