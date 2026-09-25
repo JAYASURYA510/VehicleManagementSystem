@@ -1,186 +1,585 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="save()">
 
-<form [formGroup]="form" (ngSubmit)="save()">
+  <!-- =====================================================
+       PAGE HEADER
+  ====================================================== -->
 
   <div class="page-header">
+
     <div>
-      <h2>Log Daily Expense & Trip Record</h2>
-      <p class="subtitle">Enter vehicle trip and expense details</p>
+
+      <h2>
+        Log Daily Expense & Trip Record
+      </h2>
+
+      <p class="subtitle">
+        Enter vehicle trip and expense details
+      </p>
+
     </div>
+
   </div>
+
+
+  <!-- =====================================================
+       MAIN CARD
+  ====================================================== -->
 
   <div class="card">
 
+
+    <!-- ===================================================
+         VEHICLE + DATE
+    ==================================================== -->
+
     <div class="form-grid cols-2">
-      <div class="form-group">
-        <label>Select Vehicle <span class="required">*</span></label>
-        <select formControlName="vehicleId">
-          <option value="">-- Select a Vehicle --</option>
 
-          @for (v of vehicles(); track v.id) {
-            <option [value]="v.id">
-              {{ v.registrationNumber }} — {{ v.driverName }}
-            </option>
-          }
+
+      <!-- VEHICLE REGISTRATION NUMBER -->
+
+      <div class="form-group">
+
+        <label>
+          Vehicle Registration Number
+
+          <span class="required">
+            *
+          </span>
+
+          <span
+            class="badge-count"
+            *ngIf="vehicleList.length > 0">
+
+            ({{ vehicleList.length }}
+            active vehicles)
+
+          </span>
+        </label>
+
+
+        <select
+          formControlName="vehicleId">
+
+          <option
+            [ngValue]="null">
+
+            Select Vehicle Registration Number
+
+          </option>
+
+
+          <option
+            *ngFor="let vehicle of vehicleList"
+            [ngValue]="vehicle.vehicleId">
+
+            {{ vehicle.registrationNumber }}
+
+          </option>
+
         </select>
+
+
+        <small
+          class="alert alert-danger"
+          *ngIf="isInvalid('vehicleId')">
+
+          Please select a vehicle registration number.
+
+        </small>
+
       </div>
 
+
+      <!-- DATE -->
+
       <div class="form-group">
-        <label>Date <span class="required">*</span></label>
-        <input type="date" formControlName="date" />
+
+        <label>
+          Date
+
+          <span class="required">
+            *
+          </span>
+        </label>
+
+
+        <input
+          type="date"
+          formControlName="date" />
+
       </div>
+
     </div>
+
+
+    <!-- ===================================================
+         DIESEL CHARGES & FUELING
+    ==================================================== -->
 
     <div class="section-title">
+
       Diesel Charges & Fueling
+
     </div>
+
 
     <div class="form-grid">
 
-      <div class="form-group">
-        <label>Fuel Station Name</label>
-        <input
-          formControlName="fuelStation"
-          placeholder="E.g. Shell Ring Road" />
-      </div>
+
+      <!-- FUEL STATION -->
 
       <div class="form-group">
-        <label>Diesel Litres Purchased</label>
+
+        <label>
+          Fuel Station Name
+        </label>
+
+        <input
+          type="text"
+          formControlName="fuelStation"
+          placeholder="E.g. Shell Ring Road" />
+
+      </div>
+
+
+      <!-- DIESEL LITRES -->
+
+      <div class="form-group">
+
+        <label>
+          Diesel Litres Purchased
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="dieselLitres" />
+
       </div>
 
+
+      <!-- DIESEL COST -->
+
       <div class="form-group">
-        <label>Diesel Cost (₹)</label>
+
+        <label>
+          Diesel Cost (₹)
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="dieselCost" />
+
       </div>
 
+
+      <!-- FROM KM -->
+
       <div class="form-group">
-        <label>From Odometer KM <span class="required">*</span></label>
+
+        <label>
+          From Odometer KM
+
+          <span class="required">
+            *
+          </span>
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="fromKm"
           placeholder="Starting KM" />
+
       </div>
 
+
+      <!-- TO KM -->
+
       <div class="form-group">
-        <label>To Odometer KM <span class="required">*</span></label>
+
+        <label>
+          To Odometer KM
+
+          <span class="required">
+            *
+          </span>
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="toKm"
           placeholder="Ending KM" />
+
       </div>
 
+
+      <!-- KM BEFORE FUELING -->
+
       <div class="form-group">
-        <label>KM Before Fueling</label>
+
+        <label>
+          KM Before Fueling
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="kmBeforeFueling"
           placeholder="Odometer before fill" />
+
       </div>
 
     </div>
 
+
+    <!-- ===================================================
+         OTHER OPERATIONAL EXPENSES
+    ==================================================== -->
+
     <div class="section-title">
+
       Other Operational Expenses (₹)
+
     </div>
+
 
     <div class="form-grid cols-4">
 
+
+      <!-- TOLL -->
+
       <div class="form-group">
-        <label>Toll Charges</label>
+
+        <label>
+          Toll Charges
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="tollCharges" />
+
       </div>
 
-      <!-- <div class="form-group">
-        <label>Insurance Share</label>
-        <input
-          type="number"
-          step="0.01"
-          formControlName="insuranceShare" />
-      </div> -->
+
+      <!-- WORKSHOP -->
 
       <div class="form-group">
-        <label>Workshop Expenses</label>
+
+        <label>
+          Workshop Expenses
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="workshopExpenses" />
+
       </div>
 
+
+      <!-- TYRE -->
+
       <div class="form-group">
-        <label>Tyre Maintenance</label>
+
+        <label>
+          Tyre Maintenance
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="tyreMaintenance" />
+
       </div>
 
     </div>
 
+
+    <!-- ===================================================
+         SALARY / RTO / REVENUE / NOTES
+    ==================================================== -->
+
+    <div class="section-title">
+
+      Additional Details & Notes
+
+    </div>
+
+
     <div class="form-grid cols-2">
 
+
+      <!-- DRIVER SALARY -->
+
       <div class="form-group">
-        <label>Driver / Helper Salary</label>
+
+        <label>
+          Driver / Helper Salary
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="driverSalary" />
+
       </div>
 
+
+      <!-- RTO -->
+
       <div class="form-group">
-        <label>RTO Charges / Challan</label>
+
+        <label>
+          RTO Charges / Challan
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="rtoCharges" />
+
       </div>
 
+
+      <!-- TRIP REVENUE -->
+
       <div class="form-group">
-        <label>Trip Revenue (Returns)</label>
+
+        <label>
+          Trip Revenue (Returns)
+        </label>
+
         <input
           type="number"
           step="0.01"
           formControlName="tripRevenue" />
+
       </div>
 
+
+      <!-- NOTES -->
+
       <div class="form-group">
-        <label>Notes</label>
+
+        <label>
+          Notes
+        </label>
+
         <input
           type="text"
           formControlName="notes"
           placeholder="Enter notes" />
+
       </div>
 
     </div>
 
+
+    <!-- ===================================================
+         IMAGE UPLOAD & PREVIEW SECTION
+    ==================================================== -->
+
+    <div class="section-title">
+
+      Trip / Expense Images
+
+    </div>
+
+
+    <div class="form-group">
+
+
+      <label>
+        Upload Images
+      </label>
+
+
+      <!-- IMPORTANT:
+           #imageInput is required by @ViewChild
+      -->
+
+      <input
+        #imageInput
+        type="file"
+        accept=".jpg,.jpeg,.png,.webp"
+        multiple
+        (change)="onImagesSelected($event)" />
+
+
+      <small>
+        Allowed formats:
+        JPG, JPEG, PNG, WEBP
+      </small>
+
+
+      <!-- =================================================
+           SELECTED IMAGES (PREVIEW LIST)
+      ================================================== -->
+
+      @if (selectedImagePreviews.length > 0) {
+
+        <div class="selected-images-grid">
+
+          @for (
+            item of selectedImagePreviews;
+            track item.id
+          ) {
+
+            <div class="image-item-card">
+
+              <!-- Thumbnail -->
+              <div
+                class="image-thumb-wrap"
+                (click)="openPreviewModal(item)"
+                title="Click to preview larger image">
+
+                <img
+                  [src]="item.previewUrl"
+                  [alt]="item.name"
+                  class="image-thumbnail" />
+
+              </div>
+
+              <!-- Info -->
+              <div class="image-item-info">
+
+                <span
+                  class="image-file-name"
+                  (click)="openPreviewModal(item)"
+                  title="Click to view larger image">
+                  {{ item.name }}
+                </span>
+
+                <span class="image-file-size">
+                  {{ formatFileSize(item.size) }}
+                </span>
+
+              </div>
+
+              <!-- Remove button -->
+              <button
+                type="button"
+                class="remove-image-btn"
+                (click)="removeImage(item.id)"
+                title="Remove image">
+
+                ✕
+
+              </button>
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+    </div>
+
+
+    <!-- ===================================================
+         FORM ACTIONS
+    ==================================================== -->
+
     <div class="form-actions">
+
+
+      <!-- RESET -->
+
       <button
-        type="reset"
-        class="btn btn-outline">
-         <i class="fa-solid fa-arrow-rotate-left"></i>
+        type="button"
+        class="btn btn-outline"
+        (click)="onReset()">
+
+        <i
+          class="fa-solid fa-arrow-rotate-left">
+        </i>
+
         Reset
+
       </button>
+
+
+      <!-- SUBMIT -->
 
       <button
         type="submit"
         class="btn btn-primary"
         [disabled]="form.invalid">
-        <i class="fa-solid fa-check"></i>
+
+        <i
+          class="fa-solid fa-check">
+        </i>
+
         Submit Record
+
       </button>
+
+
     </div>
 
   </div>
+
+  <!-- =====================================================
+       IMAGE PREVIEW MODAL POPUP
+  ====================================================== -->
+
+  @if (previewModalImage) {
+
+    <div
+      class="modal-overlay"
+      (click)="closePreviewModal()">
+
+      <div
+        class="modal-card image-preview-modal-card"
+        (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+
+          <div class="modal-title-wrap">
+
+            <h3>
+              {{ previewModalImage.name }}
+            </h3>
+
+            <span class="image-preview-meta">
+              {{ formatFileSize(previewModalImage.size) }} • {{ previewModalImage.type }}
+            </span>
+
+          </div>
+
+          <button
+            type="button"
+            class="btn-icon"
+            (click)="closePreviewModal()"
+            title="Close preview">
+
+            ✕
+
+          </button>
+
+        </div>
+
+        <div class="image-preview-modal-body">
+
+          <img
+            [src]="previewModalImage.previewUrl"
+            [alt]="previewModalImage.name"
+            class="modal-large-image" />
+
+        </div>
+
+      </div>
+
+    </div>
+
+  }
 
 </form>
