@@ -19,7 +19,7 @@ namespace FleetPro.API.Repository.ImageAttachmentFolder
             {
                 context.ImageAttachments.AddRange(images);
 
-                await context.SaveChangesAsync();
+                //await context.SaveChangesAsync();
             }
     }
     

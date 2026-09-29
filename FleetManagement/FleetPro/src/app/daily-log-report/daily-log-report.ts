@@ -23,6 +23,7 @@ import { ApiService } from '../core/services/api.service';
 import { CommanService } from '../core/services/comman.service';
 import { ImageStorageService, StoredImageRecord } from '../core/services/image-storage.service';
 import { UserRole } from '../core/models';
+import { DateTimePickerService } from '../core/services/datetime-picker.service';
 
 export interface Vehicle {
   vehicleId: any;
@@ -72,6 +73,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
   private readonly alert = inject(ToastrService);
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly dateTimePickerService = inject(DateTimePickerService);
 
   @ViewChild('imageInput')
   imageInput!: ElementRef<HTMLInputElement>;
@@ -106,47 +108,22 @@ export class DailyLogReport implements OnInit, OnDestroy {
   // =====================================================
 
   form = this.fb.group({
-
-    vehicleId: [
-      null as any,
-      Validators.required
-    ],
-
-    date: [
-      new Date().toISOString().substring(0, 10),
-      Validators.required
-    ],
-
+    vehicleId: [null as any,Validators.required],
+    date: [new Date().toISOString().substring(0, 10),Validators.required],
+    fromLocation: [null,Validators.required],
+    toLocation: [null,Validators.required],
     fuelStation: [''],
-
     dieselLitres: [0],
-
     dieselCost: [0],
-
-    fromKm: [
-      0,
-      Validators.required
-    ],
-
-    toKm: [
-      0,
-      Validators.required
-    ],
-
+    fromKm: [0,Validators.required],
+    toKm: [0,Validators.required],
     kmBeforeFueling: [0],
-
     tollCharges: [0],
-
     workshopExpenses: [0],
-
     tyreMaintenance: [0],
-
     driverSalary: [0],
-
     rtoCharges: [0],
-
     tripRevenue: [0],
-
     notes: ['']
   });
 
@@ -461,40 +438,26 @@ export class DailyLogReport implements OnInit, OnDestroy {
   // =====================================================
 
   async onReset(): Promise<void> {
-
     this.form.reset({
-
       date:
         new Date()
           .toISOString()
           .substring(0, 10),
-
       vehicleId: null,
-
+      fromLocation: null,
+      toLocation: null,
       dieselLitres: 0,
-
       dieselCost: 0,
-
       fromKm: 0,
-
       toKm: 0,
-
       kmBeforeFueling: 0,
-
       tollCharges: 0,
-
       workshopExpenses: 0,
-
       tyreMaintenance: 0,
-
       driverSalary: 0,
-
       rtoCharges: 0,
-
       tripRevenue: 0,
-
       fuelStation: '',
-
       notes: ''
     });
 
@@ -590,147 +553,48 @@ export class DailyLogReport implements OnInit, OnDestroy {
     // ===================================================
 
     // Only ONE vehicle ID is submitted
-    formData.append(
-      'VehicleId',
-      value.vehicleId?.toString() ?? ''
-    );
-
-    formData.append(
-      'TripDate',
-      value.date ?? ''
-    );
-
-    formData.append(
-      'FuelStation',
-      value.fuelStation ?? ''
-    );
-
-    formData.append(
-      'DieselLitres',
-      value.dieselLitres?.toString() ?? '0'
-    );
-
-    formData.append(
-      'DieselCost',
-      value.dieselCost?.toString() ?? '0'
-    );
-
-    formData.append(
-      'FromKm',
-      value.fromKm?.toString() ?? '0'
-    );
-
-    formData.append(
-      'ToKm',
-      value.toKm?.toString() ?? '0'
-    );
-
-    formData.append(
-      'KmBeforeFueling',
-      value.kmBeforeFueling?.toString() ?? '0'
-    );
-
-    formData.append(
-      'TollCharges',
-      value.tollCharges?.toString() ?? '0'
-    );
-
-    formData.append(
-      'WorkshopExpenses',
-      value.workshopExpenses?.toString() ?? '0'
-    );
-
-    formData.append(
-      'TyreMaintenance',
-      value.tyreMaintenance?.toString() ?? '0'
-    );
-
-    formData.append(
-      'DriverSalary',
-      value.driverSalary?.toString() ?? '0'
-    );
-
-    formData.append(
-      'RtoCharges',
-      value.rtoCharges?.toString() ?? '0'
-    );
-
-    formData.append(
-      'TripRevenue',
-      value.tripRevenue?.toString() ?? '0'
-    );
-
-    formData.append(
-      'Notes',
-      value.notes ?? ''
-    );
-
-    formData.append(
-      'TenantId',
-      currentTenantId
-    );
-
-    formData.append(
-      'CreatedBy',
-      currentUserId.toString()
-    );
-
-    formData.append(
-      'UpdatedBy',
-      currentUserId.toString()
-    );
+    formData.append('VehicleId',value.vehicleId?.toString() ?? '');
+    formData.append('TripDate',this.dateTimePickerService.toApiDateTime(value.date ?? '') ?? '');
+    formData.append('FromLocation',(value.fromLocation ?? '').toUpperCase());
+    formData.append('ToLocation',(value.toLocation ?? '').toUpperCase());
+    formData.append('FuelStation',(value.fuelStation ?? '').toUpperCase());
+    formData.append('DieselLitres',value.dieselLitres?.toString() ?? '0');
+    formData.append('DieselCost',value.dieselCost?.toString() ?? '0');
+    formData.append('FromKm',value.fromKm?.toString() ?? '0');
+    formData.append('ToKm',value.toKm?.toString() ?? '0');
+    formData.append('KmBeforeFueling',value.kmBeforeFueling?.toString() ?? '0');
+    formData.append('TollCharges',value.tollCharges?.toString() ?? '0');
+    formData.append('WorkshopExpenses',value.workshopExpenses?.toString() ?? '0');
+    formData.append('TyreMaintenance',value.tyreMaintenance?.toString() ?? '0');
+    formData.append('DriverSalary',value.driverSalary?.toString() ?? '0');
+    formData.append('RtoCharges',value.rtoCharges?.toString() ?? '0');
+    formData.append('TripRevenue',value.tripRevenue?.toString() ?? '0');
+    formData.append('Notes',value.notes ?? '');
+    formData.append('TenantId',currentTenantId);
+    formData.append('StatusType', '1');
+    formData.append('CreatedBy',currentUserId.toString());
+    formData.append('CreatedDate',this.dateTimePickerService.toApiDateTime(new Date().toISOString()) ?? '');
+    formData.append('UpdatedBy',currentUserId.toString());
 
     // ===================================================
     // IMAGE ATTACHMENTS
     // ===================================================
 
     const imageAttachments:
-      ImageAttachment[] =
-      actualFiles.map(
-        (image) => {
-
-          const extension =
-            image.name.includes('.')
-              ? image.name.substring(
-                  image.name.lastIndexOf('.')
-                )
-              : '';
-
+      ImageAttachment[] = actualFiles.map((image) => {
+          const extension = image.name.includes('.') ? image.name.substring(image.name.lastIndexOf('.')) : '';
           return {
-
             dailyTrackingId: null,
-
-            fileName:
-              image.name,
-
-            filePath:
-              '',
-
-            fileType:
-              image.type ||
-              extension ||
-              'image/jpeg',
-
-            imageType:
-              'DailyLog',
-
-            isDelete:
-              false,
-
-            createdAt:
-              nowIso,
-
-            createdBy:
-              currentUserId,
-
-            updatedAt:
-              nowIso,
-
-            updatedBy:
-              currentUserId,
-
-            tenantId:
-              currentTenantId
+            fileName: image.name,
+            filePath: '',
+            fileType: image.type || extension ||'image/jpeg',
+            imageType:'DailyLog',
+            isDelete: false,
+            createdAt: nowIso,
+            createdBy: currentUserId,
+            updatedAt: nowIso,
+            updatedBy: currentUserId,
+            tenantId: currentTenantId
           };
         }
       );
@@ -739,20 +603,9 @@ export class DailyLogReport implements OnInit, OnDestroy {
     // APPEND IMAGE FILES
     // ===================================================
 
-    actualFiles.forEach(
-      (image) => {
-
-        formData.append(
-          'Images',
-          image,
-          image.name
-        );
-
-        formData.append(
-          'files',
-          image,
-          image.name
-        );
+    actualFiles.forEach((image) => {
+      formData.append('Images',image,image.name);
+      formData.append('files',image,image.name);
       }
     );
 
@@ -760,185 +613,54 @@ export class DailyLogReport implements OnInit, OnDestroy {
     // JSON IMAGE ATTACHMENTS
     // ===================================================
 
-    formData.append(
-      'ImageAttachmentsJson',
-      JSON.stringify(
-        imageAttachments
-      )
-    );
-
-    formData.append(
-      'imageAttachments',
-      JSON.stringify(
-        imageAttachments
-      )
-    );
+    formData.append('ImageAttachmentsJson',JSON.stringify(imageAttachments));
+    formData.append('imageAttachments',JSON.stringify(imageAttachments));
 
     // ===================================================
     // INDEXED MODEL BINDER PROPERTIES
     // ===================================================
 
-    imageAttachments.forEach(
-      (att, i) => {
-
+    imageAttachments.forEach((att, i) => {
         // PascalCase
-        formData.append(
-          `ImageAttachments[${i}].FileName`,
-          att.fileName
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].FilePath`,
-          att.filePath
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].FileType`,
-          att.fileType
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].ImageType`,
-          att.imageType
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].IsDelete`,
-          att.isDelete.toString()
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].CreatedAt`,
-          att.createdAt
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].CreatedBy`,
-          att.createdBy.toString()
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].UpdatedAt`,
-          att.updatedAt
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].UpdatedBy`,
-          att.updatedBy.toString()
-        );
-
-        formData.append(
-          `ImageAttachments[${i}].TenantId`,
-          att.tenantId
-        );
-
+        formData.append(`ImageAttachments[${i}].FileName`,att.fileName);
+        formData.append(`ImageAttachments[${i}].FilePath`,att.filePath);
+        formData.append(`ImageAttachments[${i}].FileType`,att.fileType);
+        formData.append(`ImageAttachments[${i}].ImageType`,att.imageType);
+        formData.append(`ImageAttachments[${i}].IsDelete`,att.isDelete.toString());
+        formData.append(`ImageAttachments[${i}].CreatedAt`,att.createdAt);
+        formData.append(`ImageAttachments[${i}].CreatedBy`,att.createdBy.toString());
+        formData.append(`ImageAttachments[${i}].UpdatedAt`,att.updatedAt);
+        formData.append(`ImageAttachments[${i}].UpdatedBy`,att.updatedBy.toString());
+        formData.append(`ImageAttachments[${i}].TenantId`,att.tenantId);
         // camelCase
-        formData.append(
-          `imageAttachments[${i}].fileName`,
-          att.fileName
-        );
-
-        formData.append(
-          `imageAttachments[${i}].filePath`,
-          att.filePath
-        );
-
-        formData.append(
-          `imageAttachments[${i}].fileType`,
-          att.fileType
-        );
-
-        formData.append(
-          `imageAttachments[${i}].imageType`,
-          att.imageType
-        );
-
-        formData.append(
-          `imageAttachments[${i}].isDelete`,
-          att.isDelete.toString()
-        );
-
-        formData.append(
-          `imageAttachments[${i}].createdAt`,
-          att.createdAt
-        );
-
-        formData.append(
-          `imageAttachments[${i}].createdBy`,
-          att.createdBy.toString()
-        );
-
-        formData.append(
-          `imageAttachments[${i}].updatedAt`,
-          att.updatedAt
-        );
-
-        formData.append(
-          `imageAttachments[${i}].updatedBy`,
-          att.updatedBy.toString()
-        );
-
-        formData.append(
-          `imageAttachments[${i}].tenantId`,
-          att.tenantId
-        );
+        formData.append(`imageAttachments[${i}].fileName`,att.fileName);
+        formData.append(`imageAttachments[${i}].filePath`,att.filePath);
+        formData.append(`imageAttachments[${i}].fileType`,att.fileType);
+        formData.append(`imageAttachments[${i}].imageType`,att.imageType);
+        formData.append(`imageAttachments[${i}].isDelete`,att.isDelete.toString());
+        formData.append(`imageAttachments[${i}].createdAt`,att.createdAt);
+        formData.append(`imageAttachments[${i}].createdBy`,att.createdBy.toString());
+        formData.append(`imageAttachments[${i}].updatedAt`,att.updatedAt);
+        formData.append(`imageAttachments[${i}].updatedBy`,att.updatedBy.toString());
+        formData.append(`imageAttachments[${i}].tenantId`,att.tenantId);
       }
     );
 
-    // ===================================================
-    // DEBUG
-    // ===================================================
-
-    console.log(
-      'FormData payload:'
-    );
-
-    formData.forEach(
-      (val, key) => {
-        console.log(
-          key,
-          val
-        );
-      }
-    );
-
-    // ===================================================
-    // API CALL
-    // ===================================================
-
-    this.api
-      .post(
-        'dailyRecords',
-        formData
-      )
-      .subscribe({
-
-        next: async (response) => {
-
-          console.log(
-            'Save response:',
-            response
-          );
-
-          this.alert.success(
-            'Record Saved Successfully'
-          );
-
-          await this.onReset();
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Save error:',
-            error
-          );
-
-          this.alert.error(
-            'Failed to save record.'
-          );
+    this.apiService.create(`DailyTracking/${this.tenandId}/SaveDailyTracking`, formData).pipe(takeUntil(this.unsubscribe$)).subscribe({
+       next: (response: any) => {
+        if(response.success == true){
+          this.alert.success('Daily tracking saved successfully.');
+          this.onReset();
         }
-      });
+        else{
+            this.alert.error('Failed to Save Daily tracking. Please try again.');
+        }
+       },
+        error: (error: any) => {
+          this.alert.error('Failed to Save Daily tracking. Please try again.');
+          this.onReset();
+        }
+    });
   }
 
   // =====================================================

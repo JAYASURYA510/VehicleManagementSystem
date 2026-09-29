@@ -132,7 +132,7 @@ namespace FleetPro.API.Repository.DailyTracking
                        await imageRepository.AddRangeAsync(imageRecords);
                     }
                 }
-
+                await context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return tracking.Id;
             
