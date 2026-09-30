@@ -36,5 +36,13 @@ namespace FleetPro.API.Controllers.DailyTracking
 
             return BadRequest();
         }
+
+        [HttpPost("getDailyTrakingBySearch/{RoleId}/{UserId}")]
+        public async Task<IActionResult> getDailyTracking(Guid tenantId, int RoleId, int UserId)
+        {
+            var result = await DailyTrackingRepository.getDailyTrackingAsync(tenantId, RoleId, UserId);
+
+            return Ok(result);
+        }
     }
 }

@@ -4,6 +4,7 @@ using FleetPro.API.Data.Entitys;
 using FleetPro.API.DTOs;
 using FleetPro.API.IRepository.IDailyTracking;
 using FleetPro.API.IRepository.IImageAttachment;
+using Microsoft.EntityFrameworkCore;
 
 namespace FleetPro.API.Repository.DailyTracking
 {
@@ -136,6 +137,161 @@ namespace FleetPro.API.Repository.DailyTracking
                 await transaction.CommitAsync();
                 return tracking.Id;
             
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while saving data.", ex);
+            }
+        }
+
+        public async Task<List<DailyTrackingSearch>> getDailyTrackingAsync(Guid tenantId, int RoleId, int UserId)
+        {
+            try
+            {
+                var trakingResult = new List<DailyTrackingSearch>();
+                if (RoleId == 1 || RoleId == 2)
+                {
+                    var trakingData = await context.DailyTrackingRecords.AsNoTracking().Where(
+                            x => x.TenantId == tenantId).ToListAsync();
+
+                        var result = (
+                            from track in trakingData
+                            join vehicle in context.VehicleMsts.AsNoTracking()
+                              on track.VehicleId equals vehicle.VehicleId
+                              select new DailyTrackingSearch
+                              {
+                                TenantId = track.TenantId,
+                                VehicleId = track.VehicleId,
+                                RegistrationNumber = vehicle.RegistrationNumber,
+                                TripDate = track.TripDate,
+                                FromLocation = track.FromLocation,
+                                ToLocation = track.ToLocation,
+                                FuelStation = track.FuelStation,
+                                DieselCost = track.DieselCost,
+                                FromKm = track.FromKm,
+                                ToKm = track.ToKm,
+                                KmBeforeFueling = track.KmBeforeFueling,
+                                TollCharges = track.TollCharges,
+                                WorkshopExpenses = track.WorkshopExpenses,
+                                TyreMaintenance = track.TyreMaintenance,
+                                DriverSalary = track.DriverSalary,
+                                RtoCharges = track.RtoCharges,
+                                TripRevenue = track.TripRevenue,
+                                OtherExpenses = track.OtherExpenses,
+                                Notes = track.Notes,
+                                StatusType = track.StatusType
+                              }
+                        ).ToList();
+
+                        if(result != null)
+                        {
+                            foreach (var item in result)
+                            {
+                                var data = new DailyTrackingSearch
+                                {
+                                    TenantId = item.TenantId,
+                                    VehicleId = item.VehicleId,
+                                    RegistrationNumber = item.RegistrationNumber,
+                                    TripDate = item.TripDate,
+                                    FromLocation = item.FromLocation,
+                                    ToLocation = item.ToLocation,
+                                    FuelStation = item.FuelStation,
+                                    DieselCost = item.DieselCost,
+                                    FromKm = item.FromKm,
+                                    ToKm = item.ToKm,
+                                    KmBeforeFueling = item.KmBeforeFueling,
+                                    TollCharges = item.TollCharges,
+                                    WorkshopExpenses = item.WorkshopExpenses,
+                                    TyreMaintenance = item.TyreMaintenance,
+                                    DriverSalary = item.DriverSalary,
+                                    RtoCharges = item.RtoCharges,
+                                    TripRevenue = item.TripRevenue,
+                                    OtherExpenses = item.OtherExpenses,
+                                    Notes = item.Notes,
+                                    StatusType = item.StatusType
+                                };
+                                trakingResult.Add(data);
+                            }
+                            return trakingResult;
+                        }
+                        return trakingResult;
+                }
+                else
+                {
+                    var assignedVehicleIds = await context.VehicleUserAssignments
+                        .Where(x => x.TenantId == tenantId && x.RoleId == RoleId && x.UserId == UserId && x.IsActive)
+                        .Select(x => x.VehicleId)
+                        .ToListAsync();
+
+                    if (assignedVehicleIds.Any())
+                    {
+                        var trakingData = await context.DailyTrackingRecords.AsNoTracking().Where(
+                            x => assignedVehicleIds.Contains(x.VehicleId) && x.TenantId == tenantId && x.CreatedBy == UserId).ToListAsync();
+
+                        var result = (
+                            from track in trakingData
+                            join vehicle in context.VehicleMsts.AsNoTracking()
+                              on track.VehicleId equals vehicle.VehicleId
+                              select new DailyTrackingSearch
+                              {
+                                TenantId = track.TenantId,
+                                VehicleId = track.VehicleId,
+                                RegistrationNumber = vehicle.RegistrationNumber,
+                                TripDate = track.TripDate,
+                                FromLocation = track.FromLocation,
+                                ToLocation = track.ToLocation,
+                                FuelStation = track.FuelStation,
+                                DieselCost = track.DieselCost,
+                                FromKm = track.FromKm,
+                                ToKm = track.ToKm,
+                                KmBeforeFueling = track.KmBeforeFueling,
+                                TollCharges = track.TollCharges,
+                                WorkshopExpenses = track.WorkshopExpenses,
+                                TyreMaintenance = track.TyreMaintenance,
+                                DriverSalary = track.DriverSalary,
+                                RtoCharges = track.RtoCharges,
+                                TripRevenue = track.TripRevenue,
+                                OtherExpenses = track.OtherExpenses,
+                                Notes = track.Notes,
+                                StatusType = track.StatusType
+                              }
+                        ).ToList();
+
+                        if(result != null)
+                        {
+                            foreach (var item in result)
+                            {
+                                var data = new DailyTrackingSearch
+                                {
+                                    TenantId = item.TenantId,
+                                    VehicleId = item.VehicleId,
+                                    RegistrationNumber = item.RegistrationNumber,
+                                    TripDate = item.TripDate,
+                                    FromLocation = item.FromLocation,
+                                    ToLocation = item.ToLocation,
+                                    FuelStation = item.FuelStation,
+                                    DieselCost = item.DieselCost,
+                                    FromKm = item.FromKm,
+                                    ToKm = item.ToKm,
+                                    KmBeforeFueling = item.KmBeforeFueling,
+                                    TollCharges = item.TollCharges,
+                                    WorkshopExpenses = item.WorkshopExpenses,
+                                    TyreMaintenance = item.TyreMaintenance,
+                                    DriverSalary = item.DriverSalary,
+                                    RtoCharges = item.RtoCharges,
+                                    TripRevenue = item.TripRevenue,
+                                    OtherExpenses = item.OtherExpenses,
+                                    Notes = item.Notes,
+                                    StatusType = item.StatusType
+                                };
+                                trakingResult.Add(data);
+                            }
+                            return trakingResult;
+                        }
+                         return trakingResult;
+                    }
+                }
+                 return trakingResult;
             }
             catch (Exception ex)
             {
