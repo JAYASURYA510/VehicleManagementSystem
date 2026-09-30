@@ -20,3 +20,13 @@
 # SQLite
 *.db-shm
 *.db-wal
+
+# Ignore image files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.bmp
+*.svg
+*.ico
