@@ -1,1 +1,7 @@
-/* uses global styles */
+.custom-table th {
+  background: #f0eeee;
+  color: #7e3285;
+  padding: 12px;
+  font-weight: bolder;
+  font-size: 15px;
+}

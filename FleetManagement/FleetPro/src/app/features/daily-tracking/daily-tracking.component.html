@@ -3,69 +3,472 @@
     <h1>Daily Tracking</h1>
     <p class="subtitle">Log daily trip and expense records for your vehicles</p>
   </div>
- <button class="btn btn-primary" (click)="OpenCreate()">
-  + Log Daily Record
-</button>
+  <button class="btn btn-primary" (click)="OpenCreate()">
+    + Log Daily Record
+  </button>
 </div>
 
 <div class="filter-panel">
+
+  <!-- Search -->
   <div class="form-group">
-    <label>Vehicle</label>
-    <select [(ngModel)]="filterVehicleId">
-      <option value="">All Vehicles</option>
-      @for (v of vehicles(); track v.id) {
-        <option [value]="v.id">{{ v.registrationNumber }}</option>
-      }
-    </select>
+    <label>Search</label>
+    <input
+      type="text"
+      
+      placeholder="Search registration number..."
+    />
   </div>
+
+  <!-- From Date -->
   <div class="form-group">
     <label>From</label>
-    <input type="date" [(ngModel)]="filterFrom" />
+    <input
+      type="date"
+      [(ngModel)]="filterFrom"
+    />
   </div>
+
+  <!-- To Date -->
   <div class="form-group">
     <label>To</label>
-    <input type="date" [(ngModel)]="filterTo" />
+    <input
+      type="date"
+      [(ngModel)]="filterTo"
+    />
   </div>
-  <button class="btn btn-primary" (click)="load()">🔽 Filter</button>
-</div>
 
+  <!-- Filter Button -->
+  <button
+    class="btn btn-primary"
+    (click)="load()">
+    🔽 Filter
+  </button>
+
+</div>
 <div class="card">
-  @if (loading()) {
-    <div class="empty">Loading records...</div>
-  } @else {
-    <div class="table-responsive">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Vehicle</th>
-            <th>Total Spend</th>
-            <th>Trip Revenue</th>
-            <th>Net</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (r of records(); track r.id) {
-            <tr>
-              <td>{{ r.date | date:'mediumDate' }}</td>
-              <td><strong>{{ r.registrationNumber }}</strong></td>
-              <td>{{ r.totalSpend | currency:'INR':'symbol':'1.0-0' }}</td>
-              <td>{{ r.tripRevenue | currency:'INR':'symbol':'1.0-0' }}</td>
-              <td [class.text-success]="r.netAmount >= 0" [class.text-danger]="r.netAmount < 0">
-                {{ r.netAmount | currency:'INR':'symbol':'1.0-0' }}
-              </td>
-              <td>
-                <button class="btn-icon" (click)="deleteRecord(r.id)">🗑</button>
-              </td>
-            </tr>
-          } @empty {
-            <tr><td colspan="6" class="empty">No daily records found. Click "+ Log Daily Record" to add one.</td></tr>
-          }
-        </tbody>
+
+  <div class="card-toolbar">
+  </div>
+
+  <div class="table-responsive">
+
+    <div class="mat-elevation-z2">
+
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        class="custom-table"
+        matSort
+      >
+
+        <!-- ==================== S.No ==================== -->
+        <ng-container matColumnDef="serialNo">
+
+          <th mat-header-cell *matHeaderCellDef>
+            S.No
+          </th>
+
+          <td mat-cell *matCellDef="let r; let i = index">
+            {{ (paginator?.pageIndex || 0) * pageSize + i + 1 }}
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== Registration Number ==================== -->
+        <ng-container matColumnDef="registrationNumber">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Registration Number
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            <strong>
+              {{ r.registrationNumber || '-' }}
+            </strong>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== Trip Date ==================== -->
+        <ng-container matColumnDef="tripDate">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Trip Date
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            {{ (r.tripDate | date:'dd/MM/yyyy') || '-' }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== From Location ==================== -->
+        <ng-container matColumnDef="fromLocation">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            From Location
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            {{ r.fromLocation || '-' }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== To Location ==================== -->
+        <ng-container matColumnDef="toLocation">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            To Location
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            {{ r.toLocation || '-' }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== Diesel Litres ==================== -->
+        <ng-container matColumnDef="dieselLitres">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Diesel Litres
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            {{ r.dieselLitres ?? 0 }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== Diesel Cost ==================== -->
+        <ng-container matColumnDef="dieselCost">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            Diesel Cost
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            {{
+              r.dieselCost != null
+                ? (r.dieselCost | currency:'INR':'symbol':'1.0-0')
+                : '₹0'
+            }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== From KM ==================== -->
+        <ng-container matColumnDef="fromKm">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            From KM
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            {{ r.fromKm ?? 0 }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== To KM ==================== -->
+        <ng-container matColumnDef="toKm">
+
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            To KM
+          </th>
+
+          <td mat-cell *matCellDef="let r">
+
+            {{ r.toKm ?? 0 }}
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== Actions ==================== -->
+        <ng-container matColumnDef="actions">
+
+          <th mat-header-cell *matHeaderCellDef>
+            Actions
+          </th>
+
+          <td
+            mat-cell
+            *matCellDef="let r"
+            class="actions-cell"
+          >
+
+            <div class="action-buttons">
+
+              <!-- Edit -->
+              <button
+                mat-icon-button
+                class="action-button edit-button"
+                title="Edit"
+                aria-label="Edit daily record"
+                (click)="editRecord(r)"
+              >
+
+                <mat-icon>
+                  edit
+                </mat-icon>
+
+              </button>
+
+
+              <!-- Delete -->
+              <button
+                mat-icon-button
+                class="action-button delete-button"
+                title="Delete"
+                aria-label="Delete daily record"
+                (click)="deleteRecord(r)"
+              >
+
+                <mat-icon>
+                  delete
+                </mat-icon>
+
+              </button>
+
+            </div>
+
+          </td>
+
+        </ng-container>
+
+
+        <!-- ==================== Header Row ==================== -->
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns"
+        ></tr>
+
+
+        <!-- ==================== Data Row ==================== -->
+
+        <tr
+          mat-row
+          *matRowDef="
+            let row;
+            columns: displayedColumns
+          "
+        ></tr>
+
+
+        <!-- ==================== No Data ==================== -->
+
+        <tr
+          class="mat-row"
+          *matNoDataRow
+        >
+
+          <td
+            [attr.colspan]="displayedColumns.length"
+            class="empty"
+          >
+            No daily records found
+          </td>
+
+        </tr>
+
       </table>
+
+
+      <!-- ================================================= -->
+      <!-- Custom Paginator -->
+      <!-- ================================================= -->
+
+      <div class="custom-paginator">
+
+
+        <!-- ==================== Page Size ==================== -->
+
+        <div
+          class="page-size"
+          style="
+            font-family:
+              'Plus Jakarta Sans',
+              system-ui,
+              sans-serif;
+          "
+        >
+
+          <span>
+            Item per page :
+          </span>
+
+
+          <mat-form-field
+            appearance="fill"
+            class="page-size-select"
+          >
+
+            <mat-select
+              [value]="pageSize || 5"
+              [placeholder]="
+                (pageSize || 5).toString()
+              "
+              (selectionChange)="
+                changePageSize($event.value)
+              "
+            >
+
+              <mat-option
+                *ngFor="
+                  let size of [5, 10, 20, 50]
+                "
+                [value]="size"
+              >
+
+                {{ size }}
+
+              </mat-option>
+
+            </mat-select>
+
+          </mat-form-field>
+
+        </div>
+        <!-- ==================== Page Info ==================== -->
+        <div class="page-info">
+
+          Showing
+          {{ startRecord }}
+          -
+          {{ endRecord }}
+          of
+          {{ totalRecords }}
+
+        </div>
+
+
+        <!-- ==================== Page Navigation ==================== -->
+
+        <div class="page-nav">
+
+
+          <!-- First Page -->
+          <button
+            mat-icon-button
+            (click)="firstPage()"
+            [disabled]="
+              !paginator ||
+              paginator.pageIndex === 0
+            "
+          >
+
+            <mat-icon>
+              first_page
+            </mat-icon>
+
+          </button>
+
+
+          <!-- Previous Page -->
+          <button
+            mat-icon-button
+            (click)="previousPage()"
+            [disabled]="
+              !paginator ||
+              paginator.pageIndex === 0
+            "
+          >
+
+            <mat-icon>
+              chevron_left
+            </mat-icon>
+
+          </button>
+
+
+          <!-- Next Page -->
+          <button
+            mat-icon-button
+            (click)="nextPage()"
+            [disabled]="
+              !paginator ||
+              paginator.pageIndex >= totalPages - 1
+            "
+          >
+
+            <mat-icon>
+              chevron_right
+            </mat-icon>
+
+          </button>
+
+
+          <!-- Last Page -->
+          <button
+            mat-icon-button
+            (click)="lastPage()"
+            [disabled]="
+              !paginator ||
+              paginator.pageIndex >= totalPages - 1
+            "
+          >
+
+            <mat-icon>
+              last_page
+            </mat-icon>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================================================= -->
+      <!-- Hidden Material Paginator -->
+      <!-- ================================================= -->
+
+      <mat-paginator
+        #paginator
+        [length]="totalRecords"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[
+          5,
+          10,
+          20,
+          50
+        ]"
+        style="display: none"
+      >
+
+      </mat-paginator>
+
     </div>
-  }
+
+  </div>
+
 </div>
 
 
