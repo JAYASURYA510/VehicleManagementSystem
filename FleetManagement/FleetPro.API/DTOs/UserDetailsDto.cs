@@ -18,6 +18,8 @@ namespace FleetPro.API.DTOs
         public int? updatedBy { get; set; }
         public DateTime? created_at { get; set; }
         public DateTime? updated_at { get; set; }
+        public string? aadharCardNum { get; set; }
+        public string? drivingLicenceNum { get; set; }
     }
 
     public class userDatasDto
@@ -30,5 +32,7 @@ namespace FleetPro.API.DTOs
         public int role { get; set; }
         public bool is_active { get; set; }
         public Guid? TenantId { get; set; }
+        public string aadharCardNum { get; set; }
+        public string drivingLicenceNum { get; set; }
     }
 }

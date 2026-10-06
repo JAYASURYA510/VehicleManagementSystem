@@ -35,5 +35,9 @@ namespace FleetPro.API.Data.Entitys
         public DateTime? updated_at { get; set; }
         [Column("tenant_id")]
         public Guid? TenantId { get; set; }
+        [Column("aadhar_card_num")]
+        public string? aadharCardNum { get; set; } = string.Empty;
+        [Column("driving_licence_num")]
+        public string? drivingLicenceNum { get; set; } = string.Empty;
     }
 }

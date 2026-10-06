@@ -41,6 +41,8 @@ namespace FleetPro.API.Repository
                         role = item.role,
                         is_active = item.is_active,
                         TenantId = item.TenantId,
+                        aadharCardNum = item.aadharCardNum,
+                        drivingLicenceNum = item.drivingLicenceNum
                     };
                     userDatas.Add(data);
                 }
@@ -107,6 +109,8 @@ namespace FleetPro.API.Repository
                userData.is_active = user.is_active;
                userData.updatedBy = user.updatedBy;
                userData.updated_at = user.updated_at;
+               userData.aadharCardNum = user.aadharCardNum;
+               userData.drivingLicenceNum = user.drivingLicenceNum;
 
                await context.SaveChangesAsync();
                     return "User updated successfully.";

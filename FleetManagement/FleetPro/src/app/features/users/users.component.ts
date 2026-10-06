@@ -204,7 +204,13 @@ export class UsersComponent implements OnInit, AfterViewInit {
 
   loadRoles(): void {
     this.api.getRoles().subscribe({
-      next: (res) => { this.roleList = [...res]; },
+      next: (res) => { 
+        if(this.localStorageData.role === "Admin"){
+          this.roleList = res.filter((role: any) => role.roleName !== 'SuperAdmin' && role.roleName !== 'Admin');
+        } else if(this.localStorageData.role === "SuperAdmin") {
+          this.roleList = res.filter((role: any) => role.roleName !== 'SuperAdmin');
+        }
+      },
       error: (err) => { console.error('Roles API Error:', err); }
     });
   }
@@ -263,8 +269,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
       username: user.username, email: user.emailId, fullName: user.fullName,
       role: typeof user.role === 'number' ? user.role : null,
       isActive: user.is_active, mobileNumber: user.phoneNumber,
-      aadhaarNumber: (user as any).aadhaarNumber || (user as any).aadharNumber || '',
-      drivingLicence: (user as any).drivingLicence || (user as any).drivingLicense || ''
+      aadhaarNumber: user.aadharCardNum ? user.aadharCardNum : null,
+      drivingLicence: user.drivingLicenceNum ? user.drivingLicenceNum : null
     });
     this.updateRoleValidators();
     this.showForm.set(true);
@@ -281,6 +287,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
       is_active : this.form.get("isActive")?.value,
       updatedBy : this.localStorageData.userId,
       updated_at : new Date().toISOString(),
+      aadharCardNum : this.form.get("aadhaarNumber")?.value ? this.form.get("aadhaarNumber")?.value : null,
+      drivingLicenceNum : this.form.get("drivingLicence")?.value ? this.form.get("drivingLicence")?.value : null,
     }
 
     this.apiService.update(`User/${this.tenandId}/EditUser/${this.editedData.userId}`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
@@ -458,6 +466,8 @@ export class UsersComponent implements OnInit, AfterViewInit {
       updatedBy : this.localStorageData.userId,
       created_at : new Date().toISOString(),
       updated_at : new Date().toISOString(),
+      aadharCardNum : this.form.get("aadhaarNumber")?.value ? this.form.get("aadhaarNumber")?.value : null,
+      drivingLicenceNum : this.form.get("drivingLicence")?.value ? this.form.get("drivingLicence")?.value : null,
     }
 
     this.apiService.create(`User/${this.tenandId}/SaveUser`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {

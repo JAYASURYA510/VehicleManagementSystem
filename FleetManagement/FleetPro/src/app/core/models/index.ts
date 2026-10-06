@@ -53,8 +53,8 @@ export interface User {
   role: UserRole | string;
   is_active: boolean;
   phoneNumber: string;
-  aadhaarNumber?: string;
-  drivingLicence?: string;
+  aadharCardNum?: string;
+  drivingLicenceNum?: string;
 }
 
 export interface Vehicle {
