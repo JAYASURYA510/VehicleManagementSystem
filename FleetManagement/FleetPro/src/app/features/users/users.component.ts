@@ -43,58 +43,58 @@ export class UsersComponent implements OnInit, AfterViewInit {
   private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   displayedColumns: string[] = [
-  'id',
-  'username',
-  'fullName',
-  'email',
-  'role',
-  'phoneNumber',
-  'status',
-  'actions'
-];
+    'id',
+    'username',
+    'fullName',
+    'email',
+    'role',
+    'phoneNumber',
+    'status',
+    'actions'
+  ];
 
-dataSource = new MatTableDataSource<any>();
+  dataSource = new MatTableDataSource<any>();
 
-@ViewChild(MatPaginator) paginator!: MatPaginator;
-@ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
-pageSize = 10;
-get totalPages(): number {
-  if (!this.paginator) return 0;
+  pageSize = 10;
+  get totalPages(): number {
+    if (!this.paginator) return 0;
 
-  return Math.ceil(
-    this.paginator.length / this.paginator.pageSize
-  );
-}
+    return Math.ceil(
+      this.paginator.length / this.paginator.pageSize
+    );
+  }
 
-get totalRecords(): number {
-  return this.dataSource.data.length;
-}
+  get totalRecords(): number {
+    return this.dataSource.data.length;
+  }
 
-get startRecord(): number {
-  if (!this.paginator) return 0;
+  get startRecord(): number {
+    if (!this.paginator) return 0;
 
-  return this.paginator.pageIndex * this.paginator.pageSize + 1;
-}
+    return this.paginator.pageIndex * this.paginator.pageSize + 1;
+  }
 
-get endRecord(): number {
-  if (!this.paginator) return 0;
+  get endRecord(): number {
+    if (!this.paginator) return 0;
 
-  return Math.min(
-    (this.paginator.pageIndex + 1) * this.paginator.pageSize,
-    this.totalRecords
-  );
-}
+    return Math.min(
+      (this.paginator.pageIndex + 1) * this.paginator.pageSize,
+      this.totalRecords
+    );
+  }
 
-constructor(
-       private apiService : CommanService, private cdr: ChangeDetectorRef,
-       private router : Router, private alert: ToastrService
-    ) {}
+  constructor(
+    private apiService : CommanService, private cdr: ChangeDetectorRef,
+    private router : Router, private alert: ToastrService
+  ) {}
 
-ngAfterViewInit() {
-  this.dataSource.paginator = this.paginator;
-  this.dataSource.sort = this.sort;
-}
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
   users = signal<User[]>([]);
   vehicles = signal<Vehicle[]>([]);
@@ -123,18 +123,83 @@ ngAfterViewInit() {
     password: [''],
     fullName: ['', [Validators.required, Validators.minLength(2)]],
     role: [null as number | null, Validators.required],
+    aadhaarNumber: [''],
+    drivingLicence: [''],
     isActive: [true],
     // permissions: this.fb.array<FormGroup>([])
   });
 
+  get isManager(): boolean {
+    const role: any = this.form.get('role')?.value;
+    if (role == null) return false;
+    if (role === UserRole.Manager || role === 3 || role === '3' || role === 'Manager') return true;
+    const roleObj = this.roleList?.find((r: any) => r.id === role || r.roleName === role);
+    return roleObj?.roleName?.toLowerCase() === 'manager';
+  }
+
+  get isDriver(): boolean {
+    const role: any = this.form.get('role')?.value;
+    if (role == null) return false;
+    if (role === UserRole.Driver || role === 4 || role === '4' || role === 'Driver') return true;
+    const roleObj = this.roleList?.find((r: any) => r.id === role || r.roleName === role);
+    return roleObj?.roleName?.toLowerCase() === 'driver';
+  }
+
+  onRoleChange(): void {
+    this.updateRoleValidators();
+  }
+
+  updateRoleValidators(): void {
+    const aadhaarControl = this.form.get('aadhaarNumber');
+    const licenceControl = this.form.get('drivingLicence');
+
+    if (this.isDriver) {
+      aadhaarControl?.setValidators([Validators.required, Validators.pattern(/^\d{12}$/)]);
+      licenceControl?.setValidators([Validators.required]);
+    } else if (this.isManager) {
+      aadhaarControl?.setValidators([Validators.required, Validators.pattern(/^\d{12}$/)]);
+      licenceControl?.clearValidators();
+      licenceControl?.setValue('');
+    } else {
+      aadhaarControl?.clearValidators();
+      aadhaarControl?.setValue('');
+      licenceControl?.clearValidators();
+      licenceControl?.setValue('');
+    }
+
+    aadhaarControl?.updateValueAndValidity();
+    licenceControl?.updateValueAndValidity();
+  }
+
+  onlyNumbers(event: KeyboardEvent): boolean {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
+  }
+
+  onAadhaarInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input) {
+      input.value = input.value.replace(/\D/g, '').slice(0, 12);
+      this.form.get('aadhaarNumber')?.setValue(input.value, { emitEvent: false });
+    }
+  }
+
   ngOnInit(): void {
-    if(this.localStorageData.role === "SuperAdmin" || this.localStorageData.role === "Admin"){
-     this.isAdmin = true;
+    if(this.localStorageData.role === "SuperAdmin" || this.localStorageData.role === "Admin") {
+      this.isAdmin = true;
     }
     this.load();
-     this.getUserData();
+    this.getUserData();
     this.loadRoles();
     this.api.get<Vehicle[]>('vehicles').subscribe(v => this.vehicles.set(v));
+
+    this.form.get('role')?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.updateRoleValidators();
+    });
   }
 
   loadRoles(): void {
@@ -147,41 +212,42 @@ ngAfterViewInit() {
   // get permissionsArray(): FormArray { return this.form.get('permissions') as FormArray; }
 
   load(): void { this.api.get<User[]>('users').subscribe(u => this.users.set(u)); }
-  
-  
- changePageSize(size: number) {
-  this.pageSize = size;
-  this.paginator.pageSize = size;
-  this.paginator.firstPage();
 
-  this.dataSource.paginator = this.paginator;
-}
+
+  changePageSize(size: number) {
+    this.pageSize = size;
+    this.paginator.pageSize = size;
+    this.paginator.firstPage();
+
+    this.dataSource.paginator = this.paginator;
+  }
 
   firstPage() {
-  this.paginator.firstPage();
-}
+    this.paginator.firstPage();
+  }
 
-previousPage() {
-  this.paginator.previousPage();
-}
+  previousPage() {
+    this.paginator.previousPage();
+  }
 
-nextPage() {
-  this.paginator.nextPage();
-}
+  nextPage() {
+    this.paginator.nextPage();
+  }
 
-lastPage() {
-  this.paginator.pageIndex = this.totalPages - 1;
-  this.paginator._changePageSize(this.paginator.pageSize);
-}
+  lastPage() {
+    this.paginator.pageIndex = this.totalPages - 1;
+    this.paginator._changePageSize(this.paginator.pageSize);
+  }
 
 
   openCreate(): void {
     this.isSaveButton = true;
     this.isUpdateButton = false;
     this.editingId.set(null);
-    this.form.reset({ role: null, isActive: true });
+    this.form.reset({ role: null, isActive: true, aadhaarNumber: '', drivingLicence: '' });
     this.form.get('password')?.setValidators([Validators.required, ...this.passwordValidators]);
     this.form.get('password')?.updateValueAndValidity();
+    this.updateRoleValidators();
     this.selectedVehicleIds.set([]);
     this.showForm.set(true);
   }
@@ -196,32 +262,35 @@ lastPage() {
     this.form.patchValue({
       username: user.username, email: user.emailId, fullName: user.fullName,
       role: typeof user.role === 'number' ? user.role : null,
-      isActive: user.is_active, mobileNumber: user.phoneNumber
+      isActive: user.is_active, mobileNumber: user.phoneNumber,
+      aadhaarNumber: (user as any).aadhaarNumber || (user as any).aadharNumber || '',
+      drivingLicence: (user as any).drivingLicence || (user as any).drivingLicense || ''
     });
+    this.updateRoleValidators();
     this.showForm.set(true);
   }
 
   updateUser(): void {
     var payload = {
-        userId : this.editedData.userId,
-        username : this.form.get("username")?.value,
-        fullName : this.form.get("fullName")?.value,
-        emailId : this.form.get("email")?.value,
-        phoneNumber : this.form.get("mobileNumber")?.value,
-        role : this.form.get("role")?.value,
-        is_active : this.form.get("isActive")?.value,
-        updatedBy : this.localStorageData.userId,
-        updated_at : new Date().toISOString(),
+      userId : this.editedData.userId,
+      username : this.form.get("username")?.value,
+      fullName : this.form.get("fullName")?.value,
+      emailId : this.form.get("email")?.value,
+      phoneNumber : this.form.get("mobileNumber")?.value,
+      role : this.form.get("role")?.value,
+      is_active : this.form.get("isActive")?.value,
+      updatedBy : this.localStorageData.userId,
+      updated_at : new Date().toISOString(),
     }
 
     this.apiService.update(`User/${this.tenandId}/EditUser/${this.editedData.userId}`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
       if(data){
-       this.closeForm();
-      this.getUserData();
-      this.alert.success("User Updated Successfully");
+        this.closeForm();
+        this.getUserData();
+        this.alert.success("User Updated Successfully");
       }
     },(error) => {
-     this.alert.error("Unable to Update user");
+      this.alert.error("Unable to Update user");
     });
   }
 
@@ -239,36 +308,36 @@ lastPage() {
   applyFilter(event: Event) : void{
     const filterValue = (event.target as HTMLInputElement).value;
 
-  this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.dataSource.filter = filterValue.trim().toLowerCase();
 
-  if (this.dataSource.paginator) {
-    this.dataSource.paginator.firstPage();
-  }
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   getUserData(){
-   this.apiService.list(`User/${this.tenandId}/getUser`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
-    this.dataSource.data = data;
-     if (this.paginator) {
+    this.apiService.list(`User/${this.tenandId}/getUser`).pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+      this.dataSource.data = data;
+      if (this.paginator) {
         this.paginator.length = data.length;
       }
-      });
+    });
   }
   closeForm(): void { this.showForm.set(false); }
 
   deleteUser(id: number): void {
-     if(id != null){
-          this.apiService.delete(`User/${this.tenandId}/DeleteUser/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any) =>{
-            this.getUserData();
-            this.alert.success("User Deleted Successfully");
-          },(error) => {
-            this.alert.error("Unable to Delete user");
-          });
+    if(id != null){
+      this.apiService.delete(`User/${this.tenandId}/DeleteUser/${id}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
+        this.getUserData();
+        this.alert.success("User Deleted Successfully");
+      },(error) => {
+        this.alert.error("Unable to Delete user");
+      });
     }
   }
 
   getRoleLabel(role: any | string | number): string {
-     return UserRole[role];
+    return UserRole[role];
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -297,9 +366,12 @@ lastPage() {
       if (fieldName === 'username') {
         return 'Username can only contain letters, numbers, and underscores.';
       }
+      if (fieldName === 'aadhaarNumber' || fieldName === 'aadharNumber') {
+        return 'Enter a valid 12-digit Aadhaar number.';
+      }
       return `${this.getFieldLabel(fieldName)} format is invalid.`;
     }
-    return `${this.getFieldLabel(fieldName)} is invalid.`;
+    return `${this.getFieldLabel(fieldName)} is required.`;
   }
 
   private getFieldLabel(fieldName: string): string {
@@ -309,7 +381,11 @@ lastPage() {
       mobileNumber: 'Mobile Number',
       password: 'Password',
       fullName: 'Full Name',
-      role: 'Role'
+      role: 'Role',
+      aadhaarNumber: 'Aadhaar Number',
+      aadharNumber: 'Aadhaar Number',
+      drivingLicence: 'Driving Licence',
+      drivingLicense: 'Driving Licence'
     };
     return labels[fieldName] ?? fieldName;
   }
@@ -327,83 +403,87 @@ lastPage() {
 
   get canManage() { return this.auth.isAdminOrSuperAdmin(); }
   onStatusChange(): void {
-  const status = this.form.get('isActive')?.value;
+    const status = this.form.get('isActive')?.value;
 
-}
-
-get passwordValue(): string {
-  return this.form.get('password')?.value || '';
-}
-
-hasMinLength(): boolean {
-  return this.passwordValue.length >= 8;
-}
-
-hasUpperCase(): boolean {
-  return /[A-Z]/.test(this.passwordValue);
-}
-
-hasLowerCase(): boolean {
-  return /[a-z]/.test(this.passwordValue);
-}
-
-hasNumber(): boolean {
-  return /\d/.test(this.passwordValue);
-}
-
-hasSpecialCharacter(): boolean {
-  return /[!@#$%^&*(),.?":{}|<>_+\-=\[\]\\|;'/]/.test(this.passwordValue);
-}
-isPasswordValid(): boolean {
-  return (
-    this.hasMinLength() &&
-    this.hasUpperCase() &&
-    this.hasLowerCase() &&
-    this.hasNumber() &&
-    this.hasSpecialCharacter()
-  );
-}
-saveData(): void {
-  if (this.form.invalid) {
-    this.markFormTouched();
-    return;
   }
 
-  const payload = {
-     userId : 0,
-     username : this.form.get("username")?.value,
-     password : this.form.get("password")?.value,
-     fullName : this.form.get("fullName")?.value,
-     emailId : this.form.get("email")?.value,
-     phoneNumber : this.form.get("mobileNumber")?.value,
-     role : this.form.get("role")?.value,
-     is_active : this.form.get("isActive")?.value,
-     createdBy : this.localStorageData.userId,
-     updatedBy : this.localStorageData.userId,
-     created_at : new Date().toISOString(),
-     updated_at : new Date().toISOString(),
+  get passwordValue(): string {
+    return this.form.get('password')?.value || '';
   }
 
-  this.apiService.create(`User/${this.tenandId}/SaveUser`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data) =>{
-    this.closeForm();
-    this.getUserData();
-    this.alert.success("User Saved Successfully");
-  },(error) => {
-     this.alert.error("Unable to save user");
-  });
-  this.form.reset({ isActive: true, role: null });
-  this.editingId.set(null);
-}
+  hasMinLength(): boolean {
+    return this.passwordValue.length >= 8;
+  }
 
-resetForm(): void {
-  this.form.reset({
-    username: '',
-    email: '',
-    mobileNumber: '',
-    password: '',
-    fullName: '',
-    role: null,
-    isActive: true
-  });
-}
+  hasUpperCase(): boolean {
+    return /[A-Z]/.test(this.passwordValue);
+  }
+
+  hasLowerCase(): boolean {
+    return /[a-z]/.test(this.passwordValue);
+  }
+
+  hasNumber(): boolean {
+    return /\d/.test(this.passwordValue);
+  }
+
+  hasSpecialCharacter(): boolean {
+    return /[!@#$%^&*(),.?":{}|<>_+\-=\[\]\\|;'/]/.test(this.passwordValue);
+  }
+  isPasswordValid(): boolean {
+    return (
+      this.hasMinLength() &&
+      this.hasUpperCase() &&
+      this.hasLowerCase() &&
+      this.hasNumber() &&
+      this.hasSpecialCharacter()
+    );
+  }
+  saveData(): void {
+    if (this.form.invalid) {
+      this.markFormTouched();
+      return;
+    }
+
+    const payload = {
+      userId : 0,
+      username : this.form.get("username")?.value,
+      password : this.form.get("password")?.value,
+      fullName : this.form.get("fullName")?.value,
+      emailId : this.form.get("email")?.value,
+      phoneNumber : this.form.get("mobileNumber")?.value,
+      role : this.form.get("role")?.value,
+      is_active : this.form.get("isActive")?.value,
+      createdBy : this.localStorageData.userId,
+      updatedBy : this.localStorageData.userId,
+      created_at : new Date().toISOString(),
+      updated_at : new Date().toISOString(),
+    }
+
+    this.apiService.create(`User/${this.tenandId}/SaveUser`, payload).pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.closeForm();
+      this.getUserData();
+      this.alert.success("User Saved Successfully");
+    }, (error) => {
+      this.alert.error("Unable to save user");
+    });
+    this.form.reset({ isActive: true, role: null, aadhaarNumber: '', drivingLicence: '' });
+    this.updateRoleValidators();
+    this.editingId.set(null);
+  }
+
+  resetForm(): void {
+    this.form.reset({
+      username: '',
+      email: '',
+      mobileNumber: '',
+      password: '',
+      fullName: '',
+      role: null,
+      aadhaarNumber: '',
+      drivingLicence: '',
+      isActive: true
+    });
+    this.updateRoleValidators();
+  }
 }

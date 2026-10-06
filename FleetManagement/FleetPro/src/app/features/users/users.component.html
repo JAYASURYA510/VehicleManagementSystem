@@ -4,7 +4,7 @@
     <p class="subtitle">Manage users, roles, and vehicle assignments</p>
   </div>
   @if (canManage) {
-    <button *ngIf="isAdmin" class="btn btn-primary" (click)="openCreate()">+ Add User</button>
+  <button *ngIf="isAdmin" class="btn btn-primary" (click)="openCreate()">+ Add User</button>
   }
 </div>
 
@@ -52,8 +52,10 @@
 <div *ngIf="isAdmin" class="filter-panel">
   <div class="form-group" style="display: flex; flex-direction: row; gap: 1rem;">
     <div class="search-input-wrapper" style="position: relative; width: 100%;">
-      <i class="fa-solid fa-magnifying-glass search-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #666;"></i>
-      <input class="search find-input" matInput placeholder="Search by username, name, email, phone..." (keyup)="applyFilter($event)" style="padding-left: 2.5rem;">
+      <i class="fa-solid fa-magnifying-glass search-icon"
+        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #666;"></i>
+      <input class="search find-input" matInput placeholder="Search by username, name, email, phone..."
+        (keyup)="applyFilter($event)" style="padding-left: 2.5rem;">
     </div>
   </div>
 </div>
@@ -117,11 +119,13 @@
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let user" class="actions-cell">
             <div class="action-buttons">
-              <button mat-icon-button class="action-button edit-button" title="Edit" aria-label="Edit user" (click)="openEdit(user)">
+              <button mat-icon-button class="action-button edit-button" title="Edit" aria-label="Edit user"
+                (click)="openEdit(user)">
                 <mat-icon>edit</mat-icon>
               </button>
 
-              <button mat-icon-button class="action-button delete-button" title="Delete" aria-label="Delete user" (click)="deleteUser(user.userId)">
+              <button mat-icon-button class="action-button delete-button" title="Delete" aria-label="Delete user"
+                (click)="deleteUser(user.userId)">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -170,13 +174,8 @@
       </div>
 
       <!-- Hidden Material Paginator -->
-      <mat-paginator
-        #paginator
-        [length]="totalRecords"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 20, 50]"
-        style="display: none"
-      >
+      <mat-paginator #paginator [length]="totalRecords" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20, 50]"
+        style="display: none">
       </mat-paginator>
     </div>
   </div>
@@ -188,165 +187,170 @@
 
 
 @if (showForm()) {
-  <div class="modal-overlay" (click)="closeForm()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ editingId() ? 'Edit' : 'Add' }} User</h3>
-        <button class="btn-icon" (click)="closeForm()">✕</button>
-      </div>
-      <form [formGroup]="form" (ngSubmit)="saveData()">
-        <div class="form-grid cols-2">
-          <div class="form-group">
-            <label>Username <span class="required">*</span></label>
-            <input
-              formControlName="username"
-              placeholder="Enter UserName"
-              [readonly]="!!editingId()"
-              [class.is-invalid]="isFieldInvalid('username')"
-            />
-            @if (isFieldInvalid('username')) {
-              <div class="alert alert-danger">{{ getFieldError('username') }}</div>
+<div class="modal-overlay" (click)="closeForm()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ editingId() ? 'Edit' : 'Add' }} User</h3>
+      <button class="btn-icon" (click)="closeForm()">✕</button>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="saveData()">
+      <div class="form-grid cols-2">
+        <div class="form-group">
+          <label>Username <span class="required">*</span></label>
+          <input formControlName="username" placeholder="Enter UserName" [readonly]="!!editingId()"
+            [class.is-invalid]="isFieldInvalid('username')" />
+          @if (isFieldInvalid('username')) {
+          <div class="alert alert-danger">{{ getFieldError('username') }}</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Email <span class="required">*</span></label>
+          <input type="email" placeholder="Enter Email id" formControlName="email"
+            [class.is-invalid]="isFieldInvalid('email')" />
+          @if (isFieldInvalid('email')) {
+          <div class="alert alert-danger">{{ getFieldError('email') }}</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Mobile Number <span class="required">*</span></label>
+          <input type="tel" formControlName="mobileNumber" placeholder="Enter Mobile Number" maxlength="10"
+            [class.is-invalid]="isFieldInvalid('mobileNumber')" />
+          @if (isFieldInvalid('mobileNumber')) {
+          <div class="alert alert-danger">{{ getFieldError('mobileNumber') }}</div>
+          }
+        </div>
+        <div *ngIf="isSaveButton" class="form-group">
+          <label>
+            {{ editingId() ? 'New Password (optional)' : 'Password' }}
+            @if (!editingId()) { <span class="required">*</span> }
+          </label>
+          <input type="password" placeholder="Enter Password" formControlName="password"
+            (keydown.space)="$event.preventDefault()" [class.is-invalid]="isFieldInvalid('password')" />
+          @if (passwordValue.length > 0 && !isPasswordValid()) {
+
+          <div class="password-rules">
+
+            @if (!hasMinLength()) {
+            <div class="rule">
+              ✖ Minimum 8 characters
+            </div>
             }
-          </div>
-          <div class="form-group">
-            <label>Email <span class="required">*</span></label>
-            <input
-              type="email"
-              placeholder="Enter Email id"
-              formControlName="email"
-              [class.is-invalid]="isFieldInvalid('email')"
-            />
-            @if (isFieldInvalid('email')) {
-              <div class="alert alert-danger">{{ getFieldError('email') }}</div>
+
+            @if (!hasUpperCase()) {
+            <div class="rule">
+              ✖ Uppercase (A-Z)
+            </div>
             }
-          </div>
-          <div class="form-group">
-            <label>Mobile Number <span class="required">*</span></label>
-            <input
-              type="tel"
-              formControlName="mobileNumber"
-              placeholder="Enter Mobile Number"
-              maxlength="10"
-              [class.is-invalid]="isFieldInvalid('mobileNumber')"
-            />
-            @if (isFieldInvalid('mobileNumber')) {
-              <div class="alert alert-danger">{{ getFieldError('mobileNumber') }}</div>
+
+            @if (!hasLowerCase()) {
+            <div class="rule">
+              ✖ Lowercase (a-z)
+            </div>
             }
+
+            @if (!hasNumber()) {
+            <div class="rule">
+              ✖ Number (0-9)
+            </div>
+            }
+
+            @if (!hasSpecialCharacter()) {
+            <div class="rule">
+              ✖ Special (! @ # $ % & *)
+            </div>
+            }
+
           </div>
-          <div *ngIf="isSaveButton" class="form-group">
-            <label>
-              {{ editingId() ? 'New Password (optional)' : 'Password' }}
-              @if (!editingId()) { <span class="required">*</span> }
-            </label>
-            <input
-              type="password"
-              placeholder="Enter Password"
-              formControlName="password"
-               (keydown.space)="$event.preventDefault()"
-              [class.is-invalid]="isFieldInvalid('password')"
-            />
- @if (passwordValue.length > 0 && !isPasswordValid()) {
 
-<div class="password-rules">
-
-  @if (!hasMinLength()) {
-    <div class="rule">
-      ✖ Minimum 8 characters
-    </div>
-  }
-
-  @if (!hasUpperCase()) {
-    <div class="rule">
-      ✖ Uppercase (A-Z)
-    </div>
-  }
-
-  @if (!hasLowerCase()) {
-    <div class="rule">
-      ✖ Lowercase (a-z)
-    </div>
-  }
-
-  @if (!hasNumber()) {
-    <div class="rule">
-      ✖ Number (0-9)
-    </div>
-  }
-
-  @if (!hasSpecialCharacter()) {
-    <div class="rule">
-      ✖ Special (! @ # $ % & *)
-    </div>
-  }
-
-</div>
-
-}
-            <!-- @if (isFieldInvalid('password')) {
+          }
+          <!-- @if (isFieldInvalid('password')) {
               <div class="alert alert-danger">{{ getFieldError('password') }}</div>
             }
              -->
-          </div>
-          <div class="form-group">
-            <label>Full Name <span class="required">*</span></label>
-            <input
-              placeholder="Enter Full Name"
-              formControlName="fullName"
-              [class.is-invalid]="isFieldInvalid('fullName')"
-            />
-            @if (isFieldInvalid('fullName')) {
-              <div class="alert alert-danger">{{ getFieldError('fullName') }}</div>
-            }
-          </div>
-          <div class="form-group">
-            <label>Role <span class="required" >*</span></label>
-            <select formControlName="role" [class.is-invalid]="isFieldInvalid('role')">
-              <option [ngValue]="null"  disabled hidden>Select Role</option>
-              @for (r of roleList; track r.id) {
-                <option  [ngValue]="r.id">{{ r.roleName }} </option>
-              }
-            </select>
-            @if (isFieldInvalid('role')) {
-              <div class="alert alert-danger">{{ getFieldError('role') }}</div>
-            }
-          </div>
         </div>
         <div class="form-group">
-  <label>Status</label>
+          <label>Full Name <span class="required">*</span></label>
+          <input placeholder="Enter Full Name" formControlName="fullName"
+            [class.is-invalid]="isFieldInvalid('fullName')" />
+          @if (isFieldInvalid('fullName')) {
+          <div class="alert alert-danger">{{ getFieldError('fullName') }}</div>
+          }
+        </div>
+        <div class="form-group">
+          <label>Role <span class="required">*</span></label>
+          <select formControlName="role" (change)="onRoleChange()" [class.is-invalid]="isFieldInvalid('role')">
+            <option [ngValue]="null" disabled hidden>Select Role</option>
+            @for (r of roleList; track r.id) {
+            <option [ngValue]="r.id">{{ r.roleName }} </option>
+            }
+          </select>
+          @if (isFieldInvalid('role')) {
+          <div class="alert alert-danger">{{ getFieldError('role') }}</div>
+          }
+        </div>
+        @if (isManager || isDriver) {
+        <div class="form-group">
+          <label>Aadhaar Number <span class="required">*</span></label>
+          <input
+            type="text"
+            formControlName="aadhaarNumber"
+            placeholder="Enter 12-digit Aadhaar Number"
+            maxlength="12"
+            (keypress)="onlyNumbers($event)"
+            (input)="onAadhaarInput($event)"
+            [class.is-invalid]="isFieldInvalid('aadhaarNumber')"
+          />
+          @if (isFieldInvalid('aadhaarNumber')) {
+          <div class="alert alert-danger">{{ getFieldError('aadhaarNumber') }}</div>
+          }
+        </div>
+        }
+        @if (isDriver) {
+        <div class="form-group">
+          <label>Driving Licence <span class="required">*</span></label>
+          <input
+            type="text"
+            formControlName="drivingLicence"
+            placeholder="Enter Driving Licence Number"
+            [class.is-invalid]="isFieldInvalid('drivingLicence')"
+          />
+          @if (isFieldInvalid('drivingLicence')) {
+          <div class="alert alert-danger">{{ getFieldError('drivingLicence') }}</div>
+          }
+        </div>
+        }
+      </div>
+      <div class="form-group">
+        <label>Status</label>
 
-  <div class="status-toggle">
-    <input
-      type="checkbox"
-      id="statusToggle"
-      formControlName="isActive"
-      (change)="onStatusChange()"
-    />
+        <div class="status-toggle">
+          <input type="checkbox" id="statusToggle" formControlName="isActive" (change)="onStatusChange()" />
 
-    <label for="statusToggle" class="toggle-label">
-      <span class="toggle-slider"></span>
-    </label>
+          <label for="statusToggle" class="toggle-label">
+            <span class="toggle-slider"></span>
+          </label>
 
-    <span class="status-text">
-      {{ form.get('isActive')?.value ? 'Active' : 'Deactivated' }}
-    </span>
+          <span class="status-text">
+            {{ form.get('isActive')?.value ? 'Active' : 'Deactivated' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" (click)="resetForm()">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+          Reset
+        </button>
+        <button *ngIf="isSaveButton" type="submit" class="btn btn-primary" [disabled]="form.invalid">
+          <i class="fa-solid fa-check"></i>
+          Save
+        </button>
+        <button *ngIf="isUpdateButton" type="button" class="btn btn-primary" (click)="updateUser()">
+          <i class="fa-solid fa-edit"></i>
+          Update
+        </button>
+      </div>
+    </form>
   </div>
 </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline" (click)="resetForm()">
-            <i class="fa-solid fa-arrow-rotate-left"></i>
-            Reset
-          </button>
-          <button *ngIf="isSaveButton" type="submit" class="btn btn-primary" [disabled]="form.invalid">
-            <i class="fa-solid fa-check"></i>
-            Save
-          </button>
-          <button *ngIf="isUpdateButton" type="button" class="btn btn-primary" (click)="updateUser()">
-            <i class="fa-solid fa-edit"></i>
-            Update
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 }

@@ -53,6 +53,8 @@ export interface User {
   role: UserRole | string;
   is_active: boolean;
   phoneNumber: string;
+  aadhaarNumber?: string;
+  drivingLicence?: string;
 }
 
 export interface Vehicle {
@@ -67,7 +69,7 @@ export interface Vehicle {
   chassisNumber?: string;
   rcNumber?: string;
   fcNumber?: string;
-  
+
 }
 
 export interface Master {
