@@ -22,12 +22,17 @@ namespace FleetPro.API.Data.Entitys
         [Column("parent_id")]
         public int? ParentId { get; set; }
         [Column("parent_name")]
-        public int? ParentName { get; set; }
+        public string ParentName { get; set; }
 
         [Column("display_order")]
         public int DisplayOrder { get; set; }
 
         [Column("is_active")]
         public bool IsActive { get; set; }
+
+        [Column("grandparent_id")]
+        public int? GrandparentId { get; set; }
+        [Column("grandparent_name")]
+        public string GrandparentName { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FleetPro.API.Data;
 using FleetPro.API.DTOs;
 using FleetPro.API.IRepository;
@@ -75,22 +75,53 @@ namespace FleetPro.API.Repository
                         MenuName = menu.MenuName,
                         Icon = menu.Icon ?? string.Empty,
                         Route = menu.Route,
-                        ParentId = menu.ParentId
+                        ParentId = menu.ParentId,
+                        ParentName = menu.ParentName,
+                        GrandparentId = menu.GrandparentId,
+                        GrandparentName = menu.GrandparentName
                     })
                     .ToListAsync();
 
-                var parents = menus
-                    .Where(x => x.ParentId == null)
+
+                var grouped = menus
+                    .GroupBy(x => new { x.GrandparentId, x.GrandparentName })
+                    .OrderBy(g => g.Key.GrandparentId)
+                    .Select(gpGroup => new MenuDto
+                    {
+                        Id = gpGroup.Key.GrandparentId ?? 0,
+                        MenuName = gpGroup.Key.GrandparentName ?? string.Empty,
+                        Icon = string.Empty,
+                        Route = string.Empty,
+                        Level = 1,   // grandparent group
+                        // Existing parent-grouping logic – preserved as-is inside each grandparent
+                        Children = gpGroup
+                            .GroupBy(x => new { x.ParentId, x.ParentName })
+                            .OrderBy(g => g.Key.ParentId)
+                            .Select(pGroup => new MenuDto
+                            {
+                                Id = pGroup.Key.ParentId ?? 0,
+                                MenuName = pGroup.Key.ParentName ?? string.Empty,
+                                Icon = string.Empty,
+                                Route = string.Empty,
+                                Level = 2,   // parent group
+                                Children = pGroup.Select(item => new MenuDto
+                                {
+                                    Id = item.Id,
+                                    MenuName = item.MenuName,
+                                    Icon = item.Icon,
+                                    Route = item.Route,
+                                    ParentId = item.ParentId,
+                                    ParentName = item.ParentName,
+                                    GrandparentId = item.GrandparentId,
+                                    GrandparentName = item.GrandparentName,
+                                    Level = 3   // actual menu item (leaf)
+                                }).ToList()
+                            })
+                            .ToList()
+                    })
                     .ToList();
 
-                foreach (var parent in parents)
-                {
-                    parent.Children = menus
-                        .Where(x => x.ParentId == parent.Id)
-                        .ToList();
-                }
-
-                return parents;
+                return grouped;
             }
             catch
             {

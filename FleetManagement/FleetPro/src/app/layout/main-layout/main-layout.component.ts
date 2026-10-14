@@ -4,8 +4,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { UserRole } from '../../core/models';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Router, NavigationEnd } from '@angular/router';
+import { Subject, takeUntil, filter } from 'rxjs';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { CommanService } from '../../core/services/comman.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,19 @@ interface NavItem {
   route: string;
   icon: string;
   adminOnly?: boolean;
+}
+
+interface MenuItem {
+  id: number;
+  menuName: string;
+  icon: string;
+  route: string;
+  parentId: number | null;
+  parentName: string | null;
+  grandparentId: number | null;
+  grandparentName: string | null;
+  level: number;
+  children: MenuItem[];
 }
 
 @Component({
@@ -31,7 +44,8 @@ export class MainLayoutComponent {
   userDropdownOpen = signal(false);
   userMenuRef = viewChild<ElementRef>('userMenuRef');
   getRoleId : any;
-  navList : any;
+  navList : MenuItem[] = [];
+  expandedGroups = signal<Set<number>>(new Set<number>());
   private tenandId = localStorage.getItem("fleetPro_TenantId");
 
   constructor(
@@ -39,8 +53,23 @@ export class MainLayoutComponent {
        private router : Router
     ) {}
 
-  ngOnInit(){
-   this.getNavList();
+  ngOnInit(): void {
+    this.getNavList();
+
+    // Auto-expand the active group on every navigation
+    this.router.events
+      .pipe(
+        filter(e => e instanceof NavigationEnd),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe(() => {
+        this.expandActiveGroup();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
   readonly navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: '▦' },
@@ -83,11 +112,12 @@ export class MainLayoutComponent {
     }
 
     this.api.list(`Menu/${this.tenandId}/GetMenuByRoleId/${this.getRoleId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
-      this.navList = [];
-      this.navList = data;
-       this.cdr.detectChanges();
-      console.log("Menu Data" , data)
-   });
+      this.navList = data as MenuItem[];
+      // Expand only the group matching the current active route
+      this.expandActiveGroup();
+      this.cdr.detectChanges();
+      console.log("Menu Data", data);
+    });
   }
 
   roleLabel(): string {
@@ -108,6 +138,40 @@ export class MainLayoutComponent {
 
   toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
   closeSidebar(): void { this.sidebarOpen.set(false); }
+
+  /** Finds the level-2 group that owns the current URL and expands only that one. */
+  private expandActiveGroup(): void {
+    const currentUrl = this.router.url.split('?')[0]; // strip query params
+    const activeSet = new Set<number>();
+
+    for (const lvl1 of this.navList) {
+      for (const lvl2 of lvl1.children) {
+        const hasActive = lvl2.children.some(
+          (lvl3: MenuItem) => lvl3.route && currentUrl.startsWith(lvl3.route)
+        );
+        if (hasActive) {
+          activeSet.add(lvl2.id);
+        }
+      }
+    }
+    this.expandedGroups.set(activeSet);
+  }
+
+  toggleGroup(groupId: number): void {
+    this.expandedGroups.update(set => {
+      const next = new Set(set);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }
+
+  isGroupExpanded(groupId: number): boolean {
+    return this.expandedGroups().has(groupId);
+  }
 
   toggleUserDropdown(event: Event): void {
     event.stopPropagation();

@@ -6,14 +6,39 @@
     </div>
 
     <nav class="sidebar-nav">
-      @for (item of this.navList; track item.route) {
-        <a [routerLink]="item.route" routerLinkActive="active" class="nav-item" >
-          <mat-icon fontSet="material-symbols-outlined">
-          {{ item.icon }}
-          </mat-icon>
-          <!-- <span class="nav-icon">{{ item.icon }}</span> -->
-          <span class="nav-label">{{ item.menuName }}</span>
-        </a>
+      @for (lvl1 of navList; track lvl1.id) {
+        <!-- Level 1: Master Section Heading -->
+        <div class="nav-section-heading">{{ lvl1.menuName }}</div>
+
+        @for (lvl2 of lvl1.children; track lvl2.id) {
+          <!-- Level 2: Collapsible Group -->
+          <div class="nav-group">
+            <button
+              class="nav-group-header"
+              [class.expanded]="isGroupExpanded(lvl2.id)"
+              (click)="toggleGroup(lvl2.id)"
+              type="button">
+              <span class="nav-group-label">{{ lvl2.menuName }}</span>
+              <mat-icon class="nav-group-arrow" fontSet="material-symbols-outlined">
+                chevron_right
+              </mat-icon>
+            </button>
+
+            @if (isGroupExpanded(lvl2.id)) {
+              <div class="nav-group-children">
+                @for (lvl3 of lvl2.children; track lvl3.id) {
+                  <!-- Level 3: Actual Nav Links -->
+                  <a [routerLink]="lvl3.route" routerLinkActive="active" class="nav-item">
+                    <mat-icon fontSet="material-symbols-outlined" class="nav-item-icon">
+                      {{ lvl3.icon }}
+                    </mat-icon>
+                    <span class="nav-label">{{ lvl3.menuName }}</span>
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        }
       }
     </nav>
   </aside>

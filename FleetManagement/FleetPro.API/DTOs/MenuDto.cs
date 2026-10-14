@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FleetPro.API.DTOs
 {
@@ -13,6 +13,17 @@ namespace FleetPro.API.DTOs
         public string Route { get; set; }
 
         public int? ParentId { get; set; }
+
+        public string? ParentName { get; set; }
+
+        public int? GrandparentId { get; set; }
+
+        public string? GrandparentName { get; set; }
+
+        /// <summary>
+        /// 1 = Grandparent group node  |  2 = Parent group node  |  3 = Actual menu item (leaf)
+        /// </summary>
+        public int Level { get; set; }
 
         public List<MenuDto> Children { get; set; } = new();
     }
@@ -41,11 +52,13 @@ namespace FleetPro.API.DTOs
 
         public string Route { get; set; }
         public int? ParentId { get; set; }
-        public int? ParentName { get; set; }
+        public string ParentName { get; set; }
 
         public int DisplayOrder { get; set; }
 
         public bool IsActive { get; set; }
+        public int? GrandparentId { get; set; }
+        public string GrandparentName { get; set; }
     }
 
     public class saveMenuDto
