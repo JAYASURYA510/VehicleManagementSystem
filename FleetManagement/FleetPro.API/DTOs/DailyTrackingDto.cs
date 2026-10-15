@@ -82,6 +82,8 @@ namespace FleetPro.API.DTOs
 
     public class DailyTrackingSearch
     {
+        public Guid Id { get; set; }
+
         public Guid TenantId { get; set; }
 
         public Guid VehicleId { get; set; }

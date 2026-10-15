@@ -59,80 +59,7 @@ namespace FleetPro.API.Repository.DailyTracking
 
                 await dailyTrackingService.AddAsync(tracking);
 
-                if (request.Images != null && request.Images.Count > 0)
-                {
-                    var imageRecords = new List<ImageAttachment>();
-
-                    // Folder:
-                    // wwwroot/uploads/dailylog/{trackingId}
-
-                    string folderPath =
-                    Path.Combine(
-                        environment.WebRootPath,
-                        "uploads",
-                        "dailylog",
-                        tracking.Id.ToString());
-
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-
-                    foreach (var image in request.Images)
-                    {
-                        if (image == null || image.Length == 0)
-                        {
-                          continue;
-                        }
-
-                        string extension = Path.GetExtension(image.FileName).ToLowerInvariant();
-
-                        string[] allowedExtensions ={".jpg",".jpeg",".png",".webp"};
-
-                        if (!allowedExtensions.Contains(extension))
-                        {
-                            throw new Exception($"Invalid image format: {extension}");
-                        }
-
-                        // Generate unique name 
-                        string fileName =$"{Guid.NewGuid()}{extension}";
-                        // Physical path
-                        string physicalPath =Path.Combine(folderPath,fileName);
-
-                        // Save image
-                        using (var stream = new FileStream(physicalPath,FileMode.Create))
-                                            {
-                                                await image.CopyToAsync(stream);
-                                            }
-
-                        // DB path
-                        string filePath =$"/uploads/dailylog/" +$"{tracking.Id}/{fileName}";
-
-                        // Create DB record
-                        var imageRecord =
-                        new ImageAttachment
-                        {
-                            Id = Guid.NewGuid(),
-                            DailyTrackingId = tracking.Id,
-                            FileName = fileName,                              
-                            FilePath =  filePath,                            
-                            FileType = image.ContentType,                           
-                            ImageType = "dailylog",                         
-                            IsDelete = false,
-                            CreatedAt = request.CreatedDate,       
-                            CreatedBy = request.CreatedBy,
-                            TenantId = tenantId,
-                        };
-
-                        imageRecords.Add(imageRecord);
-
-                    }
-
-                    if (imageRecords.Count > 0)
-                    {
-                       await imageRepository.AddRangeAsync(imageRecords);
-                    }
-                }
+                await AddImagesAsync(tenantId, tracking.Id, request);
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return tracking.Id;
@@ -144,6 +71,208 @@ namespace FleetPro.API.Repository.DailyTracking
             }
         }
 
+        public async Task<bool> UpdateDailyTrackingAsync(Guid tenantId, Guid dailyTrackingId, SaveDailyTrackingRequest request)
+        {
+            using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var tracking = await context.DailyTrackingRecords.FirstOrDefaultAsync(x =>
+                    x.Id == dailyTrackingId && x.TenantId == tenantId && x.IsDelete != true);
+
+                if (tracking == null)
+                {
+                    return false;
+                }
+
+                tracking.VehicleId = request.VehicleId;
+                tracking.TripDate = request.TripDate;
+                tracking.FromLocation = request.FromLocation;
+                tracking.ToLocation = request.ToLocation;
+                tracking.FuelStation = request.FuelStation;
+                tracking.DieselLitres = request.DieselLitres;
+                tracking.DieselCost = request.DieselCost;
+                tracking.FromKm = request.FromKm;
+                tracking.ToKm = request.ToKm;
+                tracking.KmBeforeFueling = request.KmBeforeFueling;
+                tracking.TollCharges = request.TollCharges ?? 0m;
+                tracking.WorkshopExpenses = request.WorkshopExpenses ?? 0m;
+                tracking.TyreMaintenance = request.TyreMaintenance ?? 0m;
+                tracking.DriverSalary = request.DriverSalary ?? 0m;
+                tracking.RtoCharges = request.RtoCharges ?? 0m;
+                tracking.TripRevenue = request.TripRevenue ?? 0m;
+                tracking.OtherExpenses = request.OtherExpenses ?? 0m;
+                tracking.Notes = request.Notes;
+                tracking.StatusType = request.StatusType;
+                tracking.UpdatedAt = DateTime.UtcNow;
+                tracking.UpdatedBy = request.CreatedBy;
+
+                await AddImagesAsync(tenantId, tracking.Id, request);
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("An error occurred while updating data.", ex);
+            }
+        }
+
+        public async Task<bool> DeleteDailyTrackingAsync(Guid tenantId, Guid dailyTrackingId)
+        {
+            using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                var tracking = await context.DailyTrackingRecords.FirstOrDefaultAsync(x =>
+                    x.Id == dailyTrackingId && x.TenantId == tenantId && x.IsDelete != true);
+
+                if (tracking == null)
+                {
+                    return false;
+                }
+
+                var imageRecords = await context.ImageAttachments
+                    .Where(x => x.TenantId == tenantId && x.DailyTrackingId == dailyTrackingId)
+                    .ToListAsync();
+
+                context.ImageAttachments.RemoveRange(imageRecords);
+                tracking.IsDelete = true;
+                tracking.UpdatedAt = DateTime.UtcNow;
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                var folderPath = Path.Combine(
+                    environment.WebRootPath,
+                    "uploads",
+                    "dailylog",
+                    dailyTrackingId.ToString());
+
+                if (Directory.Exists(folderPath))
+                {
+                    Directory.Delete(folderPath, recursive: true);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception("An error occurred while deleting data.", ex);
+            }
+        }
+
+        private async Task AddImagesAsync(Guid tenantId, Guid trackingId, SaveDailyTrackingRequest request)
+        {
+            if (request.Images == null || request.Images.Count == 0)
+            {
+                return;
+            }
+
+            var imageRecords = new List<ImageAttachment>();
+            var folderPath = Path.Combine(
+                environment.WebRootPath,
+                "uploads",
+                "dailylog",
+                trackingId.ToString());
+
+            Directory.CreateDirectory(folderPath);
+
+            foreach (var image in request.Images)
+            {
+                if (image == null || image.Length == 0)
+                {
+                    continue;
+                }
+
+                var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+                string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
+                if (!allowedExtensions.Contains(extension))
+                {
+                    throw new Exception($"Invalid image format: {extension}");
+                }
+
+                var fileName = $"{Guid.NewGuid()}{extension}";
+                var physicalPath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+
+                imageRecords.Add(new ImageAttachment
+                {
+                    Id = Guid.NewGuid(),
+                    DailyTrackingId = trackingId,
+                    FileName = fileName,
+                    FilePath = $"/uploads/dailylog/{trackingId}/{fileName}",
+                    FileType = image.ContentType,
+                    ImageType = "dailylog",
+                    IsDelete = false,
+                    CreatedAt = request.CreatedDate,
+                    CreatedBy = request.CreatedBy,
+                    TenantId = tenantId
+                });
+            }
+
+            if (imageRecords.Count > 0)
+            {
+                await imageRepository.AddRangeAsync(imageRecords);
+            }
+        }
+
+        public async Task<DailyTrackingDto?> GetDailyTrackingByIdAsync(Guid tenantId, Guid dailyTrackingId)
+        {
+            var tracking = await context.DailyTrackingRecords
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Id == dailyTrackingId &&
+                    x.TenantId == tenantId &&
+                    x.IsDelete != true);
+
+            if (tracking == null)
+            {
+                return null;
+            }
+
+            var images = await context.ImageAttachments
+                .AsNoTracking()
+                .Where(x =>
+                    x.TenantId == tenantId &&
+                    x.DailyTrackingId == dailyTrackingId &&
+                    !x.IsDelete)
+                .ToListAsync();
+
+            return new DailyTrackingDto
+            {
+                Id = tracking.Id,
+                VehicleId = tracking.VehicleId,
+                TripDate = tracking.TripDate,
+                FromLocation = tracking.FromLocation,
+                ToLocation = tracking.ToLocation,
+                FuelStation = tracking.FuelStation,
+                DieselLitres = tracking.DieselLitres ?? 0m,
+                DieselCost = tracking.DieselCost ?? 0m,
+                FromKm = tracking.FromKm,
+                ToKm = tracking.ToKm,
+                KmBeforeFueling = tracking.KmBeforeFueling,
+                TollCharges = tracking.TollCharges ?? 0m,
+                WorkshopExpenses = tracking.WorkshopExpenses ?? 0m,
+                TyreMaintenance = tracking.TyreMaintenance ?? 0m,
+                DriverSalary = tracking.DriverSalary ?? 0m,
+                RtoCharges = tracking.RtoCharges ?? 0m,
+                TripRevenue = tracking.TripRevenue ?? 0m,
+                OtherExpenses = tracking.OtherExpenses ?? 0m,
+                Notes = tracking.Notes,
+                StatusType = tracking.StatusType,
+                IsDelete = tracking.IsDelete ?? false,
+                CreatedAt = tracking.CreatedAt,
+                CreatedBy = tracking.CreatedBy,
+                UpdatedAt = tracking.UpdatedAt,
+                UpdatedBy = tracking.UpdatedBy,
+                Images = images
+            };
+        }
+
         public async Task<List<DailyTrackingSearch>> getDailyTrackingAsync(Guid tenantId, int RoleId, int UserId)
         {
             try
@@ -152,7 +281,7 @@ namespace FleetPro.API.Repository.DailyTracking
                 if (RoleId == 1 || RoleId == 2)
                 {
                     var trakingData = await context.DailyTrackingRecords.AsNoTracking().Where(
-                            x => x.TenantId == tenantId).ToListAsync();
+                            x => x.TenantId == tenantId && x.IsDelete != true).ToListAsync();
 
                         var result = (
                             from track in trakingData
@@ -160,6 +289,7 @@ namespace FleetPro.API.Repository.DailyTracking
                               on track.VehicleId equals vehicle.VehicleId
                               select new DailyTrackingSearch
                               {
+                                Id = track.Id,
                                 TenantId = track.TenantId,
                                 VehicleId = track.VehicleId,
                                 RegistrationNumber = vehicle.RegistrationNumber,
@@ -167,6 +297,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                 FromLocation = track.FromLocation,
                                 ToLocation = track.ToLocation,
                                 FuelStation = track.FuelStation,
+                                DieselLitres = track.DieselLitres ?? 0m,
                                 DieselCost = track.DieselCost,
                                 FromKm = track.FromKm,
                                 ToKm = track.ToKm,
@@ -189,6 +320,7 @@ namespace FleetPro.API.Repository.DailyTracking
                             {
                                 var data = new DailyTrackingSearch
                                 {
+                                    Id = item.Id,
                                     TenantId = item.TenantId,
                                     VehicleId = item.VehicleId,
                                     RegistrationNumber = item.RegistrationNumber,
@@ -196,6 +328,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                     FromLocation = item.FromLocation,
                                     ToLocation = item.ToLocation,
                                     FuelStation = item.FuelStation,
+                                    DieselLitres = item.DieselLitres,
                                     DieselCost = item.DieselCost,
                                     FromKm = item.FromKm,
                                     ToKm = item.ToKm,
@@ -226,7 +359,7 @@ namespace FleetPro.API.Repository.DailyTracking
                     if (assignedVehicleIds.Any())
                     {
                         var trakingData = await context.DailyTrackingRecords.AsNoTracking().Where(
-                            x => assignedVehicleIds.Contains(x.VehicleId) && x.TenantId == tenantId && x.CreatedBy == UserId).ToListAsync();
+                            x => assignedVehicleIds.Contains(x.VehicleId) && x.TenantId == tenantId && x.CreatedBy == UserId && x.IsDelete != true).ToListAsync();
 
                         var result = (
                             from track in trakingData
@@ -234,6 +367,7 @@ namespace FleetPro.API.Repository.DailyTracking
                               on track.VehicleId equals vehicle.VehicleId
                               select new DailyTrackingSearch
                               {
+                                Id = track.Id,
                                 TenantId = track.TenantId,
                                 VehicleId = track.VehicleId,
                                 RegistrationNumber = vehicle.RegistrationNumber,
@@ -241,6 +375,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                 FromLocation = track.FromLocation,
                                 ToLocation = track.ToLocation,
                                 FuelStation = track.FuelStation,
+                                DieselLitres = track.DieselLitres ?? 0m,
                                 DieselCost = track.DieselCost,
                                 FromKm = track.FromKm,
                                 ToKm = track.ToKm,
@@ -263,6 +398,7 @@ namespace FleetPro.API.Repository.DailyTracking
                             {
                                 var data = new DailyTrackingSearch
                                 {
+                                    Id = item.Id,
                                     TenantId = item.TenantId,
                                     VehicleId = item.VehicleId,
                                     RegistrationNumber = item.RegistrationNumber,
@@ -270,6 +406,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                     FromLocation = item.FromLocation,
                                     ToLocation = item.ToLocation,
                                     FuelStation = item.FuelStation,
+                                    DieselLitres = item.DieselLitres,
                                     DieselCost = item.DieselCost,
                                     FromKm = item.FromKm,
                                     ToKm = item.ToKm,
