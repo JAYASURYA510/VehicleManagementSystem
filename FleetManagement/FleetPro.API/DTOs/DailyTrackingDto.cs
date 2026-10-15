@@ -1,4 +1,4 @@
-﻿using FleetPro.API.Data.Entitys;
+using FleetPro.API.Data.Entitys;
 
 namespace FleetPro.API.DTOs
 {
@@ -15,6 +15,11 @@ namespace FleetPro.API.DTOs
         public decimal? FromKm { get; set; } 
         public decimal? ToKm { get; set; }
         public decimal? KmBeforeFueling { get; set; }
+        public decimal? OpeningDieselLevel { get; set; }
+        public decimal? ClosingDieselLevel { get; set; }
+        public decimal? TotalDistanceTravelled { get; set; }
+        public decimal? TotalDieselConsumed { get; set; }
+        public decimal? Mileage { get; set; }
         public decimal TollCharges { get; set; }
         public decimal WorkshopExpenses { get; set; }
         public decimal TyreMaintenance { get; set; }
@@ -54,6 +59,16 @@ namespace FleetPro.API.DTOs
         public decimal? ToKm { get; set; }
 
         public decimal? KmBeforeFueling { get; set; }
+
+        public decimal? OpeningDieselLevel { get; set; }
+
+        public decimal? ClosingDieselLevel { get; set; }
+
+        public decimal? TotalDistanceTravelled { get; set; }
+
+        public decimal? TotalDieselConsumed { get; set; }
+
+        public decimal? Mileage { get; set; }
 
         public decimal? TollCharges { get; set; }
 
@@ -107,6 +122,16 @@ namespace FleetPro.API.DTOs
         public decimal? ToKm { get; set; }
 
         public decimal? KmBeforeFueling { get; set; }
+
+        public decimal? OpeningDieselLevel { get; set; }
+
+        public decimal? ClosingDieselLevel { get; set; }
+
+        public decimal? TotalDistanceTravelled { get; set; }
+
+        public decimal? TotalDieselConsumed { get; set; }
+
+        public decimal? Mileage { get; set; }
 
         public decimal? TollCharges { get; set; }
 

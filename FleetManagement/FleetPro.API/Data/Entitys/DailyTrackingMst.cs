@@ -1,4 +1,4 @@
-﻿using FleetPro.API.Data.Entitys;
+using FleetPro.API.Data.Entitys;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -42,6 +42,21 @@ public class DailyTrackingRecord
 
     [Column("km_before_fueling")]
     public decimal? KmBeforeFueling { get; set; }
+
+    [Column("opening_diesel_level")]
+    public decimal? OpeningDieselLevel { get; set; }
+
+    [Column("closing_diesel_level")]
+    public decimal? ClosingDieselLevel { get; set; }
+
+    [Column("total_distance_travelled")]
+    public decimal? TotalDistanceTravelled { get; set; }
+
+    [Column("total_diesel_consumed")]
+    public decimal? TotalDieselConsumed { get; set; }
+
+    [Column("mileage")]
+    public decimal? Mileage { get; set; }
 
     [Column("toll_charges")]
     public decimal? TollCharges { get; set; }

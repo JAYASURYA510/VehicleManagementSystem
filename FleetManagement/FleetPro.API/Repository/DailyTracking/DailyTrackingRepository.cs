@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FleetPro.API.Data;
 using FleetPro.API.Data.Entitys;
 using FleetPro.API.DTOs;
@@ -42,6 +42,11 @@ namespace FleetPro.API.Repository.DailyTracking
                     FromKm = request.FromKm,
                     ToKm = request.ToKm,
                     KmBeforeFueling = request.KmBeforeFueling,
+                    OpeningDieselLevel = request.OpeningDieselLevel,
+                    ClosingDieselLevel = request.ClosingDieselLevel,
+                    TotalDistanceTravelled = request.TotalDistanceTravelled,
+                    TotalDieselConsumed = request.TotalDieselConsumed,
+                    Mileage = request.Mileage,
                     TollCharges = request.TollCharges ?? 0m,
                     WorkshopExpenses =request.WorkshopExpenses ?? 0m,
                     TyreMaintenance = request.TyreMaintenance ?? 0m,
@@ -94,6 +99,11 @@ namespace FleetPro.API.Repository.DailyTracking
                 tracking.FromKm = request.FromKm;
                 tracking.ToKm = request.ToKm;
                 tracking.KmBeforeFueling = request.KmBeforeFueling;
+                tracking.OpeningDieselLevel = request.OpeningDieselLevel;
+                tracking.ClosingDieselLevel = request.ClosingDieselLevel;
+                tracking.TotalDistanceTravelled = request.TotalDistanceTravelled;
+                tracking.TotalDieselConsumed = request.TotalDieselConsumed;
+                tracking.Mileage = request.Mileage;
                 tracking.TollCharges = request.TollCharges ?? 0m;
                 tracking.WorkshopExpenses = request.WorkshopExpenses ?? 0m;
                 tracking.TyreMaintenance = request.TyreMaintenance ?? 0m;
@@ -255,6 +265,11 @@ namespace FleetPro.API.Repository.DailyTracking
                 FromKm = tracking.FromKm,
                 ToKm = tracking.ToKm,
                 KmBeforeFueling = tracking.KmBeforeFueling,
+                OpeningDieselLevel = tracking.OpeningDieselLevel,
+                ClosingDieselLevel = tracking.ClosingDieselLevel,
+                TotalDistanceTravelled = tracking.TotalDistanceTravelled,
+                TotalDieselConsumed = tracking.TotalDieselConsumed,
+                Mileage = tracking.Mileage,
                 TollCharges = tracking.TollCharges ?? 0m,
                 WorkshopExpenses = tracking.WorkshopExpenses ?? 0m,
                 TyreMaintenance = tracking.TyreMaintenance ?? 0m,
@@ -302,6 +317,11 @@ namespace FleetPro.API.Repository.DailyTracking
                                 FromKm = track.FromKm,
                                 ToKm = track.ToKm,
                                 KmBeforeFueling = track.KmBeforeFueling,
+                                OpeningDieselLevel = track.OpeningDieselLevel,
+                                ClosingDieselLevel = track.ClosingDieselLevel,
+                                TotalDistanceTravelled = track.TotalDistanceTravelled,
+                                TotalDieselConsumed = track.TotalDieselConsumed,
+                                Mileage = track.Mileage,
                                 TollCharges = track.TollCharges,
                                 WorkshopExpenses = track.WorkshopExpenses,
                                 TyreMaintenance = track.TyreMaintenance,
@@ -333,6 +353,11 @@ namespace FleetPro.API.Repository.DailyTracking
                                     FromKm = item.FromKm,
                                     ToKm = item.ToKm,
                                     KmBeforeFueling = item.KmBeforeFueling,
+                                    OpeningDieselLevel = item.OpeningDieselLevel,
+                                    ClosingDieselLevel = item.ClosingDieselLevel,
+                                    TotalDistanceTravelled = item.TotalDistanceTravelled,
+                                    TotalDieselConsumed = item.TotalDieselConsumed,
+                                    Mileage = item.Mileage,
                                     TollCharges = item.TollCharges,
                                     WorkshopExpenses = item.WorkshopExpenses,
                                     TyreMaintenance = item.TyreMaintenance,
@@ -380,6 +405,11 @@ namespace FleetPro.API.Repository.DailyTracking
                                 FromKm = track.FromKm,
                                 ToKm = track.ToKm,
                                 KmBeforeFueling = track.KmBeforeFueling,
+                                OpeningDieselLevel = track.OpeningDieselLevel,
+                                ClosingDieselLevel = track.ClosingDieselLevel,
+                                TotalDistanceTravelled = track.TotalDistanceTravelled,
+                                TotalDieselConsumed = track.TotalDieselConsumed,
+                                Mileage = track.Mileage,
                                 TollCharges = track.TollCharges,
                                 WorkshopExpenses = track.WorkshopExpenses,
                                 TyreMaintenance = track.TyreMaintenance,
@@ -411,6 +441,11 @@ namespace FleetPro.API.Repository.DailyTracking
                                     FromKm = item.FromKm,
                                     ToKm = item.ToKm,
                                     KmBeforeFueling = item.KmBeforeFueling,
+                                    OpeningDieselLevel = item.OpeningDieselLevel,
+                                    ClosingDieselLevel = item.ClosingDieselLevel,
+                                    TotalDistanceTravelled = item.TotalDistanceTravelled,
+                                    TotalDieselConsumed = item.TotalDieselConsumed,
+                                    Mileage = item.Mileage,
                                     TollCharges = item.TollCharges,
                                     WorkshopExpenses = item.WorkshopExpenses,
                                     TyreMaintenance = item.TyreMaintenance,
