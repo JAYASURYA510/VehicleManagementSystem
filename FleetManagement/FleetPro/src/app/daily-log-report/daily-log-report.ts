@@ -15,6 +15,7 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
 import { ToastrService } from 'ngx-toastr';
 import { Subject, takeUntil } from 'rxjs';
@@ -55,12 +56,24 @@ export interface ImagePreviewItem {
   previewUrl: string;
 }
 
+export type SectionKey = 'location' | 'diesel' | 'expenses' | 'additional' | 'images' | 'review';
+
+export interface FormCategory {
+  key: SectionKey;
+  title: string;
+  subTitle: string;
+  emoji: string;
+  matIcon: string;
+  colorClass: string;
+}
+
 @Component({
   selector: 'app-form-log-report',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatIconModule
   ],
   templateUrl: './daily-log-report.html',
   styleUrl: './daily-log-report.css'
@@ -104,20 +117,80 @@ export class DailyLogReport implements OnInit, OnDestroy {
   previewModalImage: ImagePreviewItem | null = null;
 
   // =====================================================
+  // UI SECTIONS & NAVIGATION (Rectangle Cards)
+  // =====================================================
+
+  activeSection: SectionKey = 'location';
+  viewMode: 'single' | 'all' = 'single';
+
+  categories: FormCategory[] = [
+    {
+      key: 'location',
+      title: 'Location Route',
+      subTitle: 'From & To Route',
+      emoji: '📍',
+      matIcon: 'near_me',
+      colorClass: 'cat-location'
+    },
+    {
+      key: 'diesel',
+      title: 'Diesel & Mileage',
+      subTitle: 'Fuel, KM & Mileage',
+      emoji: '⛽',
+      matIcon: 'local_gas_station',
+      colorClass: 'cat-diesel'
+    },
+    {
+      key: 'expenses',
+      title: 'Other Expenses',
+      subTitle: 'Toll, Workshop, Tyre (₹)',
+      emoji: '🛠️',
+      matIcon: 'build_circle',
+      colorClass: 'cat-expenses'
+    },
+    {
+      key: 'additional',
+      title: 'Additional Details',
+      subTitle: 'Salary, Challan & Notes',
+      emoji: '📋',
+      matIcon: 'receipt_long',
+      colorClass: 'cat-additional'
+    },
+    {
+      key: 'images',
+      title: 'Trip Images',
+      subTitle: 'Upload Bills & Receipts',
+      emoji: '📷',
+      matIcon: 'photo_camera',
+      colorClass: 'cat-images'
+    },
+    {
+      key: 'review',
+      title: 'Review & Submit',
+      subTitle: 'Verify Details Before Submit',
+      emoji: '📝',
+      matIcon: 'fact_check',
+      colorClass: 'cat-review'
+    }
+  ];
+
+  // =====================================================
   // FORM
   // =====================================================
 
   form = this.fb.group({
-    vehicleId: [null as any,Validators.required],
-    date: [new Date().toISOString().substring(0, 10),Validators.required],
-    fromLocation: [null,Validators.required],
-    toLocation: [null,Validators.required],
+    vehicleId: [null as any, Validators.required],
+    date: [new Date().toISOString().substring(0, 10), Validators.required],
+    fromLocation: [null, Validators.required],
+    toLocation: [null, Validators.required],
     fuelStation: [''],
     dieselLitres: [0],
     dieselCost: [0],
-    fromKm: [0,Validators.required],
-    toKm: [0,Validators.required],
+    fromKm: [0, Validators.required],
+    toKm: [0, Validators.required],
     kmBeforeFueling: [0],
+    openingDieselLevel: [0],
+    closingDieselLevel: [0],
     tollCharges: [0],
     workshopExpenses: [0],
     tyreMaintenance: [0],
@@ -434,6 +507,198 @@ export class DailyLogReport implements OnInit, OnDestroy {
   }
 
   // =====================================================
+  // NAVIGATION & VIEW MODE
+  // =====================================================
+
+  setActiveSection(key: SectionKey): void {
+    this.activeSection = key;
+  }
+
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'single' ? 'all' : 'single';
+  }
+
+  goToNextSection(): void {
+    const list: SectionKey[] = ['location', 'diesel', 'expenses', 'additional', 'images', 'review'];
+    const idx = list.indexOf(this.activeSection);
+    if (idx < list.length - 1) {
+      this.activeSection = list[idx + 1];
+    }
+  }
+
+  goToPreviousSection(): void {
+    const list: SectionKey[] = ['location', 'diesel', 'expenses', 'additional', 'images', 'review'];
+    const idx = list.indexOf(this.activeSection);
+    if (idx > 0) {
+      this.activeSection = list[idx - 1];
+    }
+  }
+
+  // =====================================================
+  // AUTOMATIC CALCULATIONS & METRICS
+  // =====================================================
+
+  // Total Distance Travelled = Closing KM − Starting KM
+  get totalDistanceTravelled(): number {
+    const from = Number(this.form.get('fromKm')?.value) || 0;
+    const to = Number(this.form.get('toKm')?.value) || 0;
+    return to > from ? to - from : 0;
+  }
+
+  // Total Diesel Consumed = Opening Diesel Level + Total Diesel Filled − Closing Diesel Level
+  get totalDieselConsumed(): number {
+    const filled = Number(this.form.get('dieselLitres')?.value) || 0;
+    const opening = Number(this.form.get('openingDieselLevel')?.value) || 0;
+    const closing = Number(this.form.get('closingDieselLevel')?.value) || 0;
+
+    if (opening > 0 || closing > 0) {
+      const consumed = opening + filled - closing;
+      return consumed > 0 ? consumed : 0;
+    }
+    return filled > 0 ? filled : 0;
+  }
+
+  // Mileage (KM/Litre) = Total Distance Travelled ÷ Total Diesel Consumed
+  get calculatedMileage(): number {
+    const distance = this.totalDistanceTravelled;
+    const consumed = this.totalDieselConsumed;
+    if (distance > 0 && consumed > 0) {
+      return Number((distance / consumed).toFixed(2));
+    }
+    return 0;
+  }
+
+  // Operational Expenses = Toll + Workshop + Tyre
+  get totalOtherExpenses(): number {
+    const toll = Number(this.form.get('tollCharges')?.value) || 0;
+    const workshop = Number(this.form.get('workshopExpenses')?.value) || 0;
+    const tyre = Number(this.form.get('tyreMaintenance')?.value) || 0;
+    return toll + workshop + tyre;
+  }
+
+  // Additional Expenses = Driver Salary + RTO Charges
+  get totalAdditionalExpenses(): number {
+    const salary = Number(this.form.get('driverSalary')?.value) || 0;
+    const rto = Number(this.form.get('rtoCharges')?.value) || 0;
+    return salary + rto;
+  }
+
+  // Fuel Cost
+  get totalFuelCost(): number {
+    return Number(this.form.get('dieselCost')?.value) || 0;
+  }
+
+  // Total Trip Cost / Spend
+  get totalTripCost(): number {
+    return this.totalFuelCost + this.totalOtherExpenses + this.totalAdditionalExpenses;
+  }
+
+  // Total Trip Revenue (Returns)
+  get totalTripRevenue(): number {
+    return Number(this.form.get('tripRevenue')?.value) || 0;
+  }
+
+  // Net Profit / Loss = Trip Revenue − Total Trip Cost
+  get netProfit(): number {
+    return this.totalTripRevenue - this.totalTripCost;
+  }
+
+  // Check if all primary required information is filled
+  get isAllRequiredFilled(): boolean {
+    const v = this.form.getRawValue();
+    return !!(
+      v.vehicleId &&
+      v.date &&
+      v.fromLocation &&
+      v.toLocation &&
+      Number(v.fromKm) > 0 &&
+      Number(v.toKm) > 0
+    );
+  }
+
+  // =====================================================
+  // DYNAMIC CARD STATUS & LABELS
+  // =====================================================
+
+  getSelectedVehicleReg(): string {
+    const id = this.form.get('vehicleId')?.value;
+    const found = this.vehicleList.find(v => v.vehicleId === id);
+    return found ? found.registrationNumber : 'Select Vehicle';
+  }
+
+  getLocationSummary(): string {
+    const from = this.form.get('fromLocation')?.value;
+    const to = this.form.get('toLocation')?.value;
+    if (from && to) return `${from} → ${to}`;
+    if (from) return `From: ${from}`;
+    if (to) return `To: ${to}`;
+    return 'From & To Route';
+  }
+
+  getDieselSummary(): string {
+    if (this.calculatedMileage > 0) {
+      return `${this.calculatedMileage} KM/L (${this.totalDistanceTravelled} KM)`;
+    }
+    const litres = Number(this.form.get('dieselLitres')?.value) || 0;
+    if (litres > 0) return `${litres} L Filled`;
+    return 'Fuel, KM & Mileage';
+  }
+
+  getExpensesSummary(): string {
+    if (this.totalOtherExpenses > 0) {
+      return `₹ ${this.totalOtherExpenses.toLocaleString('en-IN')}`;
+    }
+    return 'Toll, Workshop, Tyre';
+  }
+
+  getAdditionalSummary(): string {
+    if (this.totalTripRevenue > 0) {
+      return `Rev: ₹ ${this.totalTripRevenue.toLocaleString('en-IN')}`;
+    }
+    if (this.totalAdditionalExpenses > 0) {
+      return `Spend: ₹ ${this.totalAdditionalExpenses.toLocaleString('en-IN')}`;
+    }
+    return 'Salary, Challan & Notes';
+  }
+
+  getImagesSummary(): string {
+    const count = this.selectedImagePreviews.length;
+    return count > 0 ? `${count} File${count > 1 ? 's' : ''} Attached` : 'Upload Bills & Receipts';
+  }
+
+  getCategoryStatusText(key: SectionKey): string {
+    switch (key) {
+      case 'location': return this.getLocationSummary();
+      case 'diesel': return this.getDieselSummary();
+      case 'expenses': return this.getExpensesSummary();
+      case 'additional': return this.getAdditionalSummary();
+      case 'images': return this.getImagesSummary();
+      case 'review': return this.isAllRequiredFilled ? 'Ready to Submit' : 'Fill Required Details';
+      default: return '';
+    }
+  }
+
+  isSectionComplete(key: SectionKey): boolean {
+    switch (key) {
+      case 'location':
+        return !!this.form.get('fromLocation')?.value && !!this.form.get('toLocation')?.value;
+      case 'diesel':
+        return (Number(this.form.get('fromKm')?.value) > 0 && Number(this.form.get('toKm')?.value) > 0) ||
+               Number(this.form.get('dieselLitres')?.value) > 0;
+      case 'expenses':
+        return this.totalOtherExpenses > 0;
+      case 'additional':
+        return this.totalAdditionalExpenses > 0 || this.totalTripRevenue > 0 || !!this.form.get('notes')?.value;
+      case 'images':
+        return this.selectedImagePreviews.length > 0;
+      case 'review':
+        return this.isAllRequiredFilled;
+      default:
+        return false;
+    }
+  }
+
+  // =====================================================
   // RESET FORM
   // =====================================================
 
@@ -451,6 +716,8 @@ export class DailyLogReport implements OnInit, OnDestroy {
       fromKm: 0,
       toKm: 0,
       kmBeforeFueling: 0,
+      openingDieselLevel: 0,
+      closingDieselLevel: 0,
       tollCharges: 0,
       workshopExpenses: 0,
       tyreMaintenance: 0,
@@ -482,6 +749,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
       this.imageInput.nativeElement.value = '';
     }
 
+    this.activeSection = 'location';
     this.cdr.detectChanges();
   }
 
@@ -489,17 +757,35 @@ export class DailyLogReport implements OnInit, OnDestroy {
   // SAVE / SUBMIT
   // =====================================================
 
-  async save(): Promise<void> {
+  async save(forceSubmit: boolean = false): Promise<void> {
 
     // Validate form
     if (this.form.invalid) {
 
       this.form.markAllAsTouched();
 
+      // Automatically switch to first invalid section if in single view mode
+      if (this.viewMode === 'single') {
+        if (this.form.get('fromLocation')?.invalid || this.form.get('toLocation')?.invalid) {
+          this.activeSection = 'location';
+        } else if (this.form.get('fromKm')?.invalid || this.form.get('toKm')?.invalid) {
+          this.activeSection = 'diesel';
+        }
+      }
+
       this.alert.warning(
         'Please fill in all required fields properly.'
       );
 
+      return;
+    }
+
+    // If all information is filled and user is not yet reviewing it, show the review summary first
+    if (!forceSubmit && this.activeSection !== 'review' && this.viewMode === 'single') {
+      this.activeSection = 'review';
+      this.alert.info(
+        'All information ready. Please review the details below before submitting.'
+      );
       return;
     }
 
@@ -563,6 +849,11 @@ export class DailyLogReport implements OnInit, OnDestroy {
     formData.append('FromKm',value.fromKm?.toString() ?? '0');
     formData.append('ToKm',value.toKm?.toString() ?? '0');
     formData.append('KmBeforeFueling',value.kmBeforeFueling?.toString() ?? '0');
+    formData.append('OpeningDieselLevel',value.openingDieselLevel?.toString() ?? '0');
+    formData.append('ClosingDieselLevel',value.closingDieselLevel?.toString() ?? '0');
+    formData.append('TotalDistanceTravelled',this.totalDistanceTravelled.toString());
+    formData.append('TotalDieselConsumed',this.totalDieselConsumed.toString());
+    formData.append('Mileage',this.calculatedMileage.toString());
     formData.append('TollCharges',value.tollCharges?.toString() ?? '0');
     formData.append('WorkshopExpenses',value.workshopExpenses?.toString() ?? '0');
     formData.append('TyreMaintenance',value.tyreMaintenance?.toString() ?? '0');

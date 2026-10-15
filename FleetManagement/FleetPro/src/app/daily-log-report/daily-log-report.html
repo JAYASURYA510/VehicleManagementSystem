@@ -1,579 +1,981 @@
-<form
-  [formGroup]="form"
-  (ngSubmit)="save()">
+<form [formGroup]="form" (ngSubmit)="save()" class="daily-log-container">
 
   <!-- =====================================================
-       PAGE HEADER
+       PAGE HEADER & CONTROLS
   ====================================================== -->
-
   <div class="page-header">
-
-    <div>
-
-      <h2>
-        Log Daily Expense & Trip Record
-      </h2>
-
+    <div class="header-titles">
+      <h2>Daily Log Report</h2>
       <p class="subtitle">
-        Enter vehicle trip and expense details
+        Enter vehicle trip details, fuel consumption, mileage, and operational expenses
       </p>
-
     </div>
 
-  </div>
-
-
-  <!-- =====================================================
-       MAIN CARD
-  ====================================================== -->
-
-  <div class="card">
-
-
-    <!-- ===================================================
-         VEHICLE + DATE
-    ==================================================== -->
-
-    <div class="form-grid cols-2">
-
-
-      <!-- VEHICLE REGISTRATION NUMBER -->
-
-      <div class="form-group">
-
-        <label>
-          Vehicle Registration Number
-
-          <span class="required">
-            *
-          </span>
-
-          <span
-            class="badge-count"
-            *ngIf="vehicleList.length > 0">
-
-            ({{ vehicleList.length }}
-            active vehicles)
-
-          </span>
-        </label>
-
-
-        <select
-          formControlName="vehicleId">
-
-          <option
-            [ngValue]="null">
-
-            Select Vehicle Registration Number
-
-          </option>
-
-
-          <option
-            *ngFor="let vehicle of vehicleList"
-            [ngValue]="vehicle.vehicleId">
-
-            {{ vehicle.registrationNumber }}
-
-          </option>
-
-        </select>
-
-
-        <small
-          class="alert alert-danger"
-          *ngIf="isInvalid('vehicleId')">
-
-          Please select a vehicle registration number.
-
-        </small>
-
-      </div>
-
-
-      <!-- DATE -->
-
-      <div class="form-group">
-
-        <label>
-          Date
-
-          <span class="required">
-            *
-          </span>
-        </label>
-
-
-        <input
-          type="date"
-          formControlName="date" />
-
-      </div>
-
-      <div class="form-group">
-
-        <label>
-          From Location
-          <span class="required">
-            *
-          </span>
-        </label>
-
-        <input
-          type="text"
-          formControlName="fromLocation"
-          placeholder="E.g. Chennai" />
-
-      </div>
-
-      <div class="form-group">
-
-        <label>
-          To Location
-          <span class="required">
-            *
-          </span>
-        </label>
-
-        <input
-          type="text"
-          formControlName="toLocation"
-          placeholder="E.g. Bangalore" />
-
-      </div>
-
-    </div>
-
-
-    <!-- ===================================================
-         DIESEL CHARGES & FUELING
-    ==================================================== -->
-
-    <div class="section-title">
-
-      Diesel Charges & Fueling
-
-    </div>
-
-
-    <div class="form-grid">
-
-
-      <!-- FUEL STATION -->
-
-      <div class="form-group">
-
-        <label>
-          Fuel Station Name
-        </label>
-
-        <input
-          type="text"
-          formControlName="fuelStation"
-          placeholder="E.g. Shell Ring Road" />
-
-      </div>
-
-
-      <!-- DIESEL LITRES -->
-
-      <div class="form-group">
-
-        <label>
-          Diesel Litres Purchased
-        </label>
-
-        <input
-          type="text"
-          formControlName="dieselLitres" />
-
-      </div>
-
-
-      <!-- DIESEL COST -->
-
-      <div class="form-group">
-
-        <label>
-          Diesel Cost (₹)
-        </label>
-
-        <input
-          type="text"
-          formControlName="dieselCost" />
-
-      </div>
-
-
-      <!-- FROM KM -->
-
-      <div class="form-group">
-
-        <label>
-          From Odometer KM
-
-          <span class="required">
-            *
-          </span>
-        </label>
-
-        <input
-          type="text"
-          formControlName="fromKm"
-          placeholder="Starting KM" />
-
-      </div>
-
-
-      <!-- TO KM -->
-
-      <div class="form-group">
-
-        <label>
-          To Odometer KM
-
-          <span class="required">
-            *
-          </span>
-        </label>
-
-        <input
-          type="text"
-          formControlName="toKm"
-          placeholder="Ending KM" />
-
-      </div>
-
-
-      <!-- KM BEFORE FUELING -->
-
-      <div class="form-group">
-
-        <label>
-          KM Before Fueling
-        </label>
-
-        <input
-          type="text"
-          formControlName="kmBeforeFueling"
-          placeholder="Odometer before fill" />
-
-      </div>
-
-    </div>
-
-
-    <!-- ===================================================
-         OTHER OPERATIONAL EXPENSES
-    ==================================================== -->
-
-    <div class="section-title">
-
-      Other Operational Expenses (₹)
-
-    </div>
-
-
-    <div class="form-grid cols-4">
-
-
-      <!-- TOLL -->
-
-      <div class="form-group">
-
-        <label>
-          Toll Charges
-        </label>
-
-        <input
-          type="text"
-          formControlName="tollCharges" />
-
-      </div>
-
-
-      <!-- WORKSHOP -->
-
-      <div class="form-group">
-
-        <label>
-          Workshop Expenses
-        </label>
-
-        <input
-          type="text"
-          formControlName="workshopExpenses" />
-
-      </div>
-
-
-      <!-- TYRE -->
-
-      <div class="form-group">
-
-        <label>
-          Tyre Maintenance
-        </label>
-
-        <input
-          type="text"
-          formControlName="tyreMaintenance" />
-
-      </div>
-
-    </div>
-
-
-    <!-- ===================================================
-         SALARY / RTO / REVENUE / NOTES
-    ==================================================== -->
-
-    <div class="section-title">
-
-      Additional Details & Notes
-
-    </div>
-
-
-    <div class="form-grid cols-2">
-
-
-      <!-- DRIVER SALARY -->
-
-      <div class="form-group">
-
-        <label>
-          Driver / Helper Salary
-        </label>
-
-        <input
-          type="text"
-          formControlName="driverSalary" />
-
-      </div>
-
-
-      <!-- RTO -->
-
-      <div class="form-group">
-
-        <label>
-          RTO Charges / Challan
-        </label>
-
-        <input
-          type="text"
-          formControlName="rtoCharges" />
-
-      </div>
-
-
-      <!-- TRIP REVENUE -->
-
-      <div class="form-group">
-
-        <label>
-          Trip Revenue (Returns)
-        </label>
-
-        <input
-          type="text"
-          formControlName="tripRevenue" />
-
-      </div>
-
-
-      <!-- NOTES -->
-
-      <div class="form-group">
-
-        <label>
-          Notes
-        </label>
-
-        <input
-          type="text"
-          formControlName="notes"
-          placeholder="Enter notes" />
-
-      </div>
-
-    </div>
-
-
-    <!-- ===================================================
-         IMAGE UPLOAD & PREVIEW SECTION
-    ==================================================== -->
-
-    <div class="section-title">
-
-      Trip / Expense Images
-
-    </div>
-
-
-    <div class="form-group">
-
-
-      <label>
-        Upload Images
-      </label>
-
-
-      <!-- IMPORTANT:
-           #imageInput is required by @ViewChild
-      -->
-
-      <input
-        #imageInput
-        type="file"
-        accept=".jpg,.jpeg,.png,.webp"
-        multiple
-        (change)="onImagesSelected($event)" />
-
-
-      <small>
-        Allowed formats:
-        JPG, JPEG, PNG, WEBP
-      </small>
-
-
-      <!-- =================================================
-           SELECTED IMAGES (PREVIEW LIST)
-      ================================================== -->
-
-      @if (selectedImagePreviews.length > 0) {
-
-        <div class="selected-images-grid">
-
-          @for (
-            item of selectedImagePreviews;
-            track item.id
-          ) {
-
-            <div class="image-item-card">
-
-              <!-- Thumbnail -->
-              <div
-                class="image-thumb-wrap"
-                (click)="openPreviewModal(item)"
-                title="Click to preview larger image">
-
-                <img
-                  [src]="item.previewUrl"
-                  [alt]="item.name"
-                  class="image-thumbnail" />
-
-              </div>
-
-              <!-- Info -->
-              <div class="image-item-info">
-
-                <span
-                  class="image-file-name"
-                  (click)="openPreviewModal(item)"
-                  title="Click to view larger image">
-                  {{ item.name }}
-                </span>
-
-                <span class="image-file-size">
-                  {{ formatFileSize(item.size) }}
-                </span>
-
-              </div>
-
-              <!-- Remove button -->
-              <button
-                type="button"
-                class="remove-image-btn"
-                (click)="removeImage(item.id)"
-                title="Remove image">
-
-                ✕
-
-              </button>
-
-            </div>
-
-          }
-
-        </div>
-
-      }
-
-    </div>
-
-
-    <!-- ===================================================
-         FORM ACTIONS
-    ==================================================== -->
-
-    <div class="form-actions">
-
-
-      <!-- RESET -->
-
+    <div class="header-actions">
+      <!-- Mode toggle: Single Section Focus vs View All Sections -->
+      <button
+        type="button"
+        class="btn btn-mode-toggle"
+        (click)="toggleViewMode()"
+        [title]="viewMode === 'single' ? 'Switch to View All' : 'Switch to Category Focus'">
+        <mat-icon>{{ viewMode === 'single' ? 'view_agenda' : 'dashboard' }}</mat-icon>
+        <span>{{ viewMode === 'single' ? 'View All Sections' : 'Section Focus Mode' }}</span>
+      </button>
+
+      <!-- Reset -->
       <button
         type="button"
         class="btn btn-outline"
-        (click)="onReset()">
-
-        <i
-          class="fa-solid fa-arrow-rotate-left">
-        </i>
-
-        Reset
-
+        (click)="onReset()"
+        title="Reset entire form">
+        <mat-icon>restart_alt</mat-icon>
+        <span>Reset</span>
       </button>
 
-
-      <!-- SUBMIT -->
-
+      <!-- Submit Record / Review -->
       <button
         type="submit"
         class="btn btn-primary"
-        [disabled]="form.invalid">
-
-        <i
-          class="fa-solid fa-check">
-        </i>
-
-        Submit Record
-
+        [disabled]="form.invalid"
+        title="Submit or review record">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ activeSection === 'review' ? 'Confirm & Submit' : 'Submit Record' }}</span>
       </button>
-
-
     </div>
+  </div>
+
+  <!-- =====================================================
+       DEFAULT VEHICLE INFORMATION (ALWAYS SHOWN AT TOP OF PAGE)
+  ====================================================== -->
+  <div class="card default-vehicle-card" id="default-vehicle-panel">
+    <div class="vehicle-card-header">
+      <div class="vehicle-title-group">
+        <!-- <div class="vehicle-icon-box">
+          <span class="v-emoji">🚛</span>
+          <mat-icon class="v-mat">local_shipping</mat-icon>
+        </div> -->
+        <div>
+          <h3>Vehicle Information</h3>
+          <p class="section-subtitle">Vehicle registration number and record date</p>
+        </div>
+      </div>
+
+      <div class="vehicle-status-badge">
+        @if (form.get('vehicleId')?.value && form.get('date')?.value) {
+          <span class="badge-tag-success">✓ {{ getSelectedVehicleReg() }}</span>
+        } @else {
+          <span class="badge-tag-pending">Vehicle Required *</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-grid cols-2">
+      <!-- VEHICLE REGISTRATION NUMBER -->
+      <div class="form-group">
+        <label>
+          Vehicle Registration Number
+          <span class="required">*</span>
+          <span class="badge-count" *ngIf="vehicleList.length > 0">
+            ({{ vehicleList.length }} active vehicles)
+          </span>
+        </label>
+
+        <select formControlName="vehicleId">
+          <option [ngValue]="null">Select Vehicle Registration Number</option>
+          <option *ngFor="let vehicle of vehicleList" [ngValue]="vehicle.vehicleId">
+            {{ vehicle.registrationNumber }}
+          </option>
+        </select>
+
+        <small class="alert alert-danger" *ngIf="isInvalid('vehicleId')">
+          Please select a vehicle registration number.
+        </small>
+      </div>
+
+      <!-- DATE -->
+      <div class="form-group">
+        <label>
+          Date
+          <span class="required">*</span>
+        </label>
+        <input type="date" formControlName="date" />
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       RECTANGLE CATEGORY CARDS GRID
+       Clicking on any card routes to that specific form section
+  ====================================================== -->
+  <div class="rectangle-cards-grid">
+    @for (cat of categories; track cat.key) {
+      <div
+        class="rectangle-card"
+        [class.active]="activeSection === cat.key && viewMode === 'single'"
+        [class]="cat.colorClass"
+        (click)="setActiveSection(cat.key)"
+        role="button"
+        tabindex="0"
+        [attr.aria-label]="cat.title">
+
+        <!-- Medium-sized icon on left -->
+        <div class="rect-icon-box">
+          <span class="rect-emoji">{{ cat.emoji }}</span>
+          <mat-icon class="rect-mat-icon">{{ cat.matIcon }}</mat-icon>
+        </div>
+
+        <!-- Middle: Title and dynamic live details -->
+        <div class="rect-info">
+          <span class="rect-title">{{ cat.title }}</span>
+          <span class="rect-sub" [title]="getCategoryStatusText(cat.key)">
+            {{ getCategoryStatusText(cat.key) }}
+          </span>
+        </div>
+
+        <!-- Right: Status Checkmark or Arrow -->
+        <div class="rect-status">
+          @if (isSectionComplete(cat.key)) {
+            <span class="badge-complete" title="Completed">✓</span>
+          } @else {
+            <span class="badge-arrow">➔</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- All information filled notification banner -->
+  @if (isAllRequiredFilled && activeSection !== 'review') {
+    <div class="ready-banner">
+      <div class="ready-banner-text">
+        <span class="ready-icon">🎉</span>
+        <div>
+          <strong>All required information is filled!</strong>
+          <p>You can review all details before submitting to ensure complete accuracy.</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn btn-review-jump"
+        (click)="setActiveSection('review')">
+        <mat-icon>fact_check</mat-icon>
+        <span>Review Details Before Submitting</span>
+      </button>
+    </div>
+  }
+
+  <!-- Section indicator bar in focus mode -->
+  <!-- @if (viewMode === 'single') {
+    <div class="section-indicator-bar">
+      <span class="indicator-step">
+        Currently Viewing: <strong>{{ activeSection | titlecase }}</strong>
+      </span>
+      <span class="indicator-hint">
+        Click any rectangular card above to switch between forms
+      </span>
+    </div>
+  } -->
+
+  <!-- =====================================================
+       FORM SECTIONS (CONTAINERS)
+  ====================================================== -->
+  <div class="sections-wrapper">
+
+    <!-- ===================================================
+         1. LOCATION SECTION
+    ==================================================== -->
+    @if (viewMode === 'all' || activeSection === 'location') {
+      <div class="card section-card card-location" id="sec-location">
+        <div class="section-card-header">
+          <div class="section-card-title-group">
+            <!-- <div class="section-badge-icon location-bg">
+              <span>📍</span>
+              <mat-icon>near_me</mat-icon>
+            </div> -->
+            <div>
+              <h3>Location & Trip Route</h3>
+              <p class="section-subtitle">Enter departure origin and destination points</p>
+            </div>
+          </div>
+          @if (isSectionComplete('location')) {
+            <span class="section-status-pill pill-success">✓ Route Set</span>
+          }
+        </div>
+
+        <div class="form-grid cols-2">
+          <!-- FROM LOCATION -->
+          <div class="form-group" >
+            <label>
+              From Location
+              <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="fromLocation"
+              placeholder="E.g. Chennai" />
+            <small class="alert alert-danger" *ngIf="isInvalid('fromLocation')">
+              Please enter departure from location.
+            </small>
+          </div>
+
+          <!-- TO LOCATION -->
+          <div class="form-group">
+            <label>
+              To Location
+              <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="toLocation"
+              placeholder="E.g. Bangalore" />
+            <small class="alert alert-danger" *ngIf="isInvalid('toLocation')">
+              Please enter destination to location.
+            </small>
+          </div>
+        </div>
+
+        <!-- Route visual ribbon -->
+        @if (form.get('fromLocation')?.value || form.get('toLocation')?.value) {
+          <div class="route-preview-bar">
+            <span class="route-point origin">🟢 {{ form.get('fromLocation')?.value || 'Origin' }}</span>
+            <div class="route-line">
+              <span class="route-arrow">➔</span>
+              @if (totalDistanceTravelled > 0) {
+                <span class="route-km-pill">{{ totalDistanceTravelled | number }} KM</span>
+              }
+            </div>
+            <span class="route-point dest">🔴 {{ form.get('toLocation')?.value || 'Destination' }}</span>
+          </div>
+        }
+
+        <!-- Section Navigation Footer -->
+        @if (viewMode === 'single') {
+          <div class="section-nav-footer">
+            <div></div>
+            <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
+              <span>Next: Diesel & Mileage</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ===================================================
+         2. DIESEL & MILEAGE SECTION (IDENTICAL TO ATTACHED IMAGE)
+    ==================================================== -->
+    @if (viewMode === 'all' || activeSection === 'diesel') {
+      <div class="card section-card fuel-record-card card-diesel" id="sec-diesel">
+
+  
+
+        <!-- Card Title matching image -->
+        <div class="fuel-card-header">
+          <div class="section-card-title-group">
+            <!-- <div class="section-badge-icon diesel-bg">
+              <span>⛽</span>
+              <mat-icon>local_gas_station</mat-icon>
+            </div> -->
+            <div>
+              <h3 class="fuel-card-main-title">Add fuel / trip record</h3>
+              <p class="section-subtitle">Odometer readings, liters filled, and automatic mileage computation</p>
+            </div>
+          </div>
+          @if (calculatedMileage > 0) {
+            <span class="section-status-pill pill-mileage">
+              ⚡ {{ calculatedMileage | number:'1.2-2' }} KM/L
+            </span>
+          }
+        </div>
+
+        <!-- Form fields layout matching attached image -->
+        <div class="fuel-form-grid">
+          <!-- ROW 1: Date & Bunk name -->
+          <!-- <div class="form-group">
+            <label>Date</label>
+            <input
+              type="date"
+              formControlName="date" />
+          </div> -->
+
+          <div class="form-group">
+            <label>Bunk name</label>
+            <input
+              type="text"
+              formControlName="fuelStation"
+              placeholder="BRM" />
+          </div>
+
+          <!-- ROW 2: Liters & Fuel amount (₹) -->
+          <div class="form-group">
+            <label>Liters</label>
+            <input
+              type="number"
+              formControlName="dieselLitres"
+              placeholder="375" (wheel)="$event.target.blur()" />
+          </div>
+
+          <div class="form-group">
+            <label>Fuel amount (₹)</label>
+            <input
+              type="number"
+              formControlName="dieselCost"
+              placeholder="33,656" />
+          </div>
+
+          <!-- ROW 3: From KM & To KM -->
+          <div class="form-group">
+            <label>
+              From KM
+              <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              formControlName="fromKm"
+              placeholder="283925" />
+            <small class="alert alert-danger" *ngIf="isInvalid('fromKm')">
+              Please enter starting odometer KM.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>
+              To KM
+              <span class="required">*</span>
+            </label>
+            <input
+              type="number"
+              formControlName="toKm"
+              placeholder="286047" />
+            <small class="alert alert-danger" *ngIf="isInvalid('toKm')">
+              Please enter ending odometer KM.
+            </small>
+          </div>
+
+          <!-- ROW 4: Opening Diesel Level & Closing Diesel Level -->
+          <div class="form-group">
+            <label>Opening Diesel Level (L)</label>
+            <input
+              type="number"
+              formControlName="openingDieselLevel"
+              placeholder="0" />
+            <small class="text-muted">Tank level at trip start</small>
+          </div>
+
+          <div class="form-group">
+            <label>Closing Diesel Level (L)</label>
+            <input
+              type="number"
+              formControlName="closingDieselLevel"
+              placeholder="0" />
+            <small class="text-muted">Tank level at trip end</small>
+          </div>
+
+          <!-- ROW 5: KM Before Fueling -->
+          <div class="form-group full-col">
+            <label>KM Before Fueling</label>
+            <input
+              type="number"
+              formControlName="kmBeforeFueling"
+              placeholder="Odometer before fill" />
+          </div>
+        </div>
+
+        <!-- ===================================================
+             HIGHLIGHTED CALCULATION BOX (EXACT MATCH TO IMAGE)
+             Automatically calculates and displays:
+             - Total Distance Travelled = Closing KM − Starting KM
+             - Total Diesel Consumed = Opening Diesel Level + Total Diesel Filled − Closing Diesel Level
+             - Mileage (KM/Litre) = Total Distance Travelled ÷ Total Diesel Consumed
+        ==================================================== -->
+        <div class="fuel-calculation-highlight-box">
+          <div class="calc-row">
+            <span class="calc-label">Calculated total KM</span>
+            <span class="calc-value font-highlight">
+              {{ totalDistanceTravelled > 0 ? (totalDistanceTravelled | number) : '0' }}
+            </span>
+          </div>
+
+          <div class="calc-row">
+            <span class="calc-label">Total Diesel Consumed</span>
+            <span class="calc-value">
+              {{ totalDieselConsumed > 0 ? (totalDieselConsumed | number:'1.0-2') : '0' }} L
+            </span>
+          </div>
+
+          <div class="calc-row">
+            <span class="calc-label">Calculated mileage</span>
+            <span class="calc-value font-highlight">
+              {{ calculatedMileage > 0 ? (calculatedMileage | number:'1.2-2') + ' KM/L' : '0.00 KM/L' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ===================================================
+             ACTION BUTTONS (MATCHING ATTACHED IMAGE)
+        ==================================================== -->
+        <!-- <div class="fuel-card-action-buttons">
+          <button
+            type="button"
+            class="btn btn-save-record-purple"
+            (click)="save()">
+            Save Record
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-clear-form-light"
+            (click)="onReset()">
+            Clear Form
+          </button>
+        </div> -->
+
+        <!-- Section Navigation Footer -->
+        @if (viewMode === 'single') {
+          <div class="section-nav-footer">
+            <button type="button" class="btn btn-nav-prev" (click)="goToPreviousSection()">
+              <mat-icon>arrow_back</mat-icon>
+              <span>Back: Location</span>
+            </button>
+            <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
+              <span>Next: Operational Expenses</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ===================================================
+         3. OTHER OPERATIONAL EXPENSES (₹)
+    ==================================================== -->
+    @if (viewMode === 'all' || activeSection === 'expenses') {
+      <div class="card section-card card-expenses" id="sec-expenses">
+        <div class="section-card-header">
+          <div class="section-card-title-group">
+            <!-- <div class="section-badge-icon expenses-bg">
+              <span>🛠️</span>
+              <mat-icon>build_circle</mat-icon>
+            </div> -->
+            <div>
+              <h3>Other Operational Expenses (₹)</h3>
+              <p class="section-subtitle">Record toll tax, workshop maintenance, and tyre replacement expenses</p>
+            </div>
+          </div>
+          <span class="section-status-pill pill-expenses">
+            Subtotal: ₹ {{ totalOtherExpenses | number }}
+          </span>
+        </div>
+
+        <div class="form-grid cols-3">
+          <!-- TOLL -->
+          <div class="form-group">
+            <label>Toll Charges (₹)</label>
+            <input
+              type="number"
+              formControlName="tollCharges"
+              placeholder="0" />
+          </div>
+
+          <!-- WORKSHOP -->
+          <div class="form-group">
+            <label>Workshop Expenses (₹)</label>
+            <input
+              type="number"
+              formControlName="workshopExpenses"
+              placeholder="0" />
+          </div>
+
+          <!-- TYRE -->
+          <div class="form-group">
+            <label>Tyre Maintenance (₹)</label>
+            <input
+              type="number"
+              formControlName="tyreMaintenance"
+              placeholder="0" />
+          </div>
+        </div>
+
+        <!-- Section Navigation Footer -->
+        @if (viewMode === 'single') {
+          <div class="section-nav-footer">
+            <button type="button" class="btn btn-nav-prev" (click)="goToPreviousSection()">
+              <mat-icon>arrow_back</mat-icon>
+              <span>Back: Diesel & Mileage</span>
+            </button>
+            <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
+              <span>Next: Additional Details</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ===================================================
+         4. ADDITIONAL DETAILS & NOTES
+    ==================================================== -->
+    @if (viewMode === 'all' || activeSection === 'additional') {
+      <div class="card section-card card-additional" id="sec-additional">
+        <div class="section-card-header">
+          <div class="section-card-title-group">
+            <!-- <div class="section-badge-icon additional-bg">
+              <span>📋</span>
+              <mat-icon>receipt_long</mat-icon>
+            </div> -->
+            <div>
+              <h3>Additional Details & Notes</h3>
+              <p class="section-subtitle">Driver salary, RTO challans, trip returns revenue, and notes</p>
+            </div>
+          </div>
+          @if (totalTripRevenue > 0) {
+            <span class="section-status-pill pill-revenue">
+              Trip Revenue: ₹ {{ totalTripRevenue | number }}
+            </span>
+          }
+        </div>
+
+        <div class="form-grid cols-2">
+          <!-- DRIVER SALARY -->
+          <div class="form-group">
+            <label>Driver / Helper Salary (₹)</label>
+            <input
+              type="number"
+              formControlName="driverSalary"
+              placeholder="0" />
+          </div>
+
+          <!-- RTO -->
+          <div class="form-group">
+            <label>RTO Charges / Challan (₹)</label>
+            <input
+              type="number"
+              formControlName="rtoCharges"
+              placeholder="0" />
+          </div>
+
+          <!-- TRIP REVENUE -->
+          <div class="form-group">
+            <label>Trip Revenue (Returns) (₹)</label>
+            <input
+              type="number"
+              formControlName="tripRevenue"
+              placeholder="0" />
+          </div>
+
+          <!-- NOTES -->
+          <div class="form-group">
+            <label>Notes</label>
+            <input
+              type="text"
+              formControlName="notes"
+              placeholder="Enter trip notes, customer details, or remarks" />
+          </div>
+        </div>
+
+        <!-- Section Navigation Footer -->
+        @if (viewMode === 'single') {
+          <div class="section-nav-footer">
+            <button type="button" class="btn btn-nav-prev" (click)="goToPreviousSection()">
+              <mat-icon>arrow_back</mat-icon>
+              <span>Back: Other Expenses</span>
+            </button>
+            <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
+              <span>Next: Trip Images</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ===================================================
+         5. TRIP / EXPENSE IMAGES
+    ==================================================== -->
+    @if (viewMode === 'all' || activeSection === 'images') {
+      <div class="card section-card card-images" id="sec-images">
+        <div class="section-card-header">
+          <div class="section-card-title-group">
+            <!-- <div class="section-badge-icon images-bg">
+              <span>📷</span>
+              <mat-icon>photo_camera</mat-icon>
+            </div> -->
+            <div>
+              <h3>Trip / Expense Images</h3>
+              <p class="section-subtitle">Upload diesel receipts, toll tickets, workshop bills, and odometer snaps</p>
+            </div>
+          </div>
+          <span class="section-status-pill pill-images">
+            {{ selectedImagePreviews.length }} File(s)
+          </span>
+        </div>
+
+        <!-- File Upload Area -->
+        <div class="form-group">
+          <label>Upload Images (Slips, Receipts, Bills)</label>
+
+          <div class="upload-dropzone" (click)="imageInput.click()">
+            <div class="dropzone-icon">
+              <mat-icon>cloud_upload</mat-icon>
+            </div>
+            <div class="dropzone-text">
+              <strong>Click to browse or drop images here</strong>
+              <small>Supported formats: JPG, JPEG, PNG, WEBP</small>
+            </div>
+          </div>
+
+          <input
+            #imageInput
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp"
+            multiple
+            class="hidden-file-input"
+            (change)="onImagesSelected($event)" />
+
+          <!-- Selected Images Previews -->
+          @if (selectedImagePreviews.length > 0) {
+            <div class="selected-images-grid">
+              @for (item of selectedImagePreviews; track item.id) {
+                <div class="image-item-card">
+                  <!-- Thumbnail -->
+                  <div
+                    class="image-thumb-wrap"
+                    (click)="openPreviewModal(item)"
+                    title="Click to preview larger image">
+                    <img
+                      [src]="item.previewUrl"
+                      [alt]="item.name"
+                      class="image-thumbnail" />
+                  </div>
+
+                  <!-- Info -->
+                  <div class="image-item-info">
+                    <span
+                      class="image-file-name"
+                      (click)="openPreviewModal(item)"
+                      title="Click to view larger image">
+                      {{ item.name }}
+                    </span>
+                    <span class="image-file-size">
+                      {{ formatFileSize(item.size) }}
+                    </span>
+                  </div>
+
+                  <!-- Remove button -->
+                  <button
+                    type="button"
+                    class="remove-image-btn"
+                    (click)="removeImage(item.id)"
+                    title="Remove image">
+                    ✕
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Section Navigation Footer -->
+        @if (viewMode === 'single') {
+          <div class="section-nav-footer">
+            <button type="button" class="btn btn-nav-prev" (click)="goToPreviousSection()">
+              <mat-icon>arrow_back</mat-icon>
+              <span>Back: Additional Details</span>
+            </button>
+            <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
+              <span>Next: Review & Submit</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ===================================================
+         6. REVIEW & CONFIRM SECTION (PRE-SUBMISSION VERIFICATION)
+         Once all information are filled, show details before submitting.
+         Clicking any "Edit" button routes to the respective form section.
+    ==================================================== -->
+    @if (viewMode === 'all' || activeSection === 'review') {
+      <div class="card section-card card-review" id="sec-review">
+        <div class="section-card-header">
+          <div class="section-card-title-group">
+            <!-- <div class="section-badge-icon review-bg">
+              <span>📝</span>
+              <mat-icon>fact_check</mat-icon>
+            </div> -->
+            <div>
+              <h3>Review Trip & Expense Information Before Submitting</h3>
+              <p class="section-subtitle">
+                Please verify all entered details. Click "Edit" on any block to make adjustments.
+              </p>
+            </div>
+          </div>
+          <span
+            class="section-status-pill"
+            [class.pill-success]="isAllRequiredFilled"
+            [class.pill-danger]="!isAllRequiredFilled">
+            {{ isAllRequiredFilled ? '✓ Ready to Submit' : '⚠️ Missing Required Information' }}
+          </span>
+        </div>
+
+        <!-- REVIEW BLOCKS GRID -->
+        <div class="review-blocks-grid">
+
+          <!-- 1. VEHICLE & DATE BLOCK -->
+          <div class="review-block">
+            <div class="review-block-header">
+              <span class="review-block-title">🚛 Vehicle Details</span>
+              <button
+                type="button"
+                class="btn-edit-link"
+                (click)="setActiveSection('location')"
+                title="Edit Vehicle Details">
+                ✏️ Edit
+              </button>
+            </div>
+            <div class="review-block-body">
+              <div class="review-row">
+                <span class="r-label">Vehicle Registration:</span>
+                <span class="r-val highlight">{{ getSelectedVehicleReg() }}</span>
+              </div>
+              <div class="review-row">
+                <span class="r-label">Trip Date:</span>
+                <span class="r-val">{{ form.get('date')?.value || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. ROUTE BLOCK -->
+          <div class="review-block">
+            <div class="review-block-header">
+              <span class="review-block-title">📍 Trip Route</span>
+              <button
+                type="button"
+                class="btn-edit-link"
+                (click)="setActiveSection('location')"
+                title="Edit Trip Route">
+                ✏️ Edit
+              </button>
+            </div>
+            <div class="review-block-body">
+              <div class="review-row">
+                <span class="r-label">Departure From:</span>
+                <span class="r-val">{{ form.get('fromLocation')?.value || '-' }}</span>
+              </div>
+              <div class="review-row">
+                <span class="r-label">Destination To:</span>
+                <span class="r-val">{{ form.get('toLocation')?.value || '-' }}</span>
+              </div>
+              <div class="review-row">
+                <span class="r-label">Total Distance:</span>
+                <span class="r-val highlight">{{ totalDistanceTravelled | number }} KM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. FUEL & MILEAGE BLOCK -->
+          <div class="review-block span-2">
+            <div class="review-block-header">
+              <span class="review-block-title">⛽ Fuel & Mileage Computations</span>
+              <button
+                type="button"
+                class="btn-edit-link"
+                (click)="setActiveSection('diesel')"
+                title="Edit Fuel Record">
+                ✏️ Edit
+              </button>
+            </div>
+            <div class="review-block-body grid-2-col">
+              <div>
+                <div class="review-row">
+                  <span class="r-label">Bunk Name:</span>
+                  <span class="r-val">{{ form.get('fuelStation')?.value || '-' }}</span>
+                </div>
+                <div class="review-row">
+                  <span class="r-label">Liters Filled:</span>
+                  <span class="r-val">{{ form.get('dieselLitres')?.value || 0 }} L</span>
+                </div>
+                <div class="review-row">
+                  <span class="r-label">Fuel Amount:</span>
+                  <span class="r-val">₹ {{ (form.get('dieselCost')?.value || 0) | number }}</span>
+                </div>
+              </div>
+              <div>
+                <div class="review-row">
+                  <span class="r-label">Odometer (From ➔ To):</span>
+                  <span class="r-val">{{ form.get('fromKm')?.value || 0 }} ➔ {{ form.get('toKm')?.value || 0 }} KM</span>
+                </div>
+                <div class="review-row">
+                  <span class="r-label">Diesel Consumed:</span>
+                  <span class="r-val highlight">{{ totalDieselConsumed | number:'1.0-2' }} L</span>
+                </div>
+                <div class="review-row">
+                  <span class="r-label">Calculated Mileage:</span>
+                  <span class="r-val highlight-mileage">⚡ {{ calculatedMileage | number:'1.2-2' }} KM/L</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. OPERATIONAL EXPENSES BLOCK -->
+          <div class="review-block">
+            <div class="review-block-header">
+              <span class="review-block-title">🛠️ Operational Expenses</span>
+              <button
+                type="button"
+                class="btn-edit-link"
+                (click)="setActiveSection('expenses')"
+                title="Edit Operational Expenses">
+                ✏️ Edit
+              </button>
+            </div>
+            <div class="review-block-body">
+              <div class="review-row">
+                <span class="r-label">Toll Charges:</span>
+                <span class="r-val">₹ {{ (form.get('tollCharges')?.value || 0) | number }}</span>
+              </div>
+              <div class="review-row">
+                <span class="r-label">Workshop Expenses:</span>
+                <span class="r-val">₹ {{ (form.get('workshopExpenses')?.value || 0) | number }}</span>
+              </div>
+              <div class="review-row">
+                <span class="r-label">Tyre Maintenance:</span>
+                <span class="r-val">₹ {{ (form.get('tyreMaintenance')?.value || 0) | number }}</span>
+              </div>
+              <div class="review-row divider-top">
+                <span class="r-label font-bold">Total Operational:</span>
+                <span class="r-val highlight">₹ {{ totalOtherExpenses | number }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. ADDITIONAL & REVENUE BLOCK -->
+          <div class="review-block">
+            <div class="review-block-header">
+              <span class="review-block-title">📋 Additional & Revenue</span>
+              <button
+                type="button"
+                class="btn-edit-link"
+                (click)="setActiveSection('additional')"
+                title="Edit Additional Details">
+                ✏️ Edit
+              </button>
+            </div>
+            <div class="review-block-body">
+              <div class="review-row">
+                <span class="r-label">Driver/Helper Salary:</span>
+                <span class="r-val">₹ {{ (form.get('driverSalary')?.value || 0) | number }}</span>
+              </div>
+              <div class="review-row">
+                <span class="r-label">RTO Charges / Challan:</span>
+                <span class="r-val">₹ {{ (form.get('rtoCharges')?.value || 0) | number }}</span>
+              </div>
+              <div class="review-row">
+                <span class="r-label">Trip Revenue (Returns):</span>
+                <span class="r-val highlight-green">₹ {{ totalTripRevenue | number }}</span>
+              </div>
+              @if (form.get('notes')?.value) {
+                <div class="review-row">
+                  <span class="r-label">Notes:</span>
+                  <span class="r-val notes-text">{{ form.get('notes')?.value }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- 6. ATTACHED IMAGES BLOCK -->
+          <div class="review-block span-2">
+            <div class="review-block-header">
+              <span class="review-block-title">📷 Attached Images ({{ selectedImagePreviews.length }})</span>
+              <button
+                type="button"
+                class="btn-edit-link"
+                (click)="setActiveSection('images')"
+                title="Edit Uploaded Images">
+                ✏️ Edit
+              </button>
+            </div>
+            <div class="review-block-body">
+              @if (selectedImagePreviews.length > 0) {
+                <div class="review-images-strip">
+                  @for (img of selectedImagePreviews; track img.id) {
+                    <div
+                      class="review-thumb-item"
+                      (click)="openPreviewModal(img)"
+                      [title]="img.name">
+                      <img [src]="img.previewUrl" [alt]="img.name" />
+                      <span class="thumb-name">{{ img.name }}</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-muted no-margin">No images or receipts attached yet.</p>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TOTAL FINANCIAL SUMMARY STRIP -->
+        <!-- <div class="review-financial-summary">
+          <div class="fin-summary-item">
+            <span class="fin-label">Total Spend / Expenses</span>
+            <span class="fin-val text-danger">{{ totalTripCost | currency:'INR':'symbol':'1.0-0' }}</span>
+          </div>
+
+          <div class="fin-summary-item">
+            <span class="fin-label">Total Trip Revenue</span>
+            <span class="fin-val text-success">{{ totalTripRevenue | currency:'INR':'symbol':'1.0-0' }}</span>
+          </div>
+
+          <div class="fin-summary-item">
+            <span class="fin-label">Estimated Net Margin</span>
+            <span class="fin-val" [class.text-success]="netProfit >= 0" [class.text-danger]="netProfit < 0">
+              {{ netProfit | currency:'INR':'symbol':'1.0-0' }}
+            </span>
+          </div>
+        </div> -->
+
+        <!-- FINAL SUBMIT CONFIRMATION BUTTONS -->
+        <div class="review-final-actions">
+          <button
+            type="button"
+            class="btn btn-primary btn-submit-final"
+            [disabled]="form.invalid"
+            (click)="save(true)">
+            <mat-icon>check_circle</mat-icon>
+            <span>Confirm & Submit Daily Tracking Record</span>
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline"
+            (click)="setActiveSection('location')">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Back to Forms</span>
+          </button>
+        </div>
+      </div>
+    }
 
   </div>
 
   <!-- =====================================================
        IMAGE PREVIEW MODAL POPUP
   ====================================================== -->
-
   @if (previewModalImage) {
-
-    <div
-      class="modal-overlay"
-      (click)="closePreviewModal()">
-
+    <div class="modal-overlay" (click)="closePreviewModal()">
       <div
         class="modal-card image-preview-modal-card"
         (click)="$event.stopPropagation()">
 
         <div class="modal-header">
-
           <div class="modal-title-wrap">
-
-            <h3>
-              {{ previewModalImage.name }}
-            </h3>
-
+            <h3>{{ previewModalImage.name }}</h3>
             <span class="image-preview-meta">
               {{ formatFileSize(previewModalImage.size) }} • {{ previewModalImage.type }}
             </span>
-
           </div>
 
           <button
@@ -581,26 +983,18 @@
             class="btn-icon"
             (click)="closePreviewModal()"
             title="Close preview">
-
             ✕
-
           </button>
-
         </div>
 
         <div class="image-preview-modal-body">
-
           <img
             [src]="previewModalImage.previewUrl"
             [alt]="previewModalImage.name"
             class="modal-large-image" />
-
         </div>
-
       </div>
-
     </div>
-
   }
 
 </form>
