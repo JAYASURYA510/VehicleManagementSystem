@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using FleetPro.API.Data;
 using FleetPro.API.Data.Entitys;
 using FleetPro.API.DTOs;
@@ -288,7 +288,7 @@ namespace FleetPro.API.Repository.DailyTracking
             };
         }
 
-        public async Task<List<DailyTrackingSearch>> getDailyTrackingAsync(Guid tenantId, int RoleId, int UserId)
+        public async Task<List<DailyTrackingSearch>> getDailyTrackingAsync(Guid tenantId, int RoleId, int UserId, DailyTrackingSearchRequest request)
         {
             try
             {
@@ -297,6 +297,16 @@ namespace FleetPro.API.Repository.DailyTracking
                 {
                     var trakingData = await context.DailyTrackingRecords.AsNoTracking().Where(
                             x => x.TenantId == tenantId && x.IsDelete != true).ToListAsync();
+
+                    if (request.FromDate.HasValue && request.ToDate.HasValue)
+                    {
+                       trakingData = trakingData.Where(x => x.TripDate >= request.FromDate.Value && x.TripDate <= request.ToDate.Value).ToList();
+                    }
+
+                    if (request.registrationNumber != null)
+                    {
+                       trakingData = trakingData.Where(x => x.VehicleId == request.registrationNumber).ToList();
+                    }
 
                         var result = (
                             from track in trakingData
@@ -385,6 +395,16 @@ namespace FleetPro.API.Repository.DailyTracking
                     {
                         var trakingData = await context.DailyTrackingRecords.AsNoTracking().Where(
                             x => assignedVehicleIds.Contains(x.VehicleId) && x.TenantId == tenantId && x.CreatedBy == UserId && x.IsDelete != true).ToListAsync();
+                        
+                        if (request.FromDate.HasValue && request.ToDate.HasValue)
+                        {
+                           trakingData = trakingData.Where(x => x.TripDate >= request.FromDate.Value && x.TripDate <= request.ToDate.Value).ToList();
+                        }
+
+                        if (request.registrationNumber != Guid.Empty)
+                        {
+                           trakingData = trakingData.Where(x => x.VehicleId == request.registrationNumber).ToList();
+                        }
 
                         var result = (
                             from track in trakingData

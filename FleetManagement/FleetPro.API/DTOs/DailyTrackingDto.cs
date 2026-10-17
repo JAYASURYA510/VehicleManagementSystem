@@ -151,4 +151,11 @@ namespace FleetPro.API.DTOs
 
         public int? StatusType { get; set; }
     }
+
+    public class DailyTrackingSearchRequest
+    {
+        public Guid? registrationNumber { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+    }
 }

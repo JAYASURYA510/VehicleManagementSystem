@@ -87,9 +87,9 @@ namespace FleetPro.API.Controllers.DailyTracking
         }
 
         [HttpPost("getDailyTrakingBySearch/{RoleId}/{UserId}")]
-        public async Task<IActionResult> getDailyTracking(Guid tenantId, int RoleId, int UserId)
+        public async Task<IActionResult> getDailyTracking(Guid tenantId, int RoleId, int UserId, [FromBody] DailyTrackingSearchRequest request)
         {
-            var result = await DailyTrackingRepository.getDailyTrackingAsync(tenantId, RoleId, UserId);
+            var result = await DailyTrackingRepository.getDailyTrackingAsync(tenantId, RoleId, UserId, request);
 
             return Ok(result);
         }

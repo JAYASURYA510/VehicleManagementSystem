@@ -8,42 +8,44 @@
   </button>
 </div>
 
-<div class="filter-panel">
-
-  <!-- Search -->
-  <div class="form-group">
-    <label>Search</label>
-    <input
-      type="text"
-      
-      placeholder="Search registration number..."
-    />
-  </div>
+<div  [formGroup]="searchTracking" class="filter-panel">
 
   <!-- From Date -->
-  <div class="form-group">
-    <label>From</label>
-    <input
-      type="date"
-      [(ngModel)]="filterFrom"
-    />
-  </div>
+   <div class="form-group">
+      <label>
+        From Date
+      </label>
+
+      <app-datetime-picker formControlName="fromDate" pickerType="calendar"
+        placeholder="dd-mm-yyyy"></app-datetime-picker>
+
+    </div>
 
   <!-- To Date -->
-  <div class="form-group">
-    <label>To</label>
-    <input
-      type="date"
-      [(ngModel)]="filterTo"
-    />
-  </div>
+   <div class="form-group">
+      <label>
+        To Date
+      </label>
 
-  <!-- Filter Button -->
-  <button
-    class="btn btn-primary"
-    (click)="load()">
-    🔽 Filter
-  </button>
+      <app-datetime-picker
+        formControlName="toDate"
+        pickerType="calendar"
+        placeholder="dd-mm-yyyy"
+        [minDate]="selectedFromDate"
+        [disabled]="!selectedFromDate"
+      ></app-datetime-picker>
+
+    </div>
+
+   <div class="form-group">
+      <label>Registration Number</label>
+      <ngx-select formControlName="registrationNumber" [items]="vehicleList || []" optionValueField="vehicleId"
+        optionTextField="registrationNumber" placeholder="Select registration" [allowClear]="true">
+      </ngx-select>
+    </div>
+
+
+  <button type="button" class="btn btn-primary btn-blue" (click)="load()">Search</button>
 
 </div>
 <div class="card">

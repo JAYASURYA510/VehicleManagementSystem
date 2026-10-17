@@ -41,9 +41,22 @@ export class DateTimePickerComponent implements ControlValueAccessor {
   @Input() hour12Timer = true;
   @Input() firstDayOfWeek = 1;
   @Input() hideOtherMonths = true;
+  @Input() minDate: Date | null = null;
 
   value: Date | null = null;
-  disabled = false;
+
+  private _disabled = false;
+
+  @Input()
+  set disabled(val: boolean) {
+    this._disabled = val;
+    if (val) {
+      this.value = null;
+    }
+  }
+  get disabled(): boolean {
+    return this._disabled;
+  }
 
   private onChange: (value: Date | null) => void = () => {};
   private onTouched: () => void = () => {};
@@ -65,7 +78,7 @@ export class DateTimePickerComponent implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this._disabled = isDisabled;
   }
 
   onValueChange(value: Date | null): void {

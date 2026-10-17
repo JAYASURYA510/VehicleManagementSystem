@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
@@ -12,7 +13,9 @@ import {
   FormBuilder,
   ReactiveFormsModule,
   Validators,
-  FormsModule
+  FormsModule,
+  AbstractControl,
+  ValidationErrors
 } from '@angular/forms';
 
 import {
@@ -59,6 +62,9 @@ import {
   UserRole,
   Vehicle
 } from '../../core/models';
+import { NgxSelectModule } from 'ngx-select-ex';
+import { DateTimePickerService } from '../../core/services/datetime-picker.service';
+import { DateTimePickerComponent } from '../../shared/datetime-picker/datetime-picker';
 
 
 @Component({
@@ -81,7 +87,9 @@ import {
 
     MatFormField,
     MatOption,
-    MatSelect
+    MatSelect,
+    NgxSelectModule,
+    DateTimePickerComponent
   ],
 
   templateUrl: './daily-tracking.component.html',
@@ -103,6 +111,8 @@ export class DailyTrackingComponent
   private fb = inject(FormBuilder);
 
   private router = inject(Router);
+  private dateTimePickerService = inject(DateTimePickerService);
+  private cdr = inject(ChangeDetectorRef);
 
 
   // Tenant ID
@@ -115,7 +125,7 @@ export class DailyTrackingComponent
     localStorage.getItem('fleetpro_user') || '{}'
   );
 
-
+  vehicleList: any;
   role = this.localStorageData.role;
 
   userId = this.localStorageData.userId;
@@ -264,6 +274,20 @@ export class DailyTrackingComponent
   // =========================================================
   // Form
   // =========================================================
+  searchTracking = this.fb.group({
+
+    registrationNumber: this.fb.control(null),
+    fromDate: [new Date()],
+    toDate: [new Date()]
+  }, { validators: dateRangeValidator });
+
+
+  /** Returns the currently selected From Date value (or null) for use in [minDate] / [disabled] bindings on the To Date picker. */
+  get selectedFromDate(): Date | null {
+    const val: any = this.searchTracking.get('fromDate')?.value;
+    if (!val) return null;
+    return val instanceof Date ? val : new Date(val);
+  }
 
   form = this.fb.group({
 
@@ -322,7 +346,7 @@ export class DailyTrackingComponent
   // =========================================================
 
   ngOnInit(): void {
-
+    this.getVehicleNumber();
     this.load();
 
   }
@@ -335,6 +359,11 @@ export class DailyTrackingComponent
 
     this.dataSource.sort =
       this.sort;
+
+    // Trigger a second change-detection pass so that getters that depend
+    // on `paginator` (startRecord, endRecord, totalPages) are evaluated
+    // after the view is fully initialised, preventing NG0100.
+    this.cdr.detectChanges();
 
   }
 
@@ -398,224 +427,70 @@ export class DailyTrackingComponent
 
   }
 
-
-  // =========================================================
-  // Load Daily Tracking
-  // =========================================================
+  asignRole : any;
+  getVehicleNumber() {
+    this.asignRole = UserRole[this.role as keyof typeof UserRole];
+    this.api.list(`VehicleAssignment/${this.tenandId}/getUserBasedVehicleDropDown/${this.asignRole}/${this.userId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((response: any) => {
+      this.vehicleList = response?.data;
+    });
+  }
 
   load(): void {
-
     this.loading.set(true);
 
-
-    const roleId =
-      UserRole[
-        this.role as keyof typeof UserRole
-      ];
+    const roleId =UserRole[this.role as keyof typeof UserRole];
 
 
-    const payload =
-      (
-        this.filterFrom ||
-        this.filterTo
-      )
-        ? {
-
-            fromDate:
-              this.filterFrom || null,
-
-            toDate:
-              this.filterTo || null
-
-          }
-
-        : null;
-
-
-    console.log(
-      'Calling Daily Tracking API...'
-    );
-
-
-    console.log(
-      'Tenant ID:',
-      this.tenandId
-    );
-
-
-    console.log(
-      'Role ID:',
-      roleId
-    );
-
-
-    console.log(
-      'User ID:',
-      this.userId
-    );
-
-
-    console.log(
-      'Request Payload:',
-      payload
-    );
-
-
-    this.api
-      .create(
-
-        `DailyTracking/${this.tenandId}/getDailyTrakingBySearch/${roleId}/${this.userId}`,
-
-        payload
-
-      )
-
-      .pipe(
-        takeUntil(
-          this.unsubscribe$
-        )
-      )
-
-      .subscribe({
-
-        // =================================================
-        // SUCCESS
-        // =================================================
-
+    const payload = {
+      registrationNumber: this.searchTracking.get('registrationNumber')?.value || null,
+      fromDate: this.searchTracking.get('fromDate')?.value
+        ? this.dateTimePickerService.startDate(this.searchTracking.get('fromDate')!.value)
+        : null,
+      toDate: this.searchTracking.get('toDate')?.value
+        ? this.dateTimePickerService.endDate(this.searchTracking.get('toDate')!.value)
+        : null
+    }
+    this.api.create(`DailyTracking/${this.tenandId}/getDailyTrakingBySearch/${roleId}/${this.userId}`,payload).pipe(takeUntil(this.unsubscribe$)).subscribe({
         next: (data: any) => {
-
-
-          console.log(
-            '===================================='
-          );
-
-
-          console.log(
-            'getDailyTracking API RESPONSE:'
-          );
-
-
-          console.log(
-            data
-          );
-
-
-          console.log(
-            '===================================='
-          );
-
-
           let items: any[] = [];
-
-
-          // API returns array directly
           if (Array.isArray(data)) {
-
             items = data;
-
           }
-
-
           // API returns { message: [] }
-          else if (
-            data &&
-            Array.isArray(data.message)
-          ) {
-
-            items =
-              data.message;
-
+          else if (data &&Array.isArray(data.message)) {
+            items = data.message;
           }
-
 
           // API returns { data: [] }
-          else if (
-            data &&
-            Array.isArray(data.data)
-          ) {
-
-            items =
-              data.data;
-
+          else if (data && Array.isArray(data.data)) {
+            items = data.data;
           }
-
-
-          console.log(
-            'Processed Records:',
-            items
-          );
-
-
-          console.log(
-            'Total Records:',
-            items.length
-          );
-
 
           // Set signal
           this.records.set(items);
 
-
           // Set Material table
-          this.dataSource.data =
-            items;
+          this.dataSource.data = items;
 
 
           // Make sure paginator is connected
           if (this.paginator) {
-
-            this.dataSource.paginator =
-              this.paginator;
-
+            this.dataSource.paginator = this.paginator;
           }
 
 
           // Make sure sorting is connected
           if (this.sort) {
-
-            this.dataSource.sort =
-              this.sort;
-
+            this.dataSource.sort =this.sort;
           }
-
-
           this.loading.set(false);
 
         },
 
-
-        // =================================================
-        // ERROR
-        // =================================================
-
         error: (error) => {
-
-          console.error(
-            '===================================='
-          );
-
-
-          console.error(
-            'Error loading daily tracking:'
-          );
-
-
-          console.error(
-            error
-          );
-
-
-          console.error(
-            '===================================='
-          );
-
-
           this.records.set([]);
-
           this.dataSource.data = [];
-
           this.loading.set(false);
-
         }
 
       });
@@ -720,4 +595,18 @@ export class DailyTrackingComponent
 
   }
 
+}
+
+function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
+  const fromDate = group.get('fromDate')?.value;
+  const toDate = group.get('toDate')?.value;
+
+  if (fromDate && toDate) {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    if (to < from) {
+      return { dateRangeInvalid: true };
+    }
+  }
+  return null;
 }

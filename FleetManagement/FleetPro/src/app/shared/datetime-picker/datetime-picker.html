@@ -10,6 +10,7 @@
     [placeholder]="placeholder"
     [disabled]="disabled"
     (blur)="markTouched()"
+    [min]="minDate"
     readonly
   />
   <span class="calendar-icon" [owlDateTimeTrigger]="picker">
