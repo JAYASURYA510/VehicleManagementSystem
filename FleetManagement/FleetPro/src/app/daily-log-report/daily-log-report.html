@@ -28,7 +28,7 @@
         class="btn btn-outline"
         (click)="onReset()"
         title="Reset entire form">
-        <mat-icon>restart_alt</mat-icon>
+         <i class="fa-solid fa-arrow-rotate-left"></i>
         <span>Reset</span>
       </button>
 
@@ -38,40 +38,19 @@
         class="btn btn-primary"
         [disabled]="form.invalid"
         title="Submit or review record">
-        <mat-icon>check_circle</mat-icon>
+        <i class="fa-solid fa-check"></i>
         <span>{{ activeSection === 'review' ? 'Confirm & Submit' : 'Submit Record' }}</span>
       </button>
     </div>
   </div>
 
   <!-- =====================================================
-       DEFAULT VEHICLE INFORMATION (ALWAYS SHOWN AT TOP OF PAGE)
+       VEHICLE INFORMATION (ALWAYS SHOWN AT TOP OF PAGE)
   ====================================================== -->
-  <div class="card default-vehicle-card" id="default-vehicle-panel">
-    <div class="vehicle-card-header">
-      <div class="vehicle-title-group">
-        <!-- <div class="vehicle-icon-box">
-          <span class="v-emoji">🚛</span>
-          <mat-icon class="v-mat">local_shipping</mat-icon>
-        </div> -->
-        <div>
-          <h3>Vehicle Information</h3>
-          <p class="section-subtitle">Vehicle registration number and record date</p>
-        </div>
-      </div>
-
-      <div class="vehicle-status-badge">
-        @if (form.get('vehicleId')?.value && form.get('date')?.value) {
-          <span class="badge-tag-success">✓ {{ getSelectedVehicleReg() }}</span>
-        } @else {
-          <span class="badge-tag-pending">Vehicle Required *</span>
-        }
-      </div>
-    </div>
-
+  <div class="card vehicle-card" id="default-vehicle-panel">
     <div class="form-grid cols-2">
       <!-- VEHICLE REGISTRATION NUMBER -->
-      <div class="form-group">
+      <div class="form-groups">
         <label>
           Vehicle Registration Number
           <span class="required">*</span>
@@ -372,7 +351,7 @@
           </div>
 
           <!-- ROW 5: KM Before Fueling -->
-          <div class="form-group full-col">
+          <div class="form-group">
             <label>KM Before Fueling</label>
             <input
               type="number"
@@ -459,7 +438,7 @@
             </div> -->
             <div>
               <h3>Other Operational Expenses (₹)</h3>
-              <p class="section-subtitle">Record toll tax, workshop maintenance, and tyre replacement expenses</p>
+              <p class="section-subtitle">Record toll tax, workshop maintenance, tyre, RTO challans, trip revenue, and notes</p>
             </div>
           </div>
           <span class="section-status-pill pill-expenses">
@@ -492,56 +471,6 @@
             <input
               type="number"
               formControlName="tyreMaintenance"
-              placeholder="0" />
-          </div>
-        </div>
-
-        <!-- Section Navigation Footer -->
-        @if (viewMode === 'single') {
-          <div class="section-nav-footer">
-            <button type="button" class="btn btn-nav-prev" (click)="goToPreviousSection()">
-              <mat-icon>arrow_back</mat-icon>
-              <span>Back: Diesel & Mileage</span>
-            </button>
-            <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
-              <span>Next: Additional Details</span>
-              <mat-icon>arrow_forward</mat-icon>
-            </button>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- ===================================================
-         4. ADDITIONAL DETAILS & NOTES
-    ==================================================== -->
-    @if (viewMode === 'all' || activeSection === 'additional') {
-      <div class="card section-card card-additional" id="sec-additional">
-        <div class="section-card-header">
-          <div class="section-card-title-group">
-            <!-- <div class="section-badge-icon additional-bg">
-              <span>📋</span>
-              <mat-icon>receipt_long</mat-icon>
-            </div> -->
-            <div>
-              <h3>Additional Details & Notes</h3>
-              <p class="section-subtitle">Driver salary, RTO challans, trip returns revenue, and notes</p>
-            </div>
-          </div>
-          @if (totalTripRevenue > 0) {
-            <span class="section-status-pill pill-revenue">
-              Trip Revenue: ₹ {{ totalTripRevenue | number }}
-            </span>
-          }
-        </div>
-
-        <div class="form-grid cols-2">
-          <!-- DRIVER SALARY -->
-          <div class="form-group">
-            <label>Driver / Helper Salary (₹)</label>
-            <input
-              type="number"
-              formControlName="driverSalary"
               placeholder="0" />
           </div>
 
@@ -578,7 +507,7 @@
           <div class="section-nav-footer">
             <button type="button" class="btn btn-nav-prev" (click)="goToPreviousSection()">
               <mat-icon>arrow_back</mat-icon>
-              <span>Back: Other Expenses</span>
+              <span>Back: Diesel & Mileage</span>
             </button>
             <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
               <span>Next: Trip Images</span>
@@ -680,7 +609,7 @@
           <div class="section-nav-footer">
             <button type="button" class="btn btn-nav-prev" (click)="goToPreviousSection()">
               <mat-icon>arrow_back</mat-icon>
-              <span>Back: Additional Details</span>
+              <span>Back: Other Expenses</span>
             </button>
             <button type="button" class="btn btn-nav-next" (click)="goToNextSection()">
               <span>Next: Review & Submit</span>
@@ -843,44 +772,38 @@
                 <span class="r-label">Tyre Maintenance:</span>
                 <span class="r-val">₹ {{ (form.get('tyreMaintenance')?.value || 0) | number }}</span>
               </div>
+              <div class="review-row">
+                <span class="r-label">RTO Charges / Challan:</span>
+                <span class="r-val">₹ {{ (form.get('rtoCharges')?.value || 0) | number }}</span>
+              </div>
               <div class="review-row divider-top">
-                <span class="r-label font-bold">Total Operational:</span>
+                <span class="r-label font-bold">Total Expenses:</span>
                 <span class="r-val highlight">₹ {{ totalOtherExpenses | number }}</span>
               </div>
             </div>
           </div>
 
-          <!-- 5. ADDITIONAL & REVENUE BLOCK -->
+          <!-- 5. TRIP REVENUE & NOTES BLOCK -->
           <div class="review-block">
             <div class="review-block-header">
-              <span class="review-block-title">📋 Additional & Revenue</span>
+              <span class="review-block-title">💰 Trip Revenue & Notes</span>
               <button
                 type="button"
                 class="btn-edit-link"
-                (click)="setActiveSection('additional')"
-                title="Edit Additional Details">
+                (click)="setActiveSection('expenses')"
+                title="Edit Trip Revenue and Notes">
                 ✏️ Edit
               </button>
             </div>
             <div class="review-block-body">
               <div class="review-row">
-                <span class="r-label">Driver/Helper Salary:</span>
-                <span class="r-val">₹ {{ (form.get('driverSalary')?.value || 0) | number }}</span>
-              </div>
-              <div class="review-row">
-                <span class="r-label">RTO Charges / Challan:</span>
-                <span class="r-val">₹ {{ (form.get('rtoCharges')?.value || 0) | number }}</span>
-              </div>
-              <div class="review-row">
                 <span class="r-label">Trip Revenue (Returns):</span>
                 <span class="r-val highlight-green">₹ {{ totalTripRevenue | number }}</span>
               </div>
-              @if (form.get('notes')?.value) {
-                <div class="review-row">
-                  <span class="r-label">Notes:</span>
-                  <span class="r-val notes-text">{{ form.get('notes')?.value }}</span>
-                </div>
-              }
+              <div class="review-row">
+                <span class="r-label">Notes:</span>
+                <span class="r-val notes-text">{{ form.get('notes')?.value || '-' }}</span>
+              </div>
             </div>
           </div>
 
@@ -944,7 +867,7 @@
             class="btn btn-primary btn-submit-final"
             [disabled]="form.invalid"
             (click)="save(true)">
-            <mat-icon>check_circle</mat-icon>
+                 <i class="fa-solid fa-check"></i>
             <span>Confirm & Submit Daily Tracking Record</span>
           </button>
 

@@ -56,7 +56,7 @@ export interface ImagePreviewItem {
   previewUrl: string;
 }
 
-export type SectionKey = 'location' | 'diesel' | 'expenses' | 'additional' | 'images' | 'review';
+export type SectionKey = 'location' | 'diesel' | 'expenses' | 'images' | 'review';
 
 export interface FormCategory {
   key: SectionKey;
@@ -143,18 +143,10 @@ export class DailyLogReport implements OnInit, OnDestroy {
     {
       key: 'expenses',
       title: 'Other Expenses',
-      subTitle: 'Toll, Workshop, Tyre (₹)',
+      subTitle: 'Toll, Workshop, Tyre, RTO (₹)',
       emoji: '🛠️',
       matIcon: 'build_circle',
       colorClass: 'cat-expenses'
-    },
-    {
-      key: 'additional',
-      title: 'Additional Details',
-      subTitle: 'Salary, Challan & Notes',
-      emoji: '📋',
-      matIcon: 'receipt_long',
-      colorClass: 'cat-additional'
     },
     {
       key: 'images',
@@ -211,6 +203,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokeAllPreviewUrls();
+    // this.selectedImagePreviews = [];
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -519,7 +512,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
   }
 
   goToNextSection(): void {
-    const list: SectionKey[] = ['location', 'diesel', 'expenses', 'additional', 'images', 'review'];
+    const list: SectionKey[] = ['location', 'diesel', 'expenses', 'images', 'review'];
     const idx = list.indexOf(this.activeSection);
     if (idx < list.length - 1) {
       this.activeSection = list[idx + 1];
@@ -527,7 +520,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
   }
 
   goToPreviousSection(): void {
-    const list: SectionKey[] = ['location', 'diesel', 'expenses', 'additional', 'images', 'review'];
+    const list: SectionKey[] = ['location', 'diesel', 'expenses', 'images', 'review'];
     const idx = list.indexOf(this.activeSection);
     if (idx > 0) {
       this.activeSection = list[idx - 1];
@@ -568,19 +561,19 @@ export class DailyLogReport implements OnInit, OnDestroy {
     return 0;
   }
 
-  // Operational Expenses = Toll + Workshop + Tyre
+  // Operational Expenses = Toll + Workshop + Tyre + RTO
   get totalOtherExpenses(): number {
     const toll = Number(this.form.get('tollCharges')?.value) || 0;
     const workshop = Number(this.form.get('workshopExpenses')?.value) || 0;
     const tyre = Number(this.form.get('tyreMaintenance')?.value) || 0;
-    return toll + workshop + tyre;
+    const rto = Number(this.form.get('rtoCharges')?.value) || 0;
+    return toll + workshop + tyre + rto;
   }
 
-  // Additional Expenses = Driver Salary + RTO Charges
+  // Additional Expenses = Driver Salary
   get totalAdditionalExpenses(): number {
     const salary = Number(this.form.get('driverSalary')?.value) || 0;
-    const rto = Number(this.form.get('rtoCharges')?.value) || 0;
-    return salary + rto;
+    return salary;
   }
 
   // Fuel Cost
@@ -648,17 +641,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
     if (this.totalOtherExpenses > 0) {
       return `₹ ${this.totalOtherExpenses.toLocaleString('en-IN')}`;
     }
-    return 'Toll, Workshop, Tyre';
-  }
-
-  getAdditionalSummary(): string {
-    if (this.totalTripRevenue > 0) {
-      return `Rev: ₹ ${this.totalTripRevenue.toLocaleString('en-IN')}`;
-    }
-    if (this.totalAdditionalExpenses > 0) {
-      return `Spend: ₹ ${this.totalAdditionalExpenses.toLocaleString('en-IN')}`;
-    }
-    return 'Salary, Challan & Notes';
+    return 'Toll, Workshop, Tyre, RTO';
   }
 
   getImagesSummary(): string {
@@ -671,7 +654,6 @@ export class DailyLogReport implements OnInit, OnDestroy {
       case 'location': return this.getLocationSummary();
       case 'diesel': return this.getDieselSummary();
       case 'expenses': return this.getExpensesSummary();
-      case 'additional': return this.getAdditionalSummary();
       case 'images': return this.getImagesSummary();
       case 'review': return this.isAllRequiredFilled ? 'Ready to Submit' : 'Fill Required Details';
       default: return '';
@@ -686,9 +668,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
         return (Number(this.form.get('fromKm')?.value) > 0 && Number(this.form.get('toKm')?.value) > 0) ||
                Number(this.form.get('dieselLitres')?.value) > 0;
       case 'expenses':
-        return this.totalOtherExpenses > 0;
-      case 'additional':
-        return this.totalAdditionalExpenses > 0 || this.totalTripRevenue > 0 || !!this.form.get('notes')?.value;
+        return this.totalOtherExpenses > 0 || this.totalTripRevenue > 0 || !!this.form.get('notes')?.value;
       case 'images':
         return this.selectedImagePreviews.length > 0;
       case 'review':

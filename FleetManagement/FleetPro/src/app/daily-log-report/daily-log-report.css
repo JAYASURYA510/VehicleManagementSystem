@@ -66,80 +66,11 @@
 }
 
 /* =====================================================
-   DEFAULT VEHICLE INFORMATION CARD (ALWAYS AT TOP)
+   VEHICLE INFORMATION CARD (DEFAULT STYLE)
 ====================================================== */
 
-.default-vehicle-card {
-  background: #ffffff;
-  border-radius: var(--radius, 14px);
-  padding: 1.5rem 1.75rem;
-  border: 1.5px solid var(--border, #e8eaed);
-  /* border-left: 5px solid #2563eb; */
-  box-shadow: var(--shadow-sm, 0 1px 3px rgba(26, 29, 35, 0.05));
+.vehicle-card {
   margin-bottom: 1.5rem;
-}
-
-.vehicle-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.25rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.vehicle-title-group {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.vehicle-icon-box {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #2563eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  flex-shrink: 0;
-}
-
-.vehicle-icon-box .v-mat {
-  display: none;
-}
-
-.vehicle-card-header h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-primary, #1a1d23);
-  letter-spacing: -0.01em;
-}
-
-.vehicle-status-badge {
-  display: flex;
-  align-items: center;
-}
-
-.badge-tag-success {
-  padding: 0.35rem 0.85rem;
-  border-radius: 20px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.badge-tag-pending {
-  padding: 0.35rem 0.85rem;
-  border-radius: 20px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  background: #fee2e2;
-  color: #b91c1c;
 }
 
 /* =====================================================
@@ -172,8 +103,22 @@
 
 .rectangle-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(26, 29, 35, 0.08);
+  box-shadow: 0 8px 24px rgba(26, 29, 35, 0.12);
   border-color: var(--accent-muted, #e0b6e4);
+  z-index: 5;
+}
+
+.rectangle-card:hover .rect-info {
+  overflow: visible;
+}
+
+.rectangle-card:hover .rect-title,
+.rectangle-card:hover .rect-sub {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+  line-height: 1.35;
 }
 
 .rectangle-card.active {
@@ -577,8 +522,8 @@
 
 .fuel-form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem 1.75rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
   margin-bottom: 1.75rem;
 }
 
@@ -606,7 +551,7 @@
 }
 
 .fuel-form-grid .full-col {
-  grid-column: 1 / -1;
+  grid-column: auto;
 }
 
 /* =====================================================
@@ -1252,6 +1197,10 @@
 @media (max-width: 1024px) {
   .rectangle-cards-grid {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .fuel-form-grid,
+  .form-grid.cols-3 {
+    grid-template-columns: repeat(2, 1fr);
   }
   .review-blocks-grid {
     grid-template-columns: 1fr;
