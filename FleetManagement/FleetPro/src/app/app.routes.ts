@@ -38,6 +38,7 @@ export const routes: Routes = [
       { path: 'NewVehiclemaster', component: NewVehicleMaster},
       { path: 'NewVehiclemaster/edit/:id', component: NewVehicleMaster},
       { path: 'daily-log-report', component: DailyLogReport},
+      { path: 'daily-log-report/edit/:id', component: DailyLogReport},
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: DashboardComponent},
       { path: 'daily-tracking', component: DailyTrackingComponent },

@@ -65,6 +65,7 @@ import {
 import { NgxSelectModule } from 'ngx-select-ex';
 import { DateTimePickerService } from '../../core/services/datetime-picker.service';
 import { DateTimePickerComponent } from '../../shared/datetime-picker/datetime-picker';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -109,7 +110,7 @@ export class DailyTrackingComponent
   private api = inject(CommanService);
 
   private fb = inject(FormBuilder);
-
+  private readonly alert = inject(ToastrService);
   private router = inject(Router);
   private dateTimePickerService = inject(DateTimePickerService);
   private cdr = inject(ChangeDetectorRef);
@@ -573,12 +574,7 @@ export class DailyTrackingComponent
   // =========================================================
 
   editRecord(record: any): void {
-
-    console.log(
-      'Edit tracking record:',
-      record
-    );
-
+     this.router.navigate(['/daily-log-report/edit', record.id]);
   }
 
 
@@ -587,11 +583,21 @@ export class DailyTrackingComponent
   // =========================================================
 
   deleteRecord(record: any): void {
+    this.api.delete(`DailyTracking/${this.tenandId}/DeleteDailyTracking/${record.id}`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+        next: (data: any) => {
+          if(data.success) {
+            this.alert.success('Record deleted successfully');
+            this.load();
+          }
+        },
 
-    console.log(
-      'Delete tracking record:',
-      record
-    );
+        error: (error) => {
+          this.records.set([]);
+          this.dataSource.data = [];
+          this.loading.set(false);
+        }
+
+      });
 
   }
 

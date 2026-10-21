@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FleetPro.API.Data;
 using FleetPro.API.Data.Entitys;
 using FleetPro.API.DTOs;
@@ -116,7 +116,7 @@ namespace FleetPro.API.Repository.DailyTracking
                 tracking.UpdatedAt = DateTime.UtcNow;
                 tracking.UpdatedBy = request.CreatedBy;
 
-                await AddImagesAsync(tenantId, tracking.Id, request);
+                await UpdateImagesAsync(tenantId, tracking.Id, request);
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return true;
@@ -151,8 +151,12 @@ namespace FleetPro.API.Repository.DailyTracking
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
+                var rootPath = string.IsNullOrWhiteSpace(environment.WebRootPath)
+                    ? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+                    : environment.WebRootPath;
+
                 var folderPath = Path.Combine(
-                    environment.WebRootPath,
+                    rootPath,
                     "uploads",
                     "dailylog",
                     dailyTrackingId.ToString());
@@ -178,14 +182,19 @@ namespace FleetPro.API.Repository.DailyTracking
                 return;
             }
 
-            var imageRecords = new List<ImageAttachment>();
+            var rootPath = string.IsNullOrWhiteSpace(environment.WebRootPath)
+                ? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+                : environment.WebRootPath;
+
             var folderPath = Path.Combine(
-                environment.WebRootPath,
+                rootPath,
                 "uploads",
                 "dailylog",
                 trackingId.ToString());
 
             Directory.CreateDirectory(folderPath);
+
+            var imageRecords = new List<ImageAttachment>();
 
             foreach (var image in request.Images)
             {
@@ -218,7 +227,7 @@ namespace FleetPro.API.Repository.DailyTracking
                     FileType = image.ContentType,
                     ImageType = "dailylog",
                     IsDelete = false,
-                    CreatedAt = request.CreatedDate,
+                    CreatedAt = request.CreatedDate ?? DateTime.UtcNow,
                     CreatedBy = request.CreatedBy,
                     TenantId = tenantId
                 });
@@ -227,6 +236,158 @@ namespace FleetPro.API.Repository.DailyTracking
             if (imageRecords.Count > 0)
             {
                 await imageRepository.AddRangeAsync(imageRecords);
+            }
+        }
+
+        private async Task UpdateImagesAsync(Guid tenantId, Guid trackingId, SaveDailyTrackingRequest request)
+        {
+            var rootPath = string.IsNullOrWhiteSpace(environment.WebRootPath)
+                ? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+                : environment.WebRootPath;
+
+            var folderPath = Path.Combine(
+                rootPath,
+                "uploads",
+                "dailylog",
+                trackingId.ToString());
+
+            // 1. Fetch existing active image records from database for this tracking ID
+            var existingImages = await context.ImageAttachments
+                .Where(x => x.TenantId == tenantId && x.DailyTrackingId == trackingId && !x.IsDelete)
+                .ToListAsync();
+
+            var incomingFiles = request.Images?
+                .Where(f => f != null)
+                .ToList() ?? new List<IFormFile>();
+
+            // Extract file names from payload (strip any client directory prefix)
+            var incomingFileNames = incomingFiles
+                .Select(f => Path.GetFileName(f.FileName))
+                .Where(name => !string.IsNullOrEmpty(name))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // 2. If an existing image in DB is NOT in incoming payload, delete from DB and physical folder
+            var imagesToDelete = existingImages
+                .Where(existing => !incomingFileNames.Contains(existing.FileName))
+                .ToList();
+
+            if (imagesToDelete.Count > 0)
+            {
+                foreach (var img in imagesToDelete)
+                {
+                    var fileNameOnly = Path.GetFileName(img.FileName);
+                    var physicalPath = Path.Combine(folderPath, fileNameOnly);
+
+                    if (File.Exists(physicalPath))
+                    {
+                        try
+                        {
+                            File.Delete(physicalPath);
+                        }
+                        catch
+                        {
+                            // Best effort physical file deletion
+                        }
+                    }
+                    else if (!string.IsNullOrWhiteSpace(img.FilePath))
+                    {
+                        var altPath = Path.Combine(rootPath, img.FilePath.TrimStart('/', '\\'));
+                        if (File.Exists(altPath))
+                        {
+                            try
+                            {
+                                File.Delete(altPath);
+                            }
+                            catch
+                            {
+                                // Best effort physical file deletion
+                            }
+                        }
+                    }
+                }
+
+                context.ImageAttachments.RemoveRange(imagesToDelete);
+            }
+
+            // 3. Existing file names in database that are preserved
+            var existingFileNames = existingImages
+                .Select(e => e.FileName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // 4. Validate extensions for all new files first
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
+            foreach (var image in incomingFiles)
+            {
+                var originalName = Path.GetFileName(image.FileName);
+                if (string.IsNullOrEmpty(originalName) || existingFileNames.Contains(originalName))
+                {
+                    // Existing image - no need to validate or save again
+                    continue;
+                }
+
+                var extension = Path.GetExtension(originalName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(extension))
+                {
+                    throw new Exception($"Invalid image format: {extension}");
+                }
+            }
+
+            // 5. Save any new incoming images (not already in existing images) to folder and DB
+            var newImageRecords = new List<ImageAttachment>();
+            var processedNames = new HashSet<string>(existingFileNames, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var image in incomingFiles)
+            {
+                var originalName = Path.GetFileName(image.FileName);
+                if (string.IsNullOrEmpty(originalName))
+                {
+                    continue;
+                }
+
+                // If already in existing DB records or already processed in this batch, keep it and do not re-save
+                if (!processedNames.Add(originalName))
+                {
+                    continue;
+                }
+
+                if (image.Length == 0)
+                {
+                    continue;
+                }
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                var extension = Path.GetExtension(originalName).ToLowerInvariant();
+                var newFileName = $"{Guid.NewGuid()}{extension}";
+                var physicalPath = Path.Combine(folderPath, newFileName);
+
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+
+                newImageRecords.Add(new ImageAttachment
+                {
+                    Id = Guid.NewGuid(),
+                    DailyTrackingId = trackingId,
+                    FileName = newFileName,
+                    FilePath = $"/uploads/dailylog/{trackingId}/{newFileName}",
+                    FileType = image.ContentType,
+                    ImageType = "dailylog",
+                    IsDelete = false,
+                    CreatedAt = request.CreatedDate ?? DateTime.UtcNow,
+                    CreatedBy = request.CreatedBy,
+                    TenantId = tenantId
+                });
+            }
+
+            if (newImageRecords.Count > 0)
+            {
+                await imageRepository.AddRangeAsync(newImageRecords);
             }
         }
 

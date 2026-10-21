@@ -17,14 +17,18 @@ import {
 } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
+import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, firstValueFrom } from 'rxjs';
 
 import { ApiService } from '../core/services/api.service';
 import { CommanService } from '../core/services/comman.service';
 import { ImageStorageService, StoredImageRecord } from '../core/services/image-storage.service';
 import { UserRole } from '../core/models';
 import { DateTimePickerService } from '../core/services/datetime-picker.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '../../environments/environment';
+import { DateTimePickerComponent } from '../shared/datetime-picker/datetime-picker';
 
 export interface Vehicle {
   vehicleId: any;
@@ -73,7 +77,8 @@ export interface FormCategory {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatIconModule
+    MatIconModule,
+    DateTimePickerComponent
   ],
   templateUrl: './daily-log-report.html',
   styleUrl: './daily-log-report.css'
@@ -82,11 +87,14 @@ export class DailyLogReport implements OnInit, OnDestroy {
 
   private readonly api = inject(ApiService);
   private readonly apiService = inject(CommanService);
+  private readonly http = inject(HttpClient);
   private readonly imageStorageService = inject(ImageStorageService);
   private readonly alert = inject(ToastrService);
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly dateTimePickerService = inject(DateTimePickerService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   @ViewChild('imageInput')
   imageInput!: ElementRef<HTMLInputElement>;
@@ -102,6 +110,8 @@ export class DailyLogReport implements OnInit, OnDestroy {
   role = this.localStorageData.role;
   userId = this.localStorageData.userId;
   asignRole: any;
+  dailyTrackingId: any;
+  updateButton : boolean = false;
 
   // =====================================================
   // VEHICLES
@@ -197,8 +207,23 @@ export class DailyLogReport implements OnInit, OnDestroy {
   // =====================================================
 
   async ngOnInit(): Promise<void> {
+    this.dailyTrackingId = this.route.snapshot.paramMap.get('id');
+    if (this.dailyTrackingId) {
+      this.updateButton = true;
+      this.selectedImagePreviews = [];
+      this.revokeAllPreviewUrls();
+      await this.imageStorageService.clearAllImages();
+      this.getDailyTrackingById(this.dailyTrackingId);
+    } else {
+      this.updateButton = false;
+      this.selectedImagePreviews = [];
+      this.revokeAllPreviewUrls();
+      await this.imageStorageService.clearAllImages();
+      if (this.imageInput) {
+        this.imageInput.nativeElement.value = '';
+      }
+    }
     this.loadVehicles();
-    await this.loadPendingImagesFromStorage();
   }
 
   ngOnDestroy(): void {
@@ -251,6 +276,168 @@ export class DailyLogReport implements OnInit, OnDestroy {
           this.vehicleList = [];
         }
       });
+  }
+
+  getDailyTrackingById(id: any): void {
+    this.apiService
+      .list(`DailyTracking/${this.tenandId}/GetDailyTrackingById/${id}`)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: async (response: any) => {
+          if (response) {
+            this.form.controls['vehicleId'].setValue(response.vehicleId);
+            const tripDate = response.tripDate ? response.tripDate.toString().substring(0, 10) : '';
+            this.form.controls['date'].setValue(tripDate || response.tripDate);
+            this.form.controls['fromLocation'].setValue(response.fromLocation);
+            this.form.controls['toLocation'].setValue(response.toLocation);
+            this.form.controls['fuelStation'].setValue(response.fuelStation ?? '');
+            this.form.controls['dieselLitres'].setValue(response.dieselLitres ?? 0);
+            this.form.controls['dieselCost'].setValue(response.dieselCost ?? 0);
+            this.form.controls['fromKm'].setValue(response.fromKm ?? 0);
+            this.form.controls['toKm'].setValue(response.toKm ?? 0);
+            this.form.controls['kmBeforeFueling'].setValue(response.kmBeforeFueling ?? 0);
+            this.form.controls['openingDieselLevel'].setValue(response.openingDieselLevel ?? 0);
+            this.form.controls['closingDieselLevel'].setValue(response.closingDieselLevel ?? 0);
+            this.form.controls['tollCharges'].setValue(response.tollCharges ?? 0);
+            this.form.controls['workshopExpenses'].setValue(response.workshopExpenses ?? 0);
+            this.form.controls['tyreMaintenance'].setValue(response.tyreMaintenance ?? 0);
+            this.form.controls['driverSalary'].setValue(response.driverSalary ?? 0);
+            this.form.controls['rtoCharges'].setValue(response.rtoCharges ?? 0);
+            this.form.controls['tripRevenue'].setValue(response.tripRevenue ?? 0);
+            this.form.controls['notes'].setValue(response.notes ?? '');
+
+            console.log('Daily Tracking Data:', response);
+
+            // Extract images returned by GetDailyTrackingById
+            const imageList = response.images
+              ?? response.Images
+              ?? response.imageAttachments
+              ?? response.ImageAttachments
+              ?? response.imageAttachment
+              ?? (Array.isArray(response) ? response : []);
+
+            if (imageList && imageList.length > 0) {
+              await this.patchImagesFromApi(imageList);
+            }
+
+            this.cdr.detectChanges();
+          }
+        },
+        error: (error: any) => {
+          console.error('Failed to load daily tracking data:', error);
+          this.alert.error('Failed to load daily tracking data');
+        }
+      });
+  }
+
+  // =====================================================
+  // PATCH IMAGES FROM API (Using existing image selection logic)
+  // =====================================================
+
+  async patchImagesFromApi(images: any[]): Promise<void> {
+    if (!images || images.length === 0) {
+      return;
+    }
+
+    const serverBase = (environment.apiUrl || (environment as any).baseUrl || '').replace(/\/api\/?$/, '');
+    const newRecordsToStore: StoredImageRecord[] = [];
+    const newPreviewItems: ImagePreviewItem[] = [];
+
+    for (const img of images) {
+      if (!img || !img.fileName) {
+        continue;
+      }
+
+      const fileName = img.fileName;
+      const fileType = img.fileType || 'image/jpeg';
+      const filePath = img.filePath || img.fileLocation || '';
+      const id = img.id || this.generateUniqueId();
+      const createdAt = img.createdAt || new Date().toISOString();
+
+      // Check if already in previews to prevent duplication
+      const isDuplicate = this.selectedImagePreviews.some(
+        (existing) => existing.id === id || existing.name === fileName
+      );
+      if (isDuplicate) {
+        continue;
+      }
+
+      let fullUrl = filePath;
+      if (fullUrl && !fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+        fullUrl = `${serverBase}${fullUrl.startsWith('/') ? '' : '/'}${fullUrl}`;
+      }
+
+      // Convert remote file into a File object using the same format as selected files
+      const file = await this.fetchImageFile(fullUrl, fileName, fileType, createdAt);
+
+      const record: StoredImageRecord = {
+        id,
+        name: fileName,
+        type: fileType,
+        size: file.size,
+        createdAt,
+        file
+      };
+
+      const previewUrl = file.size > 0 ? URL.createObjectURL(file) : fullUrl;
+
+      const previewItem: ImagePreviewItem = {
+        id,
+        name: fileName,
+        type: fileType,
+        size: file.size,
+        createdAt,
+        file,
+        previewUrl
+      };
+
+      newRecordsToStore.push(record);
+      newPreviewItems.push(previewItem);
+    }
+
+    if (newRecordsToStore.length > 0) {
+      try {
+        await this.imageStorageService.saveImages(newRecordsToStore);
+      } catch (err) {
+        console.error('Failed to save patched images in IndexedDB:', err);
+      }
+
+      this.selectedImagePreviews = [
+        ...this.selectedImagePreviews,
+        ...newPreviewItems
+      ];
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async fetchImageFile(imageUrl: string, fileName: string, fileType: string, createdAt?: string): Promise<File> {
+    const lastModified = createdAt ? new Date(createdAt).getTime() : Date.now();
+    try {
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error(`Fetch status ${response.status}`);
+      }
+      const blob = await response.blob();
+      return new File([blob], fileName, {
+        type: fileType || blob.type || 'image/jpeg',
+        lastModified
+      });
+    } catch (fetchErr) {
+      console.warn(`Fetch image failed for ${imageUrl}, trying HttpClient:`, fetchErr);
+      try {
+        const blob = await firstValueFrom(this.http.get(imageUrl, { responseType: 'blob' }));
+        return new File([blob], fileName, {
+          type: fileType || blob.type || 'image/jpeg',
+          lastModified
+        });
+      } catch (httpErr) {
+        console.warn(`Could not download image blob for ${imageUrl}:`, httpErr);
+        return new File([], fileName, {
+          type: fileType || 'image/jpeg',
+          lastModified
+        });
+      }
+    }
   }
 
   // =====================================================
@@ -436,8 +623,8 @@ export class DailyLogReport implements OnInit, OnDestroy {
 
     const itemToRemove = this.selectedImagePreviews[index];
 
-    // Revoke preview object URL
-    if (itemToRemove.previewUrl) {
+    // Revoke preview object URL only if it is a blob URL
+    if (itemToRemove.previewUrl && itemToRemove.previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(itemToRemove.previewUrl);
     }
 
@@ -490,8 +677,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
   // =====================================================
 
   formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 B';
-    if (!bytes) return '';
+    if (!bytes || bytes === 0) return 'Attached';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -738,7 +924,6 @@ export class DailyLogReport implements OnInit, OnDestroy {
   // =====================================================
 
   async save(forceSubmit: boolean = false): Promise<void> {
-
     // Validate form
     if (this.form.invalid) {
 
@@ -794,18 +979,22 @@ export class DailyLogReport implements OnInit, OnDestroy {
       console.error('Error fetching stored images from IndexedDB before submit:', err);
     }
 
-    // Convert Blobs/Files back into File objects if needed
-    const actualFiles: File[] = storedRecords.length > 0
-      ? storedRecords.map((record) => {
-          if (record.file instanceof File) {
-            return record.file;
+    // Convert Blobs/Files back into File objects matching active selectedImagePreviews only
+    const actualFiles: File[] = this.selectedImagePreviews.length === 0
+      ? []
+      : this.selectedImagePreviews.map((preview) => {
+          const matchedRecord = storedRecords.find(
+            (record) => record.id === preview.id || record.name === preview.name
+          );
+          const fileSource = matchedRecord ? matchedRecord.file : preview.file;
+          if (fileSource instanceof File) {
+            return fileSource;
           }
-          return new File([record.file], record.name, {
-            type: record.type || 'image/jpeg',
-            lastModified: record.createdAt ? new Date(record.createdAt).getTime() : Date.now()
+          return new File([fileSource], preview.name, {
+            type: preview.type || (fileSource as Blob)?.type || 'image/jpeg',
+            lastModified: preview.createdAt ? new Date(preview.createdAt).getTime() : Date.now()
           });
-        })
-      : this.selectedImagePreviews.map((preview) => preview.file);
+        });
 
     // ===================================================
     // FORMDATA
@@ -813,6 +1002,11 @@ export class DailyLogReport implements OnInit, OnDestroy {
 
     const formData =
       new FormData();
+
+    if (this.dailyTrackingId) {
+      formData.append('Id', this.dailyTrackingId.toString());
+      formData.append('DailyTrackingId', this.dailyTrackingId.toString());
+    }
 
     // ===================================================
     // DAILY TRACKING DATA
@@ -855,7 +1049,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
       ImageAttachment[] = actualFiles.map((image) => {
           const extension = image.name.includes('.') ? image.name.substring(image.name.lastIndexOf('.')) : '';
           return {
-            dailyTrackingId: null,
+            dailyTrackingId: this.dailyTrackingId ?? null,
             fileName: image.name,
             filePath: '',
             fileType: image.type || extension ||'image/jpeg',
@@ -917,20 +1111,38 @@ export class DailyLogReport implements OnInit, OnDestroy {
       }
     );
 
-    this.apiService.create(`DailyTracking/${this.tenandId}/SaveDailyTracking`, formData).pipe(takeUntil(this.unsubscribe$)).subscribe({
-       next: (response: any) => {
-        if(response.success == true){
-          this.alert.success('Daily tracking saved successfully.');
-          this.onReset();
+    const isUpdate = !!(this.dailyTrackingId && this.updateButton);
+    const apiCall$ = isUpdate
+      ? this.apiService.update(`DailyTracking/${this.tenandId}/UpdateDailyTracking/${this.dailyTrackingId}`, formData)
+      : this.apiService.create(`DailyTracking/${this.tenandId}/SaveDailyTracking`, formData);
+
+    apiCall$.pipe(takeUntil(this.unsubscribe$)).subscribe({
+      next: async (response: any) => {
+        if (response?.success == true || response?.id) {
+          this.alert.success(isUpdate ? 'Daily tracking updated successfully.' : 'Daily tracking saved successfully.');
+          
+          try {
+            await this.imageStorageService.clearAllImages();
+          } catch (err) {
+            console.error('Failed to clear images from IndexedDB after submit:', err);
+          }
+          this.revokeAllPreviewUrls();
+          this.selectedImagePreviews = [];
+
+          if (isUpdate) {
+            this.router.navigate(['/daily-tracking']);
+          } else {
+            await this.onReset();
+            this.router.navigate(['/daily-tracking']);
+          }
+        } else {
+          this.alert.error(`Failed to ${isUpdate ? 'update' : 'save'} Daily tracking. Please try again.`);
         }
-        else{
-            this.alert.error('Failed to Save Daily tracking. Please try again.');
-        }
-       },
-        error: (error: any) => {
-          this.alert.error('Failed to Save Daily tracking. Please try again.');
-          this.onReset();
-        }
+      },
+      error: (error: any) => {
+        console.error(`Failed to ${isUpdate ? 'update' : 'save'} Daily tracking:`, error);
+        this.alert.error(`Failed to ${isUpdate ? 'update' : 'save'} Daily tracking. Please try again.`);
+      }
     });
   }
 
