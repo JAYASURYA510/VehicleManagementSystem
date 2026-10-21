@@ -20,20 +20,20 @@ export class LoadingService {
 
   }
 
-  hide(): void {
+  hide(force: boolean = false): void {
+    if (force) {
+      this.requestCount = 0;
+      this.loadingSubject.next(false);
+      return;
+    }
 
     if (this.requestCount > 0) {
-
       this.requestCount--;
-
     }
 
     if (this.requestCount === 0) {
-
       this.loadingSubject.next(false);
-
     }
-
   }
 
 }

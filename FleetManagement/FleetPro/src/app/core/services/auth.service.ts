@@ -1,16 +1,18 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { AppModule, LoginResponse, Permission, UserRole } from '../models';
+import { LoadingService } from './loading.service';
 
 const TOKEN_KEY = 'fleetpro_token';
 const USER_KEY = 'fleetpro_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly loadingService = inject(LoadingService);
   private currentUser = signal<LoginResponse | null>(this.loadUser());
 
   readonly user = this.currentUser.asReadonly();
@@ -36,10 +38,17 @@ export class AuthService {
   }
 
   logout(): void {
+    this.loadingService.show();
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     this.currentUser.set(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']).then(() => {
+      setTimeout(() => {
+        this.loadingService.hide(true);
+      }, 700);
+    }).catch(() => {
+      this.loadingService.hide(true);
+    });
   }
 
   getToken(): string | null {

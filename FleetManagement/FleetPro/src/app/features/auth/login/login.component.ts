@@ -12,6 +12,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
 import { CommanService } from '../../../core/services/comman.service';
+import { LoadingService } from '../../../core/services/loading.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -57,7 +58,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private auth: AuthService,
     private apiService: CommanService,
-    private router: Router
+    private router: Router,
+    private loadingService: LoadingService
   ) {
 
     // Login form
@@ -216,25 +218,28 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     // Start loading
     this.loading.set(true);
+    this.loadingService.show();
     const { username, password } = this.form.getRawValue();
     this.auth.login(username, password).subscribe({
         next: (data) => {
-        this.loading.set(false);
-         this.customerData = data;
           this.loading.set(false);
+          this.customerData = data;
           localStorage.setItem('fleetPro_TenantId', this.customerData?.tenantId);   
           localStorage.setItem('fleetPro_CustomerName', this.customerData?.customerName);
           localStorage.setItem('fleetPro_PhoneNum', this.customerData?.phoneNum);
-        if(data.role == "SuperAdmin"){
-          this.router.navigate(['/superAdminList']);
-        }
-        else{
-          this.router.navigate(['/dashboard']);
-        }
+          const targetRoute = data.role === 'SuperAdmin' ? '/superAdminList' : '/dashboard';
+          this.router.navigate([targetRoute]).then(() => {
+            setTimeout(() => {
+              this.loadingService.hide(true);
+            }, 700);
+          }).catch(() => {
+            this.loadingService.hide(true);
+          });
         },
         error: (err: any) => {
           this.loading.set(false);
-        console.error('Login error:', err);
+          this.loadingService.hide(true);
+          console.error('Login error:', err);
         /*
          * Backend not available
          */
