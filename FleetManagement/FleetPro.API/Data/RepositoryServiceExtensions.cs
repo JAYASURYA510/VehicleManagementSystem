@@ -24,6 +24,7 @@ namespace FleetPro.API.Data
             services.AddScoped<ITenantService, TenantService>();
             services.AddScoped<ITenantServiceRepository, TenantRepository>();
             services.AddScoped<IPasswordService, PasswordService>();
+            services.AddScoped<ISettingRepository, SettingRepository>();
             return services;
         }
     }
