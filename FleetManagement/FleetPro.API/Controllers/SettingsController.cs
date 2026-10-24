@@ -46,6 +46,28 @@ namespace FleetPro.API.Controllers
             }
         }
 
+        [HttpPost("updateSettings")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Update(Guid tenantId, [FromForm] UpdateSettingsResponseDto request)
+        {
+            if (request.File == null || request.File.Length == 0)
+                return BadRequest(new { message = "No file was provided." });
+
+            var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml" };
+            if (!allowedTypes.Contains(request.File.ContentType.ToLower()))
+                return BadRequest(new { message = "Invalid file type. Only image files are allowed." });
+
+            try
+            {
+                var result = await settingRepository.UpdateAsync(tenantId, request);
+                return Ok(new { message = "Setting updated successfully.", data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
         // GET api/settings/{tenantId}/settings
         /// <summary>
         /// Retrieve the active settings for a tenant.

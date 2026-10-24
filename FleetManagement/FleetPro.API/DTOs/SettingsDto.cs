@@ -12,6 +12,18 @@ namespace FleetPro.API.DTOs
 
         /// <summary>Id of the user performing the operation.</summary>
         public int? CreatedBy { get; set; }
+        public DateTime? CreatedAt { get; set; }
+    }
+
+    /// <summary>
+    /// DTO returned after saving the logo and for GET responses.
+    /// </summary>
+    public class UpdateSettingsResponseDto
+    {
+        public Guid Id { get; set; }
+        public IFormFile File { get; set; } = null!;
+        public int? UpdatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 
     /// <summary>

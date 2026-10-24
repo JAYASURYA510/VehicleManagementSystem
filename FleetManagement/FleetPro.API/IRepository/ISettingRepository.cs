@@ -14,6 +14,8 @@ namespace FleetPro.API.IRepository
         /// Returns the active (non-deleted) logo record for the given tenant, or null if none exists.
         /// </summary>
         Task<SettingsResponseDto?> GetAsync(Guid tenantId);
+
+        Task<SettingsResponseDto> UpdateAsync(Guid tenantId, UpdateSettingsResponseDto request);
     }
 }
 

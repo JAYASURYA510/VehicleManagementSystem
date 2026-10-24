@@ -67,5 +67,33 @@ namespace FleetPro.API.Controllers
             Message = "Role menus saved successfully."
             });
         }
+
+        [HttpGet("{tenantId}/getClientLogo")]
+        public async Task<IActionResult> getClientLogo(Guid tenantId)
+        {
+            var logo = await context.ImageAttachments
+                .AsNoTracking()
+                .Where(x => x.TenantId == tenantId
+                         && x.ImageType == "logo"
+                         && x.IsDelete == false)
+                .FirstOrDefaultAsync();
+
+            if (logo == null)
+            {
+                return NotFound(new { message = "No logo found for the specified tenant." });
+            }
+
+            var logoDto = new 
+            {
+                logo.Id,
+                logo.FileName,
+                logo.FilePath,
+                logo.FileType,
+                logo.ImageType,
+                logo.TenantId,
+            };
+
+            return Ok(logoDto);
+        }
     }
 }
