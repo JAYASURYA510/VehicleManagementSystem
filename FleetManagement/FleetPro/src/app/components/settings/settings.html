@@ -1,0 +1,441 @@
+
+<div class="daily-log-container">
+
+  <!-- =====================================================
+       PAGE HEADER & CONTROLS (DAILY-LOG-REPORT STYLE)
+  ====================================================== -->
+  <div class="page-header">
+    <div class="header-titles">
+      <h2>Settings</h2>
+      <p class="subtitle">Upload and manage your organization Details</p>
+    </div>
+
+    <div class="header-actions">
+      <!-- Reset -->
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="resetSettings()"
+        [disabled]="isSaving || !selectedFile"
+        title="Reset logo">
+        <i class="fa-solid fa-arrow-rotate-left"></i>
+        <span>Reset</span>
+      </button>
+
+      <!-- Save Button -->
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="saveSettings()"
+        [disabled]="isSaving || !selectedFile"
+        title="Save Logo">
+        <i class="fa-solid" [ngClass]="isSaving ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+        <span>{{ isSaving ? 'Uploading...' : 'Save Settings' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       COMPANY BRAND LOGO CARD (ROUNDED SQUARE STYLE)
+  ====================================================== -->
+  <section class="card settings-card">
+    <div class="card-header-row">
+      <div class="card-icon-pill">
+        <span class="material-symbols-outlined">image</span>
+      </div>
+      <div>
+        <h3 class="card-title">Brand Logo & Identity</h3>
+        <p class="card-subtitle">Upload and fine-tune your organization's logo displayed across FleetPro dashboards, reports, and vehicle documents.</p>
+      </div>
+    </div>
+
+    <div class="logo-management-grid">
+
+      <!-- Left: Rounded Square Logo Preview Showcase -->
+      <div class="logo-preview-column">
+        <div class="preview-card-frame">
+          <div class="preview-badge-row">
+            <span class="preview-label">Logo Preview</span>
+            <span *ngIf="hasCustomAdjustment" class="badge-adjusted">
+              <span class="material-symbols-outlined badge-icon">check_circle</span> Adjusted
+            </span>
+            <span *ngIf="previewUrl && !hasCustomAdjustment" class="badge-active">
+              <span class="material-symbols-outlined badge-icon">verified</span> Ready to Upload
+            </span>
+            <span *ngIf="!previewUrl" class="badge-default">No Logo</span>
+          </div>
+
+          <!-- Rounded Square Logo Preview Box -->
+          <div class="rounded-square-wrapper">
+            <div class="rounded-square-frame" [class.has-image]="!!previewUrl">
+              <img
+                *ngIf="previewUrl; else emptyLogoPlaceholder"
+                [src]="previewUrl"
+                alt="Company Logo Preview"
+                class="rounded-square-img"
+              />
+              <ng-template #emptyLogoPlaceholder>
+                <div class="rounded-square-placeholder">
+                  <span class="material-symbols-outlined">domain</span>
+                  <span class="placeholder-hint">Add Logo</span>
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Quick Action Camera Badge -->
+         
+          </div>
+
+          <div class="profile-preview-meta">
+            <span class="profile-meta-title">Company Logo</span>
+            <span class="profile-meta-sub">Rounded Square Format</span>
+          </div>
+
+          <!-- Context Mini Previews -->
+          <div *ngIf="previewUrl" class="context-previews-container">
+            <span class="context-previews-title">Appearance in App:</span>
+            <div class="context-samples-row">
+              <!-- Topbar Pill -->
+              <div class="context-sample-item">
+                <div class="sample-topbar-pill">
+                  <img [src]="previewUrl" alt="Navbar preview" class="sample-topbar-img" />
+                  <span>FleetPro</span>
+                </div>
+                <span class="sample-caption">Navbar</span>
+              </div>
+
+              <!-- Square Avatar -->
+              <div class="context-sample-item">
+                <div class="sample-square-badge">
+                  <img [src]="previewUrl" alt="Badge preview" class="sample-square-img" />
+                </div>
+                <span class="sample-caption">Badge</span>
+              </div>
+
+              <!-- Document Header -->
+              <div class="context-sample-item">
+                <div class="sample-invoice-badge">
+                  <img [src]="previewUrl" alt="Invoice preview" class="sample-invoice-img" />
+                </div>
+                <span class="sample-caption">Document</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Upload Dropzone & Controls -->
+      <div class="logo-controls-column">
+        <!-- Dropzone -->
+        <div
+          class="upload-dropzone"
+          [class.drag-over]="isDragOver"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDropFile($event)">
+
+          <div class="dropzone-icon-ring">
+            <span class="material-symbols-outlined">cloud_upload</span>
+          </div>
+
+          <h4 class="dropzone-title">Upload your company logo</h4>
+          <p class="dropzone-subtext">Drag and drop your file here, or click to browse</p>
+
+          <input
+            id="companyLogo"
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+            (change)="onLogoSelected($event)"
+            hidden
+          />
+
+          <label for="companyLogo" class="btn btn-primary dropzone-cta">
+            <span class="material-symbols-outlined">folder_open</span>
+            <span>{{ previewUrl ? 'Select New Image' : 'Browse Computer' }}</span>
+          </label>
+
+          <div class="dropzone-rules">
+            <div class="rule-chip"><span class="material-symbols-outlined">check</span> PNG, JPG, WebP, SVG</div>
+            <div class="rule-chip"><span class="material-symbols-outlined">check</span> Max 5 MB</div>
+            <div class="rule-chip"><span class="material-symbols-outlined">check</span> Min 256x256 px</div>
+          </div>
+        </div>
+
+        <!-- Quick Action Buttons when a logo is loaded -->
+        <div *ngIf="previewUrl" class="logo-actions-banner">
+          <div class="actions-message">
+            <span class="material-symbols-outlined action-msg-icon">auto_fix_high</span>
+            <div>
+              <strong>Fine-tune your logo</strong>
+              <p>Adjust zoom, drag to center, rotate or flip before saving.</p>
+            </div>
+          </div>
+
+          <div class="actions-buttons-row">
+            <button
+              type="button"
+              class="btn btn-adjust"
+              (click)="openAdjustModal()">
+              <span class="material-symbols-outlined">tune</span>
+              <span>Adjust / Crop Logo</span>
+            </button>
+
+            <label for="companyLogo" class="btn btn-outline change-btn">
+              <span class="material-symbols-outlined">sync</span>
+              <span>Change</span>
+            </label>
+
+            <button
+              type="button"
+              class="btn btn-danger-soft"
+              (click)="removeLogo()">
+              <span class="material-symbols-outlined">delete</span>
+              <span>Remove</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       INTERACTIVE LOGO ADJUSTER STUDIO MODAL
+  ====================================================== -->
+  <div *ngIf="showAdjustModal" class="adjust-modal-overlay" (click)="closeAdjustModal()">
+    <div class="adjust-modal-dialog" (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="adjust-modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge">
+            <span class="material-symbols-outlined">crop_rotate</span>
+          </div>
+          <div>
+            <h3>Adjust Company Logo</h3>
+            <p>Pan, zoom, rotate, and frame your logo before saving.</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" (click)="closeAdjustModal()" title="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="adjust-modal-body">
+
+        <!-- Left: Interactive Canvas & Viewport -->
+        <div class="adjust-viewport-container">
+          <div
+            class="adjust-canvas-frame"
+            (mousedown)="startDrag($event)"
+            (touchstart)="startDrag($event)"
+            (wheel)="onWheel($event)"
+            [class.dragging]="isDragging">
+
+            <!-- Checkered background canvas simulation -->
+            <div class="canvas-checkers"></div>
+
+            <!-- Movable Image -->
+            <img
+              *ngIf="rawPreviewUrl"
+              [src]="rawPreviewUrl"
+              alt="Adjusting logo"
+              class="adjuster-image"
+              [class.smooth-transition]="!isDragging"
+              [style.width.px]="baseWidth"
+              [style.height.px]="baseHeight"
+              [style.margin-left.px]="-baseWidth / 2"
+              [style.margin-top.px]="-baseHeight / 2"
+              [style.transform]="adjusterImageTransform"
+              draggable="false"
+            />
+
+            <!-- Rounded Square Crop Frame Mask & Guides -->
+            <div class="crop-frame-mask">
+              <div class="crop-crosshair-h"></div>
+              <div class="crop-crosshair-v"></div>
+            </div>
+
+            <!-- Gesture Helper -->
+            <div class="viewport-gesture-hint">
+              <span class="material-symbols-outlined hint-icon">pan_tool</span>
+              <span>Drag to move • Scroll to zoom</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Adjustment Controls Panel -->
+        <div class="adjust-controls-panel">
+
+          <!-- Zoom Section -->
+          <div class="control-box">
+            <div class="control-header">
+              <label class="control-label">
+                <span class="material-symbols-outlined">zoom_in</span>
+                <span>Zoom / Scale</span>
+              </label>
+              <span class="control-value-badge">{{ zoomPercentage }}%</span>
+            </div>
+
+            <div class="zoom-slider-row">
+              <button
+                type="button"
+                class="btn-control-step"
+                (click)="zoomOut()"
+                [disabled]="zoom <= minZoom"
+                title="Zoom Out">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+
+              <input
+                type="range"
+                [min]="minZoom"
+                [max]="maxZoom"
+                step="0.05"
+                [value]="zoom"
+                (input)="setZoom(+($any($event.target).value))"
+                class="custom-range-slider"
+              />
+
+              <button
+                type="button"
+                class="btn-control-step"
+                (click)="zoomIn()"
+                [disabled]="zoom >= maxZoom"
+                title="Zoom In">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Rotation Section -->
+          <div class="control-box">
+            <div class="control-header">
+              <label class="control-label">
+                <span class="material-symbols-outlined">rotate_right</span>
+                <span>Rotation</span>
+              </label>
+              <span class="control-value-badge">{{ rotation }}°</span>
+            </div>
+
+            <div class="rotation-tools-row">
+              <button
+                type="button"
+                class="btn-tool"
+                (click)="rotateBy(-90)"
+                title="Rotate 90° counter-clockwise">
+                <span class="material-symbols-outlined">rotate_90_degrees_ccw</span>
+                <span>-90°</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-tool"
+                (click)="rotateBy(90)"
+                title="Rotate 90° clockwise">
+                <span class="material-symbols-outlined">rotate_90_degrees_cw</span>
+                <span>+90°</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-tool"
+                (click)="setRotation(0)"
+                [class.active]="rotation === 0"
+                title="Reset angle to 0°">
+                <span class="material-symbols-outlined">straighten</span>
+                <span>0°</span>
+              </button>
+            </div>
+
+            <div class="slider-wrapper">
+              <input
+                type="range"
+                min="-180"
+                max="180"
+                step="1"
+                [value]="rotation"
+                (input)="setRotation(+($any($event.target).value))"
+                class="custom-range-slider"
+              />
+            </div>
+          </div>
+
+          <!-- Flip & Orientation -->
+          <div class="control-box">
+            <div class="control-header">
+              <label class="control-label">
+                <span class="material-symbols-outlined">flip</span>
+                <span>Mirror & Orientation</span>
+              </label>
+            </div>
+
+            <div class="flip-tools-row">
+              <button
+                type="button"
+                class="btn-tool"
+                [class.active]="flipH"
+                (click)="toggleFlipH()">
+                <span class="material-symbols-outlined">flip</span>
+                <span>Flip Horizontal</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-tool"
+                [class.active]="flipV"
+                (click)="toggleFlipV()">
+                <span class="material-symbols-outlined" style="transform: rotate(90deg);">flip</span>
+                <span>Flip Vertical</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Position & Reset -->
+          <div class="control-box">
+            <div class="quick-helpers-row">
+              <button
+                type="button"
+                class="btn-helper"
+                (click)="centerImage()">
+                <span class="material-symbols-outlined">filter_center_focus</span>
+                <span>Center Logo</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-helper"
+                (click)="resetAdjustments()">
+                <span class="material-symbols-outlined">refresh</span>
+                <span>Reset All</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="adjust-modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="closeAdjustModal()">
+          <span>Cancel</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary apply-crop-btn"
+          (click)="applyAdjustments($event)">
+          <i class="fa-solid fa-check"></i>
+          <span>Apply & Crop Logo</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

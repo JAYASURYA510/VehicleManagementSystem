@@ -16,6 +16,8 @@ import { SuperAdminList } from './features/super-admin-list/super-admin-list';
 import { NewonboardClientComponent } from './features/newonboard-client/newonboard-client';
 import { OnboardingClientList } from './features/onboarding-client-list/onboarding-client-list';
 import { AdminDashboard } from './features/admin-dashboard/admin-dashboard';
+import { SettingsComponent } from './components/settings/settings';
+
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -53,7 +55,8 @@ export const routes: Routes = [
       { path: 'salary', redirectTo: 'daily-tracking' },
       { path: 'rto', redirectTo: 'daily-tracking' },
       { path: 'profit', redirectTo: 'daily-tracking' },
-      { path: 'masters', redirectTo: 'dashboard' }
+      { path: 'masters', redirectTo: 'dashboard' },
+      { path: 'settings',component: SettingsComponent }
     ]
   },
   { path: '**', redirectTo: '' }
