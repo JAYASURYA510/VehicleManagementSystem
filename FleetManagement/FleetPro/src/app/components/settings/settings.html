@@ -23,7 +23,7 @@
       </button>
 
       <!-- Save Button -->
-      <button
+      <button *ngIf="saveButton"
         type="button"
         class="btn btn-primary"
         (click)="saveSettings()"
@@ -31,6 +31,17 @@
         title="Save Logo">
         <i class="fa-solid" [ngClass]="isSaving ? 'fa-spinner fa-spin' : 'fa-check'"></i>
         <span>{{ isSaving ? 'Uploading...' : 'Save Settings' }}</span>
+      </button>
+
+      <!-- Update Button -->
+      <button *ngIf="updateButton"
+        type="button"
+        class="btn btn-primary"
+        (click)="updateSettings()"
+        [disabled]="isSaving"
+        title="Update Logo">
+        <i class="fa-solid" [ngClass]="isSaving ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+        <span>{{ isSaving ? 'Updating...' : 'Update Settings' }}</span>
       </button>
     </div>
   </div>
@@ -99,7 +110,6 @@
               <div class="context-sample-item">
                 <div class="sample-topbar-pill">
                   <img [src]="previewUrl" alt="Navbar preview" class="sample-topbar-img" />
-                  <span>FleetPro</span>
                 </div>
                 <span class="sample-caption">Navbar</span>
               </div>

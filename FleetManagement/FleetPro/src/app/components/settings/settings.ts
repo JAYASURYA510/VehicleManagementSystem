@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Subject, takeUntil } from 'rxjs';
 import { CommanService } from '../../core/services/comman.service';
 import { DateTimePickerService } from '../../core/services/datetime-picker.service';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -38,12 +39,21 @@ export class SettingsComponent implements OnDestroy {
   role = this.localStorageData?.role;
   userId = this.localStorageData?.userId ?? this.localStorageData?.id;
 
+  // Base server URL for constructing saved image paths
+  private readonly serverBaseUrl = environment.apiUrl.replace('/api', '');
+
   // File and preview states
   selectedFile: File | null = null;
   rawFile: File | null = null;
   previewUrl: string | null = null;
   rawPreviewUrl: string | null = null;
   private loadedImg: HTMLImageElement | null = null;
+
+  // Tracks whether the current previewUrl is a server-saved image (not a local blob)
+  savedImageUrl: string | null = null;
+
+  saveButton : boolean = false;
+  updateButton : boolean = false;
 
   // Modal and interaction states
   showAdjustModal = false;
@@ -85,6 +95,9 @@ export class SettingsComponent implements OnDestroy {
     return `translate(${this.panX}px, ${this.panY}px) rotate(${this.rotation}deg) scale(${scaleX}, ${scaleY})`;
   }
 
+  ngOnInit(): void {
+    this.getSavedData();
+  }
   onLogoSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -156,9 +169,38 @@ export class SettingsComponent implements OnDestroy {
   }
 
   openAdjustModal(): void {
-    if (!this.rawPreviewUrl) return;
-    this.showAdjustModal = true;
-    this.cdr.detectChanges();
+    // Case 1: a newly selected local file is already loaded
+    if (this.rawPreviewUrl) {
+      this.showAdjustModal = true;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Case 2: only a server-saved image is present — load it into the adjuster
+    if (this.savedImageUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        this.loadedImg = img;
+        this.imageNaturalWidth = img.naturalWidth || this.VIEWPORT_SIZE;
+        this.imageNaturalHeight = img.naturalHeight || this.VIEWPORT_SIZE;
+        const scale = Math.max(
+          this.VIEWPORT_SIZE / this.imageNaturalWidth,
+          this.VIEWPORT_SIZE / this.imageNaturalHeight
+        );
+        this.baseWidth = Math.round(this.imageNaturalWidth * scale);
+        this.baseHeight = Math.round(this.imageNaturalHeight * scale);
+        // Borrow savedImageUrl as rawPreviewUrl so the canvas can render it
+        this.rawPreviewUrl = this.savedImageUrl;
+        this.resetAdjustments();
+        this.showAdjustModal = true;
+        this.cdr.detectChanges();
+      };
+      img.onerror = () => {
+        this.alert.error('Could not load the saved logo for adjustment.');
+      };
+      img.src = this.savedImageUrl;
+    }
   }
 
   closeAdjustModal(): void {
@@ -167,6 +209,10 @@ export class SettingsComponent implements OnDestroy {
     if (!this.previewUrl && this.rawPreviewUrl && this.rawFile) {
       this.previewUrl = this.rawPreviewUrl;
       this.selectedFile = this.rawFile;
+    }
+    // If rawPreviewUrl was borrowed from savedImageUrl, release it
+    if (this.rawPreviewUrl === this.savedImageUrl) {
+      this.rawPreviewUrl = null;
     }
     this.cdr.detectChanges();
   }
@@ -306,7 +352,7 @@ export class SettingsComponent implements OnDestroy {
             lastModified: Date.now()
           });
 
-          if (this.previewUrl && this.previewUrl !== this.rawPreviewUrl) {
+          if (this.previewUrl && this.previewUrl !== this.rawPreviewUrl && this.previewUrl !== this.savedImageUrl) {
             URL.revokeObjectURL(this.previewUrl);
           }
           this.previewUrl = URL.createObjectURL(blob);
@@ -329,19 +375,80 @@ export class SettingsComponent implements OnDestroy {
     this.rawFile = null;
     this.loadedImg = null;
     this.hasCustomAdjustment = false;
+    this.savedImageUrl = null;
     this.alert.info('Logo removed.');
     this.cdr.detectChanges();
   }
 
   private clearPreviews(): void {
-    if (this.previewUrl) {
+    // Only revoke blob URLs — server image URLs must not be revoked
+    if (this.previewUrl && this.previewUrl !== this.savedImageUrl) {
       URL.revokeObjectURL(this.previewUrl);
-      this.previewUrl = null;
     }
+    this.previewUrl = null;
     if (this.rawPreviewUrl) {
       URL.revokeObjectURL(this.rawPreviewUrl);
       this.rawPreviewUrl = null;
     }
+  }
+
+  settingsList : any;
+  getSavedData(){
+    this.apiService.list(`Settings/${this.tenantId}/getSettings`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+      next: (response: any) => {
+        if(response.data){
+          this.updateButton = true;
+          this.saveButton = false;
+          this.settingsList = response.data;
+          console.log('Settings GET Response:', response);
+
+          // Patch the saved logo into the preview
+          if (response.data?.filePath) {
+            const imageUrl = `${this.serverBaseUrl}/${response.data.filePath}`;
+            this.savedImageUrl = imageUrl;
+            this.previewUrl = imageUrl;
+            this.cdr.detectChanges();
+          }
+        } else {
+          // No saved settings — show Save button
+          this.saveButton = true;
+          this.updateButton = false;
+        }
+      }
+    });
+  }
+
+  updateSettings(): void {
+    if (!this.selectedFile) {
+      this.alert.warning('Please select a new logo image to update.');
+      return;
+    }
+     const formData = new FormData();
+     formData.append('Id', this.settingsList?.id ?? this.settingsList?.Id ?? '');
+     formData.append('File', this.selectedFile, this.selectedFile.name);
+     formData.append('UpdatedBy', this.localStorageData?.userId);
+     formData.append('UpdatedAt', this.dateTimePickerService.toApiDateTime(new Date().toISOString()) ?? '');
+     this.isSaving = true;
+     this.apiService.create(`Settings/${this.tenantId}/updateSettings`, formData).pipe(takeUntil(this.unsubscribe$)).subscribe({
+      next: (response: any) => {
+        this.isSaving = false;
+        console.log('Update Settings Response:', response);
+        if (response?.success === false) {
+          this.alert.error(response?.message || 'Failed to update company logo.');
+        } else {
+          this.alert.success(response?.message || 'Company logo updated successfully!');
+          // Refresh saved data to sync preview with server state
+          this.getSavedData();
+        }
+        this.cdr.detectChanges();
+      },
+      error: (error: any) => {
+        this.isSaving = false;
+        console.error('Update Settings Error:', error);
+        this.alert.error(error.error?.message || 'Failed to update company logo. Please try again.');
+        this.cdr.detectChanges();
+      }
+     });
   }
 
   saveSettings(): void {
