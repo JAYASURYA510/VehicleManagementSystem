@@ -10,6 +10,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 import { CommanService } from '../../core/services/comman.service';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangeDetectorRef } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 interface NavItem {
   label: string;
@@ -43,18 +44,21 @@ export class MainLayoutComponent {
   sidebarOpen = signal(this.getInitialSidebarState());
   userDropdownOpen = signal(false);
   userMenuRef = viewChild<ElementRef>('userMenuRef');
-  getRoleId : any;
-  navList : MenuItem[] = [];
+  getRoleId: any;
+  navList: MenuItem[] = [];
   expandedGroups = signal<Set<number>>(new Set<number>());
   private tenandId = localStorage.getItem("fleetPro_TenantId");
+  companyLogoUrl: string | null = null;
+  private readonly serverBaseUrl = environment.apiUrl.replace('/api', '');
 
   constructor(
-       private fb : FormBuilder,private api : CommanService, private cdr: ChangeDetectorRef,
-       private router : Router
-    ) {}
+    private fb: FormBuilder, private api: CommanService, private cdr: ChangeDetectorRef,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.getNavList();
+    this.getCompanyLogo();
 
     // Auto-expand the active group on every navigation
     this.router.events
@@ -97,7 +101,7 @@ export class MainLayoutComponent {
   }
 
   getNavList(): void {
-     const role = this.auth.role();
+    const role = this.auth.role();
     if (role === UserRole.SuperAdmin || role === 'SuperAdmin') {
       this.getRoleId = 1;
     }
@@ -111,7 +115,7 @@ export class MainLayoutComponent {
       this.getRoleId = 4;
     }
 
-    this.api.list(`Menu/${this.tenandId}/GetMenuByRoleId/${this.getRoleId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data : any)=>{
+    this.api.list(`Menu/${this.tenandId}/GetMenuByRoleId/${this.getRoleId}`).pipe(takeUntil(this.unsubscribe$)).subscribe((data: any) => {
       this.navList = data as MenuItem[];
       // Expand only the group matching the current active route
       this.expandActiveGroup();
@@ -191,5 +195,82 @@ export class MainLayoutComponent {
   logout(): void {
     this.closeUserDropdown();
     this.auth.logout();
+  }
+
+  @HostListener('window:fleetpro-logo-updated', ['$event'])
+  onLogoUpdated(event: any): void {
+    const newUrl = event?.detail?.url;
+    if (newUrl) {
+      this.companyLogoUrl = newUrl;
+      this.cdr.detectChanges();
+    }
+  }
+
+  getCompanyLogo(): void {
+    const tenantId = localStorage.getItem('fleetPro_TenantId') || this.tenandId;
+    if (!tenantId) {
+      console.log('No tenant ID found in localStorage for company logo.');
+      return;
+    }
+
+    // Call GET endpoint using existing common API service
+    this.api.list(`Settings/${tenantId}/getSettings`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+      next: (response: any) => {
+        console.log('MainLayout GET company icon response (Settings):', response);
+        this.applyCompanyLogo(response);
+      },
+      error: (err: any) => {
+        if (err?.status === 404) {
+          // Fallback to Menu/${tenantId}/getSettings in case backend routed to Menu controller
+          this.api.list(`Menu/${tenantId}/getSettings`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+            next: (res: any) => {
+              console.log('MainLayout GET company icon response (Menu):', res);
+              this.applyCompanyLogo(res);
+            },
+            error: (fallbackErr: any) => {
+              if (fallbackErr?.status === 404) {
+                console.log('No company icon uploaded yet (404). Showing default fallback icon.');
+              } else {
+                console.error('Failed to retrieve company icon:', fallbackErr);
+              }
+              this.companyLogoUrl = null;
+              this.cdr.detectChanges();
+            }
+          });
+        } else {
+          console.error('Failed to retrieve company icon:', err);
+          this.companyLogoUrl = null;
+          this.cdr.detectChanges();
+        }
+      }
+    });
+  }
+
+  private applyCompanyLogo(response: any): void {
+    const record = response?.data || response;
+    const filePath = record?.filePath;
+    if (filePath) {
+      this.companyLogoUrl = this.resolveImageUrl(filePath);
+      this.cdr.detectChanges();
+    }
+  }
+
+  private resolveImageUrl(filePath: string): string | null {
+    if (!filePath) return null;
+    const cleaned = filePath.trim().replace(/\\/g, '/');
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://') || cleaned.startsWith('data:')) {
+      return cleaned;
+    }
+    if (/^[a-zA-Z]:\//.test(cleaned)) {
+      console.warn('Physical server file path received instead of web URL:', filePath);
+      return null;
+    }
+    const pathPart = cleaned.startsWith('/') ? cleaned.slice(1) : cleaned;
+    return `${this.serverBaseUrl}/${pathPart}`;
+  }
+
+  onLogoError(): void {
+    this.companyLogoUrl = null;
+    this.cdr.detectChanges();
   }
 }

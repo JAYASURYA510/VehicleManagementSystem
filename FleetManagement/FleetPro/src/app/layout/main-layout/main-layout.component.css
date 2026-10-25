@@ -27,19 +27,43 @@
 }
 
 .sidebar-brand {
-  padding: 1.25rem 1.5rem;
+  padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
   border-bottom: 1px solid var(--border);
+  min-height: 80px;
+  gap: 0.5rem;
 }
 
+.brand-icon {
+  font-size: 2.75rem;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
 .brand-icon { font-size: 1.5rem; color: var(--accent); }
 .brand-text {
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.02em;}
+.brand-logo-img {
+  width: 40px;
+  height: 58px;
+  max-width: 140px;
+  max-height: 58px;
+  object-fit: contain;
+  border-radius: 12px;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.brand-logo-img:hover {
+  transform: scale(1.05);
 }
 
 .sidebar-nav {
@@ -112,8 +136,15 @@
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .nav-item {
@@ -422,7 +453,17 @@
     z-index: 99;
   }
 
-  .top-navbar { padding: 0.65rem 1rem; }
-  .content-area { padding: 1rem; }
-  .user-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+  .top-navbar {
+    padding: 0.65rem 1rem;
+  }
+
+  .content-area {
+    padding: 1rem;
+  }
+
+  .user-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
