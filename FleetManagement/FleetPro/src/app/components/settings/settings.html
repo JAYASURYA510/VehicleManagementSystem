@@ -1,5 +1,5 @@
 
-<div class="daily-log-container">
+<div *ngIf="isAdmin" class="daily-log-container">
 
   <!-- =====================================================
        PAGE HEADER & CONTROLS (DAILY-LOG-REPORT STYLE)
@@ -449,3 +449,18 @@
   </div>
 
 </div>
+
+<div *ngIf="!isAdmin" class="daily-log-container">
+  <div class="page-header">
+    <div class="header-titles">
+      <h2>Settings</h2>
+      <p class="subtitle">Upload and manage your organization Details</p>
+    </div>
+  </div>
+
+  <div class="admin-access">
+  <p style="color: rgb(218, 55, 55);">You do not have permission to access this page. Contact The Administrator.</p>
+  </div>
+
+</div>
+

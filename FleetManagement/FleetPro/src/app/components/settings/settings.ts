@@ -48,6 +48,7 @@ export class SettingsComponent implements OnDestroy {
   previewUrl: string | null = null;
   rawPreviewUrl: string | null = null;
   private loadedImg: HTMLImageElement | null = null;
+  isAdmin:any;
 
   // Tracks whether the current previewUrl is a server-saved image (not a local blob)
   savedImageUrl: string | null = null;
@@ -96,6 +97,9 @@ export class SettingsComponent implements OnDestroy {
   }
 
   ngOnInit(): void {
+    if(this.localStorageData.role === "SuperAdmin" || this.localStorageData.role === "Admin") {
+      this.isAdmin = true;
+    }
     this.getSavedData();
   }
   onLogoSelected(event: Event): void {
