@@ -51,9 +51,11 @@ export class FormDataComponent implements OnInit {
   }
 
   loadRoles() {
-    this.apiService.getRoles().subscribe({
+    this.apiService.getAllRoles().subscribe({
       next: (res) => {
-        this.roles = [...res];
+        this.roles = this.localStorageData.role === 'Admin'
+          ? res.filter((role : any) => role.id !== 1)
+          : [...res];
         this.cdr.detectChanges();
       },
       error: (err) => {

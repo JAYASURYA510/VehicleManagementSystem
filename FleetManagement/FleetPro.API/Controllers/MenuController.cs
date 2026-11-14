@@ -23,6 +23,13 @@ namespace FleetPro.API.Controllers
             this.context = context;
         }
 
+        [HttpGet("GetAllRoles")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var roles = await menuRepository.getallrole();
+            return Ok(roles);
+        }
+
         [HttpGet("GetRoles")]
         public async Task<IActionResult> get()
         {

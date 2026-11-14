@@ -17,6 +17,23 @@ namespace FleetPro.API.Repository
             this.mapper = mapper;
         }
 
+        public async Task<List<RoleDto>> getallrole()
+        {
+            try{
+            var roleData = await context.RoleMsts.AsNoTracking().ToListAsync();
+
+            return roleData.Select(data => new RoleDto
+            {
+                Id = data.id,
+                RoleName = data.roleName
+            }).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public async Task<List<RoleDto>> getrole()
         {
             try{

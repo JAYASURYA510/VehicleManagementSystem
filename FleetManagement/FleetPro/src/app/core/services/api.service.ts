@@ -24,6 +24,10 @@ export class ApiService {
   private apiUrl = 'https://localhost:7236/api/Menu';
   constructor(private http: HttpClient) {}
   
+  getAllRoles(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/GetAllRoles`);
+  }
+
   getRoles(): Observable<any> {
     return this.http.get(`${this.apiUrl}/GetRoles`);
   }
