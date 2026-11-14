@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FleetPro.API.Data.Entitys;
 using FleetPro.API.DTOs;
 
@@ -11,6 +11,9 @@ namespace FleetPro.API.Data.AutoMapper
             CreateMap<MenuTypesDto, MenuMst>().ReverseMap();
             CreateMap<VehicleMstDto, VehicleMst>().ReverseMap();
             CreateMap<VehicleUserAssignmentDto, VehicleUserAssignment>().ReverseMap();
+            CreateMap<AdvanceSalaryDto, AdvanceSalaryMst>().ReverseMap();
+            CreateMap<CreateAdvanceSalaryDto, AdvanceSalaryMst>();
+            CreateMap<UpdateAdvanceSalaryDto, AdvanceSalaryMst>();
         }
     }
 }

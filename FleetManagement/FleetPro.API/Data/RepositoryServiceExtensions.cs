@@ -1,4 +1,4 @@
-﻿
+
 using FleetPro.API.IRepository;
 using FleetPro.API.IRepository.IDailyTracking;
 using FleetPro.API.IRepository.IImageAttachment;
@@ -25,6 +25,7 @@ namespace FleetPro.API.Data
             services.AddScoped<ITenantServiceRepository, TenantRepository>();
             services.AddScoped<IPasswordService, PasswordService>();
             services.AddScoped<ISettingRepository, SettingRepository>();
+            services.AddScoped<IAdvanceSalaryRepository, AdvanceSalaryRepository>();
             return services;
         }
     }
