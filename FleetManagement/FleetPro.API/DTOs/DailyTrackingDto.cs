@@ -27,6 +27,7 @@ namespace FleetPro.API.DTOs
         public decimal RtoCharges { get; set; }
         public decimal TripRevenue { get; set; }
         public decimal OtherExpenses { get; set; }
+        public decimal? BalanceAdvance { get; set; }
         public string? Notes { get; set; }
         public int? StatusType { get; set; }
         public bool IsDelete { get; set; }
@@ -83,6 +84,8 @@ namespace FleetPro.API.DTOs
         public decimal? TripRevenue { get; set; }
 
         public decimal? OtherExpenses { get; set; }
+
+        public decimal? BalanceAdvance { get; set; }
 
         public string? Notes { get; set; }
 
@@ -146,6 +149,8 @@ namespace FleetPro.API.DTOs
         public decimal? TripRevenue { get; set; }
 
         public decimal? OtherExpenses { get; set; }
+
+        public decimal? BalanceAdvance { get; set; }
 
         public string? Notes { get; set; }
 

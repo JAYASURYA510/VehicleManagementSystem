@@ -175,7 +175,11 @@ namespace FleetPro.API.Repository
                         .Select(vehicle => new vehicleDto
                         {
                             VehicleId = vehicle.VehicleId,
-                            RegistrationNumber = vehicle.RegistrationNumber
+                            RegistrationNumber = vehicle.RegistrationNumber,
+                            AssignedId = context.VehicleUserAssignments
+                                    .Where(x => x.VehicleId == vehicle.VehicleId && x.TenantId == tenantId && x.RoleId == RoleId && x.UserId == UserId && x.IsActive)
+                                    .Select(x => x.AssignmentId)
+                                    .FirstOrDefault()
                         })
                         .ToListAsync();
                 }
@@ -193,7 +197,11 @@ namespace FleetPro.API.Repository
                             .Select(vehicle => new vehicleDto
                             {
                                 VehicleId = vehicle.VehicleId,
-                                RegistrationNumber = vehicle.RegistrationNumber
+                                RegistrationNumber = vehicle.RegistrationNumber,
+                                AssignedId = context.VehicleUserAssignments
+                                    .Where(x => x.VehicleId == vehicle.VehicleId && x.TenantId == tenantId && x.RoleId == RoleId && x.UserId == UserId && x.IsActive)
+                                    .Select(x => x.AssignmentId)
+                                    .FirstOrDefault()
                             })
                             .ToListAsync();
                     }

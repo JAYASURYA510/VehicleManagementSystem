@@ -38,5 +38,6 @@
     {
         public Guid? VehicleId { get; set; }
         public string? RegistrationNumber { get; set; }
+        public Guid? AssignedId { get; set; }
     }
 }

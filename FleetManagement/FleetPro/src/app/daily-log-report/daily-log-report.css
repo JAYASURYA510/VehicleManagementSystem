@@ -421,11 +421,20 @@
 }
 
 .pill-success { background: #dcfce7; color: #15803d; }
+.pill-advance { background: #dcfce7; color: #15803d; }
 .pill-danger { background: #fee2e2; color: #b91c1c; }
 .pill-mileage { background: #f5e8f6; color: #7e3285; }
 .pill-expenses { background: #fee2e2; color: #dc2626; }
+.pill-remaining { background: #ffedd5; color: #c2410c; }
 .pill-revenue { background: #dcfce7; color: #16a34a; }
 .pill-images { background: #ecfeff; color: #0891b2; }
+
+.expense-pills-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
 
 /* Grid Columns */
 .form-grid {
@@ -817,6 +826,11 @@
 
 .r-val.highlight-green {
   color: #16a34a;
+  font-weight: 700;
+}
+
+.r-val.highlight-orange {
+  color: #c2410c;
   font-weight: 700;
 }
 

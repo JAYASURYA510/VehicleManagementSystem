@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, takeUntil, firstValueFrom } from 'rxjs';
+import { Subject, takeUntil, firstValueFrom, distinctUntilChanged } from 'rxjs';
 
 import { ApiService } from '../core/services/api.service';
 import { CommanService } from '../core/services/comman.service';
@@ -33,6 +33,7 @@ import { DateTimePickerComponent } from '../shared/datetime-picker/datetime-pick
 export interface Vehicle {
   vehicleId: any;
   registrationNumber: string;
+  assignedId: any;
 }
 
 export interface ImageAttachment {
@@ -224,6 +225,15 @@ export class DailyLogReport implements OnInit, OnDestroy {
       }
     }
     this.loadVehicles();
+
+    this.form.get('vehicleId')?.valueChanges
+      .pipe(
+        distinctUntilChanged(),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe(() => {
+        this.onVehicleSelect();
+      });
   }
 
   ngOnDestroy(): void {
@@ -255,8 +265,14 @@ export class DailyLogReport implements OnInit, OnDestroy {
 
           if (response?.data?.length > 0) {
             this.vehicleList = response.data;
+            const currentVehicleId = this.form.get('vehicleId')?.value;
+            if (currentVehicleId) {
+              this.onVehicleSelect();
+            }
           } else {
             this.vehicleList = [];
+            this.totalAdvanceAmount = 0;
+            this.advanceSalaryData = null;
           }
 
           this.cdr.detectChanges();
@@ -274,6 +290,9 @@ export class DailyLogReport implements OnInit, OnDestroy {
           );
 
           this.vehicleList = [];
+          this.totalAdvanceAmount = 0;
+          this.advanceSalaryData = null;
+          this.cdr.detectChanges();
         }
       });
   }
@@ -756,6 +775,11 @@ export class DailyLogReport implements OnInit, OnDestroy {
     return toll + workshop + tyre + rto;
   }
 
+  // Remaining Amount = Advance Amount − Operational Expenses (Subtotal)
+  get remainingAdvanceAmount(): number {
+    return (this.totalAdvanceAmount || 0) - this.totalOtherExpenses;
+  }
+
   // Additional Expenses = Driver Salary
   get totalAdditionalExpenses(): number {
     const salary = Number(this.form.get('driverSalary')?.value) || 0;
@@ -915,8 +939,98 @@ export class DailyLogReport implements OnInit, OnDestroy {
       this.imageInput.nativeElement.value = '';
     }
 
+    this.lastFetchedAssignId = null;
+    this.totalAdvanceAmount = 0;
+    this.advanceSalaryData = null;
+
     this.activeSection = 'location';
     this.cdr.detectChanges();
+  }
+
+  // =====================================================
+  // ADVANCE SALARY DATA & VEHICLE SELECTION
+  // =====================================================
+
+  totalAdvanceAmount: number = 0; 
+  advanceSalaryData: any;
+  private lastFetchedAssignId: any = null;
+
+  onVehicleSelect(): void {
+    const selectedVehicleId = this.form.get('vehicleId')?.value;
+    if (!selectedVehicleId) {
+      this.lastFetchedAssignId = null;
+      this.totalAdvanceAmount = 0;
+      this.advanceSalaryData = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const selectedVehicle = this.vehicleList.find(
+      (v) => v.vehicleId === selectedVehicleId || v.vehicleId?.toString() === selectedVehicleId?.toString()
+    );
+
+    const assignedId = selectedVehicle?.assignedId ?? (selectedVehicle as any)?.AssignedId;
+    const emptyGuid = '00000000-0000-0000-0000-000000000000';
+
+    if (assignedId && assignedId !== emptyGuid) {
+      this.getAdvanceData(assignedId);
+    } else {
+      this.lastFetchedAssignId = null;
+      this.totalAdvanceAmount = 0;
+      this.advanceSalaryData = null;
+      this.cdr.detectChanges();
+    }
+  }
+
+  getAdvanceData(assignId: any): void {
+    const emptyGuid = '00000000-0000-0000-0000-000000000000';
+    if (!assignId || assignId === emptyGuid) {
+      this.lastFetchedAssignId = null;
+      this.totalAdvanceAmount = 0;
+      this.advanceSalaryData = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.lastFetchedAssignId === assignId) {
+      return;
+    }
+    this.lastFetchedAssignId = assignId;
+
+    this.apiService
+      .list(`AdvanceSalary/${this.tenandId}/getAdvanceSalaryByAssignId/${assignId}`)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe({
+        next: (response: any) => {
+          if (response?.success === true && response?.data) {
+            this.advanceSalaryData = response.data;
+            if (Array.isArray(response.data)) {
+              if (response.data.length > 0) {
+                this.totalAdvanceAmount = response.data.reduce((sum: number, item: any) => {
+                  const val = Number(item.advanceAmount ?? item.AdvanceAmount ?? 0);
+                  return sum + (isNaN(val) ? 0 : val);
+                }, 0);
+              } else {
+                this.totalAdvanceAmount = 0;
+              }
+            } else {
+              const val = Number(response.data.advanceAmount ?? response.data.AdvanceAmount ?? 0);
+              this.totalAdvanceAmount = isNaN(val) ? 0 : val;
+            }
+          } else {
+            this.advanceSalaryData = null;
+            this.totalAdvanceAmount = 0;
+          }
+          this.cdr.detectChanges();
+        },
+        error: (error: any) => {
+          console.error('Failed to get advance data:', error);
+          this.lastFetchedAssignId = null;
+          this.totalAdvanceAmount = 0;
+          this.advanceSalaryData = null;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   // =====================================================
@@ -1034,6 +1148,7 @@ export class DailyLogReport implements OnInit, OnDestroy {
     formData.append('DriverSalary',value.driverSalary?.toString() ?? '0');
     formData.append('RtoCharges',value.rtoCharges?.toString() ?? '0');
     formData.append('TripRevenue',value.tripRevenue?.toString() ?? '0');
+    formData.append('BalanceAdvance',this.remainingAdvanceAmount?.toString() ?? '0');
     formData.append('Notes',value.notes ?? '');
     formData.append('TenantId',currentTenantId);
     formData.append('StatusType', '1');

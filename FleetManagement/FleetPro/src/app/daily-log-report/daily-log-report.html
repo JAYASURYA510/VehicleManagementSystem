@@ -443,9 +443,17 @@
               <p class="section-subtitle">Record toll tax, workshop maintenance, tyre, RTO challans, trip revenue, and notes</p>
             </div>
           </div>
-          <span class="section-status-pill pill-expenses">
-            Subtotal: ₹ {{ totalOtherExpenses | number }}
-          </span>
+          <div class="expense-pills-group">
+            <span class="section-status-pill pill-advance">
+              Advance: ₹ {{ (totalAdvanceAmount || 0) | number }}
+            </span>
+            <span class="section-status-pill pill-expenses">
+              Subtotal: ₹ {{ totalOtherExpenses | number }}
+            </span>
+            <span class="section-status-pill pill-remaining">
+              Remaining: {{ remainingAdvanceAmount < 0 ? '-₹ ' + (-remainingAdvanceAmount | number) : '₹ ' + (remainingAdvanceAmount | number) }}
+            </span>
+          </div>
         </div>
 
         <div class="form-grid cols-3">
@@ -762,6 +770,12 @@
               </button>
             </div>
             <div class="review-block-body">
+              @if (totalAdvanceAmount > 0) {
+                <div class="review-row">
+                  <span class="r-label">Advance Amount:</span>
+                  <span class="r-val highlight-green">₹ {{ totalAdvanceAmount | number }}</span>
+                </div>
+              }
               <div class="review-row">
                 <span class="r-label">Toll Charges:</span>
                 <span class="r-val">₹ {{ (form.get('tollCharges')?.value || 0) | number }}</span>
@@ -782,6 +796,14 @@
                 <span class="r-label font-bold">Total Expenses:</span>
                 <span class="r-val highlight">₹ {{ totalOtherExpenses | number }}</span>
               </div>
+              @if (totalAdvanceAmount > 0) {
+                <div class="review-row">
+                  <span class="r-label font-bold">Remaining Balance:</span>
+                  <span class="r-val highlight-orange">
+                    {{ remainingAdvanceAmount < 0 ? '-₹ ' + (-remainingAdvanceAmount | number) : '₹ ' + (remainingAdvanceAmount | number) }}
+                  </span>
+                </div>
+              }
             </div>
           </div>
 

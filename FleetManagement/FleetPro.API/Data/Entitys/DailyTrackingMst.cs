@@ -105,6 +105,9 @@ public class DailyTrackingRecord
     public Guid TenantId { get; set; }
     public TenantMst tenantMst { get; set; }
 
+    [Column("balance_advance")]
+    public decimal? BalanceAdvance { get; set; }
+
         // public ICollection<ImageAttachment> Images { get; set; } = new List<ImageAttachment>();
 
     }

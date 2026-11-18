@@ -54,6 +54,7 @@ namespace FleetPro.API.Repository.DailyTracking
                     RtoCharges = request.RtoCharges ?? 0m,
                     TripRevenue = request.TripRevenue ?? 0m,
                     OtherExpenses = request.OtherExpenses ?? 0m,
+                    BalanceAdvance = request.BalanceAdvance,
                     Notes = request.Notes,
                     StatusType =  request.StatusType,
                     IsDelete = false,
@@ -111,6 +112,7 @@ namespace FleetPro.API.Repository.DailyTracking
                 tracking.RtoCharges = request.RtoCharges ?? 0m;
                 tracking.TripRevenue = request.TripRevenue ?? 0m;
                 tracking.OtherExpenses = request.OtherExpenses ?? 0m;
+                tracking.BalanceAdvance = request.BalanceAdvance;
                 tracking.Notes = request.Notes;
                 tracking.StatusType = request.StatusType;
                 tracking.UpdatedAt = DateTime.UtcNow;
@@ -438,6 +440,7 @@ namespace FleetPro.API.Repository.DailyTracking
                 RtoCharges = tracking.RtoCharges ?? 0m,
                 TripRevenue = tracking.TripRevenue ?? 0m,
                 OtherExpenses = tracking.OtherExpenses ?? 0m,
+                BalanceAdvance = tracking.BalanceAdvance,
                 Notes = tracking.Notes,
                 StatusType = tracking.StatusType,
                 IsDelete = tracking.IsDelete ?? false,
@@ -500,6 +503,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                 RtoCharges = track.RtoCharges,
                                 TripRevenue = track.TripRevenue,
                                 OtherExpenses = track.OtherExpenses,
+                                BalanceAdvance = track.BalanceAdvance,
                                 Notes = track.Notes,
                                 StatusType = track.StatusType
                               }
@@ -536,6 +540,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                     RtoCharges = item.RtoCharges,
                                     TripRevenue = item.TripRevenue,
                                     OtherExpenses = item.OtherExpenses,
+                                    BalanceAdvance = item.BalanceAdvance,
                                     Notes = item.Notes,
                                     StatusType = item.StatusType
                                 };
@@ -598,6 +603,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                 RtoCharges = track.RtoCharges,
                                 TripRevenue = track.TripRevenue,
                                 OtherExpenses = track.OtherExpenses,
+                                BalanceAdvance = track.BalanceAdvance,
                                 Notes = track.Notes,
                                 StatusType = track.StatusType
                               }
@@ -634,6 +640,7 @@ namespace FleetPro.API.Repository.DailyTracking
                                     RtoCharges = item.RtoCharges,
                                     TripRevenue = item.TripRevenue,
                                     OtherExpenses = item.OtherExpenses,
+                                    BalanceAdvance = item.BalanceAdvance,
                                     Notes = item.Notes,
                                     StatusType = item.StatusType
                                 };
