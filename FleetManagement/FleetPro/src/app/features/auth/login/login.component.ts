@@ -53,6 +53,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   // Customer validation status
   customerValidated = signal(false);
 
+  // Toggle password visibility
+  showPassword = signal(false);
+
 
   constructor(
     private fb: FormBuilder,
@@ -201,6 +204,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.form.reset();
     this.error.set('');
     this.loading.set(false);
+    this.showPassword.set(false);
+  }
+
+  /*
+   * Toggle Password Visibility
+   */
+  togglePasswordVisibility(): void {
+    this.showPassword.update((show: boolean) => !show);
   }
 
   /*

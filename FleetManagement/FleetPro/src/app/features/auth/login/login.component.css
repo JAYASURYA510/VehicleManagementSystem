@@ -17,6 +17,10 @@ mat-icon {
     font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
 }
+
+.password-toggle-btn mat-icon {
+    font-weight: normal !important;
+}
 html,
 body{
     overflow-x:hidden;

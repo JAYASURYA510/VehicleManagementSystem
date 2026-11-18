@@ -115,19 +115,30 @@
 
 
         <!-- PASSWORD -->
-        <div class="form-group floating-group">
+        <div class="form-group floating-group password-wrapper">
 
           <input
-            type="password"
+            [type]="showPassword() ? 'text' : 'password'"
             id="password"
             formControlName="password"
             placeholder=" "
             autocomplete="current-password"
           >
 
-                    <label for="password">Password</label>
+          <label for="password">Password</label>
 
-                    <!-- Required validation -->
+          <button
+            type="button"
+            class="password-toggle-btn"
+            [class.active]="showPassword()"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+            [title]="showPassword() ? 'Hide password' : 'Show password'"
+          >
+            <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+
+          <!-- Required validation -->
           <small
             class="error-text"
             *ngIf="

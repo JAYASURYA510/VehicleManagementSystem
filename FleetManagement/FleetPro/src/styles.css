@@ -1523,3 +1523,142 @@ input:focus, select:focus, textarea:focus {
 .chip-remove:hover {
   opacity: 1;
 }
+
+/* ==========================================================================
+   Reusable Password Input & Eye Toggle Styles (Global)
+   Usable across Login, Users, Onboarding, and any form in the application.
+   ========================================================================== */
+
+/* Hide browser default password reveal button (Edge / IE) to avoid double icons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="text"]::-ms-reveal,
+input[type="text"]::-ms-clear {
+  display: none !important;
+}
+
+/* Reusable password container for standard boxed inputs */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 44px !important;
+}
+
+/* Password Toggle Eye Button */
+.password-toggle-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted, #8b93a1);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.password-toggle-btn:hover {
+  color: var(--search, #852677);
+  background-color: rgba(133, 38, 119, 0.08);
+}
+
+.password-toggle-btn:active {
+  transform: translateY(-50%) scale(0.92);
+  background-color: rgba(133, 38, 119, 0.16);
+}
+
+.password-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent-light, #9f5ea5);
+  outline-offset: 1px;
+}
+
+.password-toggle-btn mat-icon,
+.password-toggle-btn .material-icons,
+.password-toggle-btn .material-symbols-outlined {
+  font-family: 'Material Icons', 'Material Symbols Outlined' !important;
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.password-toggle-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Active state when password is visible */
+.password-toggle-btn.active,
+.password-toggle-btn[aria-pressed="true"] {
+  color: var(--search, #852677);
+}
+
+/* Integration with floating-group / underline style inputs (e.g., Login Page) */
+.floating-group.password-wrapper,
+.floating-group.password-group {
+  display: block;
+}
+
+.floating-group.password-wrapper input,
+.floating-group.password-group input,
+.floating-group:has(.password-toggle-btn) input {
+  padding-right: 38px !important;
+}
+
+.floating-group .password-toggle-btn,
+.floating-group.password-wrapper .password-toggle-btn {
+  top: 19px;
+  transform: none;
+  right: 2px;
+  color: #a89f95;
+}
+
+.floating-group .password-toggle-btn:hover {
+  color: #985197;
+  background-color: rgba(152, 81, 151, 0.1);
+}
+
+.floating-group .password-toggle-btn:active {
+  transform: scale(0.92);
+  background-color: rgba(152, 81, 151, 0.18);
+}
+
+.floating-group .password-toggle-btn.active {
+  color: #985197;
+}
+
+.floating-group:focus-within .password-toggle-btn {
+  color: #6b7280;
+}
+
+.floating-group:focus-within .password-toggle-btn:hover,
+.floating-group:focus-within .password-toggle-btn.active {
+  color: #985197;
+}
