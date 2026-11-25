@@ -1,0 +1,92 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>{{ existingAdvanceId ? 'Update Salary & Advance' : 'Salary & Advance' }}</h1>
+      <p class="subtitle">Manage vehicle salary and advance details</p>
+    </div>
+    <button type="button" class="btn btn-outline" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i>Back</button>
+  </div>
+
+  <div class="card">
+    @if (existingAdvanceId) {
+      <div style="margin-bottom: 16px;">
+        <span class="badge badge-info" style="font-size: 12px; color: #16a34a; font-weight: 600;">
+          (Existing Record Loaded)
+        </span>
+      </div>
+    }
+
+    <form [formGroup]="salaryAdvanceForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid cols-2">
+        <!-- Vehicle Registration Number (Uneditable) -->
+        <div class="form-group">
+          <label for="registrationNumber">Vehicle Registration Number</label>
+          <input id="registrationNumber" type="text" formControlName="registrationNumber" readonly
+            placeholder="Vehicle Registration Number" />
+        </div>
+
+        <!-- Driver Name (Enterable) -->
+        <div class="form-group">
+          <label for="driverName">Driver Name</label>
+          <input id="driverName" name="driverName" type="text" formControlName="driverName" readonly
+            placeholder="Enter driver name" />
+        </div>
+
+        <!-- Salary Input -->
+        <div class="form-group">
+          <label for="salary">
+            Salary <span class="required">*</span>
+          </label>
+          <input id="salary" type="number" formControlName="salary" placeholder="Enter salary amount" min="0"
+            step="any" />
+          @if (salaryAdvanceForm.controls['salary'].touched && salaryAdvanceForm.controls['salary'].invalid) {
+          <small class="alert alert-danger">
+            @if (salaryAdvanceForm.controls['salary'].errors?.['required']) {
+            Salary amount is required.
+            }
+            @if (salaryAdvanceForm.controls['salary'].errors?.['min']) {
+            Salary must be greater than or equal to 0.
+            }
+            @if (salaryAdvanceForm.controls['salary'].errors?.['maxlength']) {
+            Salary amount cannot exceed 10 characters.
+            }
+          </small>
+          }
+        </div>
+
+        <!-- Advance Input -->
+        <div class="form-group">
+          <label for="advance">
+            Advance <span class="required">*</span>
+          </label>
+          <input id="advance" type="number" formControlName="advance" placeholder="Enter advance amount" min="0"
+            step="any" />
+          @if (salaryAdvanceForm.controls['advance'].touched && salaryAdvanceForm.controls['advance'].invalid) {
+          <small class="alert alert-danger">
+            @if (salaryAdvanceForm.controls['advance'].errors?.['required']) {
+            Advance amount is required.
+            }
+            @if (salaryAdvanceForm.controls['advance'].errors?.['min']) {
+            Advance must be greater than or equal to 0.
+            }
+            @if (salaryAdvanceForm.controls['advance'].errors?.['maxlength']) {
+            Advance amount cannot exceed 10 characters.
+            }
+          </small>
+          }
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" (click)="goBack()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || isLoading">
+          <i class="fa-solid fa-check"></i> {{ isSubmitting ? 'Saving...' : (existingAdvanceId ? 'Update' : 'Save') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

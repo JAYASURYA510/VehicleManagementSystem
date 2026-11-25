@@ -17,6 +17,7 @@ import { NewonboardClientComponent } from './features/newonboard-client/newonboa
 import { OnboardingClientList } from './features/onboarding-client-list/onboarding-client-list';
 import { AdminDashboard } from './features/admin-dashboard/admin-dashboard';
 import { SettingsComponent } from './components/settings/settings';
+import { SalaryAdvance } from './features/salary-advance/salary-advance';
 
 
 export const routes: Routes = [
@@ -56,7 +57,8 @@ export const routes: Routes = [
       { path: 'rto', redirectTo: 'daily-tracking' },
       { path: 'profit', redirectTo: 'daily-tracking' },
       { path: 'masters', redirectTo: 'dashboard' },
-      { path: 'settings',component: SettingsComponent }
+      { path: 'settings',component: SettingsComponent },
+      { path: 'salary-advance',component: SalaryAdvance }
     ]
   },
   { path: '**', redirectTo: '' }

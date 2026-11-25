@@ -192,7 +192,7 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadAllActiveVehicles(): void {
-     this.apiService.list(`VehicleMst/${this.tenandId}/getActiveAllVehicle`).pipe(takeUntil(this.unsubscribe$)).subscribe({
+    this.apiService.list(`VehicleMst/${this.tenandId}/getActiveAllVehicle`).pipe(takeUntil(this.unsubscribe$)).subscribe({
       next: (res: any) => {
         this.allActiveVehicles = Array.isArray(res) ? res : (res?.data ?? []);
       },
@@ -210,6 +210,37 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   private router = inject(Router);
   AssignVehicle(): void {
     this.router.navigate(['/assign-vehicle']);
+  }
+
+  goToSalaryAdvance(assignment: any, parentRow?: any, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const vehicleId = assignment?.vehicleId ?? assignment?.id ?? '';
+    const registrationNumber = assignment?.vehicleNumber ?? assignment?.registrationNumber ?? '';
+    const driverName = parentRow?.userName ?? assignment?.driverName ?? '';
+    const assignedId = assignment?.assignmentId ?? assignment?.id ?? '';
+    const userId = parentRow?.userId ?? assignment?.userId ?? '';
+
+    const payload = {
+      vehicleId,
+      registrationNumber,
+      driverName,
+      assignedId,
+      assignmentId: assignedId,
+      userId,
+      userName: parentRow?.userName
+    };
+
+    try {
+      sessionStorage.setItem('fleetpro_salary_advance', JSON.stringify(payload));
+    } catch (e) {
+      console.error('Failed to store salary advance in sessionStorage', e);
+    }
+
+    this.router.navigate(['/salary-advance'], {
+      state: payload
+    });
   }
 
   asignRole: any;
@@ -534,11 +565,11 @@ export class AssignVehicleList implements OnInit, AfterViewInit, OnDestroy {
   applyFilter(event: Event) : void{
     const filterValue = (event.target as HTMLInputElement).value;
 
-  this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.dataSource.filter = filterValue.trim().toLowerCase();
 
-  if (this.dataSource.paginator) {
-    this.dataSource.paginator.firstPage();
-  }
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   updateAssignment(): void {

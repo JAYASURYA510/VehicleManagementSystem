@@ -39,8 +39,8 @@ body {
   min-height: 100%;
   background: linear-gradient(
     180deg,
-    #fcf8fd 0%,
-    #f7f1fb 50%,
+      #fcf8fd 0%,
+      #f7f1fb 50%,
     #f3edf9 100%
   );
   color: var(--text-primary);
@@ -56,7 +56,7 @@ button, input, select, textarea { font: inherit; }
 
 .save-btn{
     background:var(--save);
-    border-color: #FF9800;
+  border-color: #FF9800;
     color:#ffffff;
 }
 
@@ -74,7 +74,7 @@ button, input, select, textarea { font: inherit; }
     background:var(--save-hover);
 }
 
- /* .btn-clear
+/* .btn-clear
   {
     color: #ABA2A2;
     border-color: #D2D2D2;
@@ -82,16 +82,16 @@ button, input, select, textarea { font: inherit; }
 
 .reset-btn{
     background:#e2e4e8;
-    color: #ABA2A2;
-    border-color: #D2D2D2;
+  color: #ABA2A2;
+  border-color: #D2D2D2;
 }
 
 .material-symbols-outlined {
-    font-variation-settings:
-        'FILL' 0,
-        'wght' 400,
-        'GRAD' 0,
-        'opsz' 24;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }
 
 .mat-mdc-table,
@@ -107,7 +107,7 @@ button, input, select, textarea { font: inherit; }
 }
 
 .reset-btn:hover{
-    /* background:#bababd; */
+  /* background:#bababd; */
   box-shadow: none!important;
   color: #852677!important;
 }
@@ -176,7 +176,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-search:hover:not(:disabled) { color: #ffffff;
-    text-decoration: none;
+  text-decoration: none;
     box-shadow: 0px 0px 13px rgb(183 180 180 / 82%); }  
 
 .btn-outline {
@@ -196,13 +196,13 @@ input:focus, select:focus, textarea:focus {
   {
     background: #3398DA!important;
     color: #ffffff!important;
-  }
+}
 
   .btn-blue:hover
   {
     background: #1b76b3!important;
     color: #ffffff!important;
-  }
+}
 
 .btn-icon {
   width: 36px;
@@ -260,11 +260,26 @@ input:focus, select:focus, textarea:focus {
 }
 
 .delete-button:hover {
-  color: #fff!important;
-  background: #dc2626!important;
-  border-color: #dc2626!important;
+  color: #fff !important;
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
 }
 
+.add-button {
+  color: #16a34a !important;
+  background: #dcfce7 !important;
+}
+
+.add-button:hover {
+  color: #fff !important;
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+}
+input[readonly] {
+    background-color: #f8fafc;
+    cursor: not-allowed;
+    color: #64748b;
+}
 .card {
   background: #fff;
   border-radius: var(--radius);
@@ -815,7 +830,7 @@ input:focus, select:focus, textarea:focus {
 
 @media (max-width: 600px) {
   .vehicle-checkboxes { grid-template-columns: 1fr; }
-}
+  }
 .status-toggle {
   display: flex;
   align-items: center;
@@ -925,7 +940,7 @@ input:focus, select:focus, textarea:focus {
     font-size:14px;
     color:#64748b;
     font-weight:500;
-    margin-left: 55%;
+  margin-left: 55%;
 }
 
 .page-size{
@@ -1087,43 +1102,43 @@ input:focus, select:focus, textarea:focus {
   margin-top: 4px;
 }
 .password-rules {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px 12px;
-    margin-top: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px 12px;
+  margin-top: 6px;
 }
 
 .admin-access{
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #dc3545;
-    font-size: 16px;
-    font-weight: 500;
-    margin-left: 25%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #dc3545;
+  font-size: 16px;
+  font-weight: 500;
+  margin-left: 25%;
 }
 
 .rule {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #dc3545;
-    font-size: 11px;
-    font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #dc3545;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 /* Tablet */
 @media (max-width:768px){
     .password-rules{
         grid-template-columns:repeat(2,1fr);
-    }
+  }
 }
 
 /* Mobile */
 @media (max-width:480px){
     .password-rules{
         grid-template-columns:1fr;
-    }
+  }
 }
 
 /* Expandable assigned-vehicle table */
@@ -1225,22 +1240,29 @@ input:focus, select:focus, textarea:focus {
 
 .nested-assignment-table {
   width: 100%;
-  min-width: 650px;
+  min-width: 820px;
   table-layout: fixed;
   border-collapse: separate;
-  border-spacing: 0 10px;
+  border-spacing: 0 8px;
   background: transparent;
   margin: 0;
 }
 
-.nested-assignment-table col.col-vehicle,
+.nested-assignment-table col.col-vehicle {
+  width: 18%;
+}
+
 .nested-assignment-table col.col-from,
 .nested-assignment-table col.col-to {
-  width: 24%;
+  width: 20%;
 }
 
 .nested-assignment-table col.col-status {
-  width: 14%;
+  width: 13%;
+}
+
+.nested-assignment-table col.col-salary-advance {
+  width: 15%;
 }
 
 .nested-assignment-table col.col-actions {
@@ -1257,12 +1279,13 @@ input:focus, select:focus, textarea:focus {
 .nested-assignment-table thead th {
   background: #ece9ea;
   color: #7e3285;
-  padding: 14px 20px;
+  padding: 12px 16px;
   height: 48px;
-  font-weight: bolder;
+  font-weight: 700;
   font-size: 13px;
   text-align: left;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .nested-assignment-table thead th:first-child {
@@ -1273,10 +1296,17 @@ input:focus, select:focus, textarea:focus {
   border-radius: 0 10px 10px 0;
 }
 
+.nested-assignment-table thead th.th-status,
+.nested-assignment-table thead th.th-salary-advance,
+.nested-assignment-table thead th.salary-advance-col,
+.nested-assignment-table thead th.th-actions {
+  text-align: center;
+}
+
 .nested-assignment-table tbody td {
   background: #fff;
-  padding: 16px 20px;
-  height: 56px;
+  padding: 12px 16px;
+  height: 54px;
   font-size: 14px;
   color: var(--text-secondary);
   text-align: left;
@@ -1291,12 +1321,45 @@ input:focus, select:focus, textarea:focus {
   border-radius: 0 10px 10px 0;
 }
 
+.nested-assignment-table tbody td.status-cell {
+  text-align: center;
+}
+
 .nested-assignment-table tbody td .status-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 72px;
   padding: 0.35rem 0.85rem;
+}
+
+.nested-assignment-table tbody td.salary-advance-cell,
+.salary-advance-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.nested-assignment-table td.salary-advance-cell .action-buttons,
+.salary-advance-cell .action-buttons {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.nested-assignment-table tbody td.actions-cell,
+.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.nested-assignment-table td.actions-cell .action-buttons,
+.actions-cell .action-buttons {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
 .nested-assignment-table tbody tr:hover td {
